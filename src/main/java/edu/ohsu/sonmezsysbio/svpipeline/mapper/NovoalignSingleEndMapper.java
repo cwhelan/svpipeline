@@ -1,6 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -104,10 +105,23 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 
         //Thread progressThread = new Thread(new ProgressReporter());
         //progressThread.start();
+        if (! s1File.exists()) {
+            System.err.println("file does not exist: " + s1File.getPath());
+        } else {
+            System.err.println("read file length: " + s1File.length());
+        }
+
+        File indexFile = new File(reference);
+        if (! indexFile.exists()) {
+            System.err.println("index file does not exist: " + indexFile.getPath());
+        } else {
+            System.err.println("index file length: " + indexFile.length());
+        }
+
         String[] commandLine = buildCommandLine(reference, s1File.getPath());
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
-
+        System.err.println("Exec'd");
 
         BufferedReader stdInput = new BufferedReader(new
                          InputStreamReader(p.getInputStream()));
@@ -120,8 +134,11 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
         String outLine;
         while ((outLine = stdInput.readLine()) != null) {
-            //System.err.println("LINE: " + outLine);
-            if (outLine.startsWith("#"))  continue;
+            // System.err.println("LINE: " + outLine);
+            if (outLine.startsWith("#"))  {
+                System.err.println("COMMENT LINE: " + outLine);
+                continue;
+            }
             if (outLine.startsWith("Novoalign") || outLine.startsWith("Exception")) {
                 String error = printErrorStream(errorStream);
                 throw new RuntimeException(error);
@@ -136,6 +153,12 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 
             output.collect(new Text(readPairId), new Text(outLine));
 
+        }
+
+        String errLine;
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
+        while ((errLine = errorReader.readLine()) != null) {
+            System.err.println("ERROR: " + errLine);
         }
     }
 

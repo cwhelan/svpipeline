@@ -6,6 +6,7 @@ import edu.ohsu.sonmezsysbio.svpipeline.reducer.NovoalignSingleEndAlignmentsToPa
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.NovoalignSingleEndMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -14,6 +15,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,89 +29,45 @@ import java.io.*;
 @Parameters(separators = "=", commandDescription = "Run a novoalign mate pair alignment")
 public class CommandNovoalignSingleEnds implements SVPipelineCommand {
 
-    @Parameter(names = {"--HDFSDir"}, required = true)
-    String hdfsDir;
+    @Parameter(names = {"--HDFSDataDir"}, required = true)
+    String hdfsDataDir;
 
-    @Parameter(names = {"--fastqFile1"}, required = true)
-    String readFile1;
-
-    @Parameter(names = {"--fastqFile2"}, required = true)
-    String readFile2;
+    @Parameter(names = {"--HDFSAlignmentsDir"}, required = true)
+    String hdfsAlignmentsDir;
 
     @Parameter(names = {"--reference"}, required = true)
     String reference;
 
-    private int numRecords;
-
-    public void copyReadFilesToHdfs() throws IOException {
-        Configuration config = new Configuration();
-
-        FileSystem hdfs = FileSystem.get(config);
-
-        FSDataOutputStream outputStream = hdfs.create(new Path(hdfsDir + "/" + "novoIn.txt"));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-
-        try {
-            readFile(writer, readFile1);
-            readFile(writer, readFile2);
-        } finally {
-            writer.close();
-        }
-
-    }
-
-    private void readFile(BufferedWriter writer, String pathname) throws IOException {
-        BufferedReader inputReader1 = new BufferedReader(new FileReader(new File(pathname)));
-
-        numRecords = 0;
-        try {
-            String convertedFastqLine = readFastqEntry(inputReader1);
-            while (convertedFastqLine != null) {
-                writer.write(convertedFastqLine);
-                convertedFastqLine = readFastqEntry(inputReader1);
-                numRecords++;
-            }
-        } finally {
-            inputReader1.close();
-        }
-    }
-
-    private String readFastqEntry(BufferedReader inputReader1) throws IOException {
-        String read1 = inputReader1.readLine();
-        if (read1 == null) {
-            return null;
-        }
-
-        String seq1 = inputReader1.readLine();
-        String sep1 = inputReader1.readLine();
-        String qual1 = inputReader1.readLine();
-
-        StringBuffer lineBuffer = new StringBuffer();
-        lineBuffer.append(read1).append("\t").append(seq1).append("\t").append(sep1).append("\t").append(qual1);
-        lineBuffer.append("\n");
-        return lineBuffer.toString();
-    }
-
-    public void runHadoopJob() throws IOException {
+    public void runHadoopJob() throws IOException, URISyntaxException {
         JobConf conf = new JobConf();
 
         conf.setJobName("Single End Alignment");
         conf.setJarByClass(SVPipeline.class);
-        FileInputFormat.addInputPath(conf, new Path(hdfsDir));
-        Path outputDir = new Path("/user/whelanch/tmp/se_align_out/");
+        FileInputFormat.addInputPath(conf, new Path(hdfsDataDir));
+        Path outputDir = new Path(hdfsAlignmentsDir);
         FileSystem.get(conf).delete(outputDir);
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
         conf.setInputFormat(TextInputFormat.class);
 
+        File referenceFile = new File(reference);
+        String referenceBasename = referenceFile.getName();
+        String referenceDir = referenceFile.getParent();
+
+        DistributedCache.addCacheFile(new URI(referenceDir + "/" + referenceBasename + "#" + referenceBasename),
+                conf);
+        DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
-        conf.set("novoalign.reference", reference);
+        conf.set("novoalign.reference", referenceBasename);
+        conf.set("mapred.output.compress", "true");
 
         conf.setMapperClass(NovoalignSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
         conf.setMapOutputValueClass(Text.class);
-        conf.setNumMapTasks(numRecords / 60000 + 1);
+
+        //todo: do I need this? Is there a way to configure hadoop to do it
+        //conf.setNumMapTasks(numRecords / 60000 + 1);
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(DoubleWritable.class);
@@ -118,9 +79,7 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
 
     }
 
-    public void run() throws IOException {
-        copyReadFilesToHdfs();
+    public void run() throws Exception {
         runHadoopJob();
-
     }
 }
