@@ -22,6 +22,7 @@ import java.io.IOException;
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome")
 public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
 
+    // todo: rename
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 
@@ -33,6 +34,9 @@ public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
 
     @Parameter(names = {"--targetIsizeSD"}, required = true)
     int targetIsizeSD;
+
+    @Parameter(names = {"--isMatePairs"})
+    boolean matePairs = false;
 
     public void run() throws IOException {
         runHadoopJob();
@@ -53,6 +57,7 @@ public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
 
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
+        conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
 
         conf.setMapperClass(SingleEndAlignmentsToDeletionScoreMapper.class);
         conf.setMapOutputKeyClass(Text.class);
