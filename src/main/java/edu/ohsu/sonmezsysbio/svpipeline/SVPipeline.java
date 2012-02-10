@@ -3,12 +3,21 @@ package edu.ohsu.sonmezsysbio.svpipeline;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import edu.ohsu.sonmezsysbio.svpipeline.command.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
-import java.io.IOException;
-
-public class SVPipeline
+public class SVPipeline extends Configured implements Tool
 {
-    public static void main( String[] args ) throws IOException {
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(), new SVPipeline(), args);
+
+        System.exit(res);
+    }
+
+    public int run(String[] args) throws Exception {
         JCommander jc = buildJCommander();
 
         try {
@@ -17,10 +26,14 @@ public class SVPipeline
 
             SVPipelineCommand command = (SVPipelineCommand) jc.getCommands().get(parsedCommand).getObjects().get(0);
             command.run();
-
+            return 0;
         } catch (ParameterException pe) {
             System.err.println(pe.getMessage());
             jc.usage();
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1;
         }
     }
 
@@ -31,10 +44,14 @@ public class SVPipeline
         CommandPileupDeletionScores pileupDeletionScores = new CommandPileupDeletionScores();
         jc.addCommand("pileupDeletionScores", pileupDeletionScores);
 
+        CommandReadPairedEndFilesIntoHDFS readFiles = new CommandReadPairedEndFilesIntoHDFS();
+        jc.addCommand("readPairedEndFilesIntoHDFS", readFiles);
         CommandNovoalignSingleEnds singleEnds  = new CommandNovoalignSingleEnds();
         jc.addCommand("alignSingleEnds", singleEnds);
         CommandPileupSingleEndDeletionScores pileupSingleEndDeletionScores = new CommandPileupSingleEndDeletionScores();
         jc.addCommand("pileupSingleEndDeletionScores", pileupSingleEndDeletionScores);
+
+        jc.addCommand("splitDeflatedOutput", new CommandSplitDeflatedOutput());
 
         CommandAverageWigOverSlidingWindow averageWigOverSlidingWindow = new CommandAverageWigOverSlidingWindow();
         jc.addCommand("averageWigOverSlidingWindow", averageWigOverSlidingWindow);

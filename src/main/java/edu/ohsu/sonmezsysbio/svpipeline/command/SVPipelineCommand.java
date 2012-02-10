@@ -9,5 +9,5 @@ import java.io.IOException;
  * Time: 1:55 PM
  */
 public interface SVPipelineCommand {
-    public void run() throws IOException;
+    public void run() throws Exception;
 }
