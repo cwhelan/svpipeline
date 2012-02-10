@@ -22,7 +22,13 @@ public class NovoalignNativeRecord {
         record.setReadId(fields[0]);
         record.setMappingStatus(fields[4]);
         if (record.isMapped()) {
-            record.setReferenceName(fields[7]);
+            String recordReferenceName = fields[7];
+            // cut off the ">" that starts the chromosome name
+            if (recordReferenceName.startsWith(">")) {
+                recordReferenceName = recordReferenceName.substring(1);
+            }
+            record.setReferenceName(recordReferenceName);
+
             record.setPosition(Integer.parseInt(fields[8]));
             record.setPosteriorProb(Integer.parseInt(fields[6]));
             record.setForward("F".equals(fields[9]));
@@ -36,7 +42,7 @@ public class NovoalignNativeRecord {
         return "U".equals(getMappingStatus()) || "R".equals(getMappingStatus());
     }
 
-    public String getReferenceName() {
+    public String getChromosomeName() {
         return referenceName;
     }
 
