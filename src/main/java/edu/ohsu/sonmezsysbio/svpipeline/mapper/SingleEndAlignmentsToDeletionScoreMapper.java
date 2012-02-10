@@ -8,10 +8,8 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
-import sun.org.mozilla.javascript.internal.continuations.Continuation;
 
 import java.io.IOException;
-import java.math.MathContext;
 import java.util.Arrays;
 
 /**
@@ -21,6 +19,8 @@ import java.util.Arrays;
  * Time: 10:12 AM
  */
 public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
+
+    private boolean matePairs;
 
     public Double getTargetIsize() {
         return targetIsize;
@@ -38,6 +38,14 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         this.targetIsizeSD = targetIsizeSD;
     }
 
+    public boolean isMatePairs() {
+        return matePairs;
+    }
+
+    public void setMatePairs(boolean matePairs) {
+        this.matePairs = matePairs;
+    }
+
     private Double targetIsize;
     private Double targetIsizeSD;
 
@@ -47,6 +55,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
         targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
 
+        matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
     }
 
     public void map(LongWritable key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
@@ -62,6 +71,9 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         String[] alnFields2 = lineParts[1].split("\t");
         NovoalignNativeRecord record2 = NovoalignNativeRecord.parseRecord(alnFields2);
 
+        // todo: not handling translocations for now
+        if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
+
         int endPosterior1 = 0;
         int endPosterior2 = 0;
         try {
@@ -74,34 +86,57 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
             throw new RuntimeException("Could not parse input record2 " + line);
         }
 
-        boolean matePair = false;
-        if (record1.isForward() && ! record2.isForward()) {
-            if (record1.getPosition() - record2.getPosition() > 0) matePair = true;
-            if (record1.getPosition() - record2.getPosition() < 0 &&
-                    record1.getPosition() - record2.getPosition() > -500) matePair = false;
-        } else if (!record1.isForward() && record2.isForward()) {
-            if (record1.getPosition() - record2.getPosition() < 0) matePair = true;
-            if (record1.getPosition() - record2.getPosition() > 0 &&
-                    record1.getPosition() - record2.getPosition() < 500) matePair = false;
-        } else {
-            return;
-        }
+        int insertSize = -1;
+        Double isizeMean;
+        Double isizeSD;
 
         NovoalignNativeRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
         NovoalignNativeRecord rightRead = record1.getPosition() < record2.getPosition() ?
                 record2 : record1;
 
-        int insertSize = rightRead.getPosition() - leftRead.getPosition();
-        //System.err.println("insert size: " + insertSize);
+        if (matePairs) {
+            boolean matePair = false;
+
+            // validate mapping orientations
+            if (record1.isForward() && ! record2.isForward()) {
+                if (record1.getPosition() - record2.getPosition() > 0) matePair = true;
+                if (record1.getPosition() - record2.getPosition() < 0 &&
+                        record1.getPosition() - record2.getPosition() > -500) matePair = false;
+            } else if (!record1.isForward() && record2.isForward()) {
+                if (record1.getPosition() - record2.getPosition() < 0) matePair = true;
+                if (record1.getPosition() - record2.getPosition() > 0 &&
+                        record1.getPosition() - record2.getPosition() < 500) matePair = false;
+            } else {
+                return;
+            }
+
+            insertSize = rightRead.getPosition() - leftRead.getPosition();
+            //System.err.println("insert size: " + insertSize);
+
+            isizeMean = matePair ? targetIsize : 150;
+            isizeSD = matePair ? targetIsizeSD : 15;
+        } else {
+
+            // validate mapping orientations
+            if (record1.isForward() && ! record2.isForward()) {
+                if (record1.getPosition() > record2.getPosition()) return;
+            } else if (!record1.isForward() && record2.isForward()) {
+                if (record1.getPosition() < record2.getPosition()) return;
+            } else {
+                return;
+            }
+
+            insertSize = rightRead.getPosition() - leftRead.getPosition();
+            isizeMean = targetIsize;
+            isizeSD = targetIsizeSD;
+        }
 
         if (insertSize > 1000000) {
             System.err.println("Pair " + fields1[0]  + ": Insert size would be greater than 100,000 - skipping");
             return;
         }
 
-        Double isizeMean = matePair ? targetIsize : 150;
-        Double isizeSD = matePair ? targetIsizeSD : 15;
 
         double deletionScore = computeDeletionScore(
                 endPosterior1,
@@ -117,7 +152,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         insertSize = insertSize + leftRead.getPosition() % 50 + 50 - rightRead.getPosition() % 50;
 
         for (int i = 0; i <= insertSize; i = i + 50) {
-            Text outKey = new Text(record1.getReferenceName() + "\t" + (genomeOffset + i));
+            Text outKey = new Text(record1.getChromosomeName() + "\t" + (genomeOffset + i));
             DoubleWritable outVal = new DoubleWritable(deletionScore);
             output.collect(outKey, outVal);
         }
