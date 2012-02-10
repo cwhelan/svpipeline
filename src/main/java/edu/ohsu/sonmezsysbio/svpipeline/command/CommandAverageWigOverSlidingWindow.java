@@ -30,12 +30,14 @@ public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
 
         try {
             String line;
-            //LinkedList<Double> windowValues = new LinkedList<Double>();
-            HashMap<Integer,Double> window = new HashMap<Integer, Double>();
 
-            int numLines = 0;
-            double windowTotal = 0;
-            int lastPos = 0;
+            HashMap<Integer,Double> window;
+            double windowTotal;
+            int lastPos;
+
+            window = new HashMap<Integer, Double>();
+            windowTotal = 0;
+            lastPos = 0;
 
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("track")) {
@@ -45,6 +47,11 @@ public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
 
                 if (line.startsWith("variableStep")) {
                     writer.write(line + "\n");
+
+                    window = new HashMap<Integer, Double>();
+                    windowTotal = 0;
+                    lastPos = 0;
+
                     continue;
                 }
 
@@ -71,7 +78,6 @@ public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
                 if (window.keySet().size() > WINDOW_SIZE_IN_LINES) {
                     windowTotal = writeVal(writer, window, windowTotal, pos);
                 }
-                numLines++;
             }
         } finally {
             reader.close();
