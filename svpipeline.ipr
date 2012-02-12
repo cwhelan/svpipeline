@@ -203,7 +203,7 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="" />
+    <mapping directory="" vcs="Git" />
   </component>
   <component name="libraryTable">
     <library name="Maven: com.beust:jcommander:1.17">

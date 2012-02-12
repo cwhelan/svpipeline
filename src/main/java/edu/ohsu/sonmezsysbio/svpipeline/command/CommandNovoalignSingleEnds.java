@@ -71,7 +71,7 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(DoubleWritable.class);
-        conf.setCompressMapOutput(true);
+        //conf.setCompressMapOutput(true);
 
         conf.setReducerClass(NovoalignSingleEndAlignmentsToPairsReducer.class);
 

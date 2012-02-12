@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.reducer;
 
+import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -37,10 +38,22 @@ public class NovoalignSingleEndAlignmentsToPairsReducer extends MapReduceBase
             }
         }
 
-        for (String aligment1 : read1Alignments) {
-            for (String alignment2 : read2Alignments) {
-                output.collect(key, new Text(aligment1 + "\tSEP\t" + alignment2));
-            }
+        StringBuffer valueBuffer = new StringBuffer();
+        appendAligmentsToBuffer(read1Alignments, valueBuffer);
+        valueBuffer.append(SVPipeline.READ_SEPARATOR);
+        appendAligmentsToBuffer(read2Alignments, valueBuffer);
+        output.collect(key, new Text(valueBuffer.toString()));
+    }
+
+    private void appendAligmentsToBuffer(List<String> read1Alignments, StringBuffer valueBuffer) {
+        boolean firstAlignment = true;
+        for (String alignment : read1Alignments) {
+                if (! firstAlignment) {
+                    valueBuffer.append(SVPipeline.ALIGMENT_SEPARATOR);
+                } else {
+                    firstAlignment = false;
+                }
+                valueBuffer.append(alignment);
         }
     }
 }

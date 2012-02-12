@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="dcb68d0a-2860-4575-aca2-4605a32bfe59" name="Default" comment="" />
+    <list default="true" id="dcb68d0a-2860-4575-aca2-4605a32bfe59" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandNovoalignSingleEnds.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandNovoalignSingleEnds.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapperTest.java" afterPath="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapperTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/svpipeline.ipr" afterPath="$PROJECT_DIR$/svpipeline.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/svpipeline.iws" afterPath="$PROJECT_DIR$/svpipeline.iws" />
+    </list>
     <ignored path="svpipeline.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,14 +26,13 @@
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
-    <option name="REVERSE_PATCH" value="false" />
   </component>
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/MappedPairToDeletionScoreMapper.java" line="49" class="edu.ohsu.sonmezsysbio.svpipeline.MappedPairToDeletionScoreMapper" package="edu.ohsu.sonmezsysbio.svpipeline">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/MappedPairToDeletionScoreMapper.java" line="49" class="edu.ohsu.sonmezsysbio.svpipeline.mapper.MappedPairToDeletionScoreMapper" package="edu.ohsu.sonmezsysbio.svpipeline.mapper">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -38,7 +45,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignMatePairMapper.java" line="139" class="edu.ohsu.sonmezsysbio.svpipeline.NovoalignMatePairMapper" package="edu.ohsu.sonmezsysbio.svpipeline">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignMatePairMapper.java" line="139" class="edu.ohsu.sonmezsysbio.svpipeline.mapper.NovoalignMatePairMapper" package="edu.ohsu.sonmezsysbio.svpipeline.mapper">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -51,7 +58,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignMatePairMapperTest.java" line="102" class="edu.ohsu.sonmezsysbio.svpipeline.NovoalignMatePairMapperTest" package="edu.ohsu.sonmezsysbio.svpipeline">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignMatePairMapperTest.java" line="102" class="edu.ohsu.sonmezsysbio.svpipeline.mapper.NovoalignMatePairMapperTest" package="edu.ohsu.sonmezsysbio.svpipeline.mapper">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -64,7 +71,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/MappedPairToDeletionScoreMapperTest.java" line="78" class="edu.ohsu.sonmezsysbio.svpipeline.MappedPairToDeletionScoreMapperTest" package="edu.ohsu.sonmezsysbio.svpipeline">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/MappedPairToDeletionScoreMapperTest.java" line="78" class="edu.ohsu.sonmezsysbio.svpipeline.mapper.MappedPairToDeletionScoreMapperTest" package="edu.ohsu.sonmezsysbio.svpipeline.mapper">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -77,7 +84,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" line="51" class="edu.ohsu.sonmezsysbio.svpipeline.SingleEndAlignmentsToDeletionScoreMapper" package="edu.ohsu.sonmezsysbio.svpipeline">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" line="64" class="edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToDeletionScoreMapper" package="edu.ohsu.sonmezsysbio.svpipeline.mapper">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -148,55 +155,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="SingleEndAlignmentsToBedSpansMapper.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToBedSpansMapper.java">
+      <file leaf-file-name="CommandPileupSingleEndDeletionScores.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupSingleEndDeletionScores.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="119" column="32" selection-start="4725" selection-end="4725" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommandAverageWigOverSlidingWindow.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandAverageWigOverSlidingWindow.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="13" selection-start="473" selection-end="473" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SAMRecord.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SAMRecord.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="112" column="19" selection-start="2679" selection-end="2679" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SVPipeline.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="64" selection-start="1851" selection-end="1851" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HDFSPairedFastqInputFileCreator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/HDFSPairedFastqInputFileCreator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="13" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommanderMain.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommanderMain.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="13" selection-start="315" selection-end="315" vertical-scroll-proportion="0.0">
+            <state line="59" column="49" selection-start="2013" selection-end="2044" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -205,7 +167,36 @@
       <file leaf-file-name="SVPipelineCommand.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/SVPipelineCommand.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="17" selection-start="185" selection-end="185" vertical-scroll-proportion="0.0">
+            <state line="13" column="30" selection-start="247" selection-end="247" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NovoalignSingleEndAlignmentsToPairsReducer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="4" selection-start="645" selection-end="645" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SingleEndAlignmentsToDeletionScoreMapper.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="64" column="0" selection-start="1926" selection-end="1926" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#6789#6812#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CommandPileupDeletionScores.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupDeletionScores.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="13" selection-start="836" selection-end="836" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -214,16 +205,34 @@
       <file leaf-file-name="CommandNovoalignSingleEnds.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandNovoalignSingleEnds.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="92" column="67" selection-start="3050" selection-end="3050" vertical-scroll-proportion="1.6183206">
+            <state line="58" column="10" selection-start="2122" selection-end="2122" vertical-scroll-proportion="0.04054054">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NovoalignMatePairMapper.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignMatePairMapper.java">
+      <file leaf-file-name="String.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Library/Java/JavaVirtualMachines/1.6.0_22-b04-307.jdk/Contents/Home/src.jar!/src/java/lang/String.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="13" selection-start="409" selection-end="409" vertical-scroll-proportion="0.0">
+            <state line="2332" column="20" selection-start="89466" selection-end="89466" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SingleEndAlignmentsToDeletionScoreMapperTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapperTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="51" column="291" selection-start="2703" selection-end="2703" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SVPipeline.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="14" column="59" selection-start="534" selection-end="542" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -232,7 +241,7 @@
       <file leaf-file-name="NovoalignNativeRecord.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/NovoalignNativeRecord.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="15" selection-start="708" selection-end="708" vertical-scroll-proportion="0.0">
+            <state line="68" column="15" selection-start="1774" selection-end="1774" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -252,22 +261,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/MappedPairToDeletionScoreMapperTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/DeletionScorePileupReducer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/MappedPairToDeletionScoreMapper.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/CommandNovoalignSingleEnds.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/NovoalignSingleEndMapper.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/NovoalignSingleEndAlignmentsToPairsReducer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/CommandPileupSingleEndDeletionScores.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SingleEndDeletionScorePileupReducer.java" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/SingleEndAlignmentsToDeletionScoreMapperTest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/CommandAverageWigOverSlidingWindow.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SingleEndAlignmentsToDeletionScoreMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/SVPipelineCommand.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandDumpReadsWithScores.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignSingleEndMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandReadPairedEndFilesIntoHDFS.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupSingleEndDeletionScores.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/NovoalignNativeRecord.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/CommandDumpReadsWithScores.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SingleEndAlignmentsToBedSpansMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupDeletionScores.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandAverageWigOverSlidingWindow.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java" />
+        <option value="$PROJECT_DIR$/src/assemble/exe.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandSplitDeflatedOutput.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToBedSpansMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" />
+        <option value="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapperTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandNovoalignSingleEnds.java" />
       </list>
     </option>
   </component>
@@ -348,7 +357,13 @@
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+  <component name="ProjectFrameBounds">
+    <option name="x" value="62" />
+    <option name="y" value="22" />
+    <option name="width" value="1338" />
+    <option name="height" value="875" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -407,6 +422,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -483,6 +502,36 @@
               <option name="myItemId" value="main" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scripts" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="META-INF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -511,6 +560,74 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sonmezsysbio" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="reducer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sonmezsysbio" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapper" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -585,6 +702,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="assemble" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -671,8 +792,9 @@
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="options.lastSelected" value="editor.preferences.import" />
+    <property name="options.lastSelected" value="preferences.pluginManager" />
     <property name="project.structure.side.proportion" value="0.0" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
@@ -692,6 +814,7 @@
       <recent name="edu.ohsu.sonmezsysbio.svpipeline" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="edu.ohsu.sonmezsysbio.svpipeline.SVPipeline" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.SAMRecord" />
     </key>
     <key name="CreateClassDialog.RecentsKey">
@@ -704,50 +827,6 @@
     </key>
   </component>
   <component name="RunManager" selected="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest">
-    <configuration default="false" name="NovoalignMatePairMapperTest.testReadAligmnents_oneReadUnmapped" type="JUnit" factoryName="JUnit" temporary="true">
-      <module name="svpipeline" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.mapper" />
-      <option name="MAIN_CLASS_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.mapper.NovoalignMatePairMapperTest" />
-      <option name="METHOD_NAME" value="testReadAligmnents_oneReadUnmapped" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="MappedPairToDeletionScoreMapperTest" type="JUnit" factoryName="JUnit" temporary="true">
-      <module name="svpipeline" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.mapper" />
-      <option name="MAIN_CLASS_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.mapper.MappedPairToDeletionScoreMapperTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="SingleEndAlignmentsToDeletionScoreMapperTest.testMap" type="JUnit" factoryName="JUnit" temporary="true">
       <module name="svpipeline" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -816,7 +895,63 @@
       </option>
       <envs />
       <patterns />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="SVPipelineTest" type="JUnit" factoryName="JUnit" temporary="true">
+      <module name="svpipeline" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="edu.ohsu.sonmezsysbio.svpipeline" />
+      <option name="MAIN_CLASS_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.SVPipelineTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="SingleEndAlignmentsToDeletionScoreMapperTest.testMapPairedEnd" type="JUnit" factoryName="JUnit" temporary="true">
+      <module name="svpipeline" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.mapper" />
+      <option name="MAIN_CLASS_NAME" value="edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToDeletionScoreMapperTest" />
+      <option name="METHOD_NAME" value="testMapPairedEnd" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -895,11 +1030,11 @@
       </method>
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.NovoalignMatePairMapperTest.testReadAligmnents_oneReadUnmapped" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.MappedPairToDeletionScoreMapperTest" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest.testMap" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest.testComputeDeletionScore" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest.testMap" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest.testComputeDeletionScore" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.SVPipelineTest" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToDeletionScoreMapperTest.testMapPairedEnd" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -934,28 +1069,33 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="61" y="22" width="1338" height="875" extended-state="0" />
+    <frame x="62" y="22" width="1338" height="875" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32804233" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32816136" sideWeight="0.6393659" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39332816" sideWeight="0.6393659" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4002642" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3606341" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34126985" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32804233" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32816136" sideWeight="0.6393659" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39302325" sideWeight="0.65873015" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35978836" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32893" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
@@ -981,6 +1121,12 @@
     <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
     <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
+    <option name="SHORT_DIFF_HORISONTALLY" value="true" />
+    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
+    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
+    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
+    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
+    <option name="CREATE_PATCH_EXPAND_DETAILS_DEFAULT" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="LAST_COMMIT_MESSAGE" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
@@ -1004,108 +1150,118 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/assemble/exe.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="58" selection-start="462" selection-end="462" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandSplitDeflatedOutput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="49" column="40" selection-start="1701" selection-end="1701" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandAverageWigOverSlidingWindow.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="58" column="41" selection-start="1791" selection-end="1791" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignSingleEndMapper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="151" column="40" selection-start="4655" selection-end="4655" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="13" selection-start="473" selection-end="473" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/MappedPairToDeletionScoreMapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="58" column="48" selection-start="1890" selection-end="1890" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupSingleEndDeletionScores.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="0" selection-start="1409" selection-end="2389" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupDeletionScores.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="13" selection-start="732" selection-end="732" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandDumpReadsWithScores.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="36" selection-start="1545" selection-end="1545" vertical-scroll-proportion="0.0">
+        <state line="20" column="13" selection-start="507" selection-end="507" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToBedSpansMapper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="119" column="32" selection-start="4725" selection-end="4725" vertical-scroll-proportion="0.0">
+        <state line="143" column="0" selection-start="5453" selection-end="5453" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandAverageWigOverSlidingWindow.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandDumpReadsWithScores.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="13" selection-start="473" selection-end="473" vertical-scroll-proportion="0.0">
+        <state line="21" column="13" selection-start="730" selection-end="730" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupSingleEndDeletionScores.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="64" selection-start="1851" selection-end="1851" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/NovoalignMatePairMapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="13" selection-start="409" selection-end="409" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SAMRecord.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="112" column="19" selection-start="2679" selection-end="2679" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/NovoalignNativeRecord.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="15" selection-start="708" selection-end="708" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/HDFSPairedFastqInputFileCreator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="13" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommanderMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="13" selection-start="315" selection-end="315" vertical-scroll-proportion="0.0">
+        <state line="59" column="49" selection-start="2013" selection-end="2044" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/SVPipelineCommand.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="17" selection-start="185" selection-end="185" vertical-scroll-proportion="0.0">
+        <state line="13" column="30" selection-start="247" selection-end="247" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/NovoalignNativeRecord.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="68" column="15" selection-start="1774" selection-end="1774" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="59" selection-start="534" selection-end="542" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="4" selection-start="645" selection-end="645" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/1.6.0_22-b04-307.jdk/Contents/Home/src.jar!/src/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2332" column="20" selection-start="89466" selection-end="89466" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapperTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="51" column="291" selection-start="2703" selection-end="2703" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/mapper/SingleEndAlignmentsToDeletionScoreMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="0" selection-start="1926" selection-end="1926" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#6789#6812#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandPileupDeletionScores.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="13" selection-start="836" selection-end="836" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandNovoalignSingleEnds.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="92" column="67" selection-start="3050" selection-end="3050" vertical-scroll-proportion="1.6183206">
+        <state line="58" column="10" selection-start="2122" selection-end="2122" vertical-scroll-proportion="0.04054054">
           <folding />
         </state>
       </provider>

@@ -1,6 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
+import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -10,7 +11,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -61,30 +63,37 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
     public void map(LongWritable key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
             throws IOException {
         String line = value.toString();
-        //System.err.println("LINE: " + line);
+        int firstTabIndex = line.indexOf('\t');
+        String readPairId = line.substring(0,firstTabIndex);
+        String lineValues = line.substring(firstTabIndex + 1);
+        
+        String[] readAligments = lineValues.split(SVPipeline.READ_SEPARATOR);
+        String read1AlignmentsString = readAligments[0];
+        String[] read1Alignments = read1AlignmentsString.split(SVPipeline.ALIGMENT_SEPARATOR);
+        List<NovoalignNativeRecord> read1AlignmentRecords = parseAlignmentsIntoRecords(read1Alignments);
 
-        String[] lineParts = line.split("\tSEP\t");
-        String[] fields1 = lineParts[0].split("\t");
-        String[] alnFields1 = Arrays.copyOfRange(fields1, 1, fields1.length);
+        String read2AlignmentsString = readAligments[1];
+        String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGMENT_SEPARATOR);
+        List<NovoalignNativeRecord> read2AlignmentRecords = parseAlignmentsIntoRecords(read2Alignments);
 
-        NovoalignNativeRecord record1 = NovoalignNativeRecord.parseRecord(alnFields1);
-        String[] alnFields2 = lineParts[1].split("\t");
-        NovoalignNativeRecord record2 = NovoalignNativeRecord.parseRecord(alnFields2);
+        emitDeletionScoresForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
+    }
+
+    private void emitDeletionScoresForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<Text, DoubleWritable> output) throws IOException {
+        for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
+            for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
+                emitDeletionScoresForPair(record1, record2, output);
+            }
+        }
+    }
+
+    private void emitDeletionScoresForPair(NovoalignNativeRecord record1, NovoalignNativeRecord record2, OutputCollector<Text, DoubleWritable> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
 
-        int endPosterior1 = 0;
-        int endPosterior2 = 0;
-        try {
-            endPosterior1 = record1.getPosteriorProb();
-            endPosterior2 = record2.getPosteriorProb();
-            //System.err.println("posteriors: " + endPosterior1 + "," + endPosterior2);
-        } catch (NumberFormatException e) {
-            System.err.println("Problem with line: " + line);
-            e.printStackTrace();
-            throw new RuntimeException("Could not parse input record2 " + line);
-        }
+        int endPosterior1 = record1.getPosteriorProb();
+        int endPosterior2 = record2.getPosteriorProb();
 
         int insertSize = -1;
         Double isizeMean;
@@ -133,7 +142,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         }
 
         if (insertSize > 1000000) {
-            System.err.println("Pair " + fields1[0]  + ": Insert size would be greater than 100,000 - skipping");
+            System.err.println("Pair " + record1.getReadId()  + ": Insert size would be greater than 100,000 - skipping");
             return;
         }
 
@@ -156,6 +165,17 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
             DoubleWritable outVal = new DoubleWritable(deletionScore);
             output.collect(outKey, outVal);
         }
+
+    }
+
+    private List<NovoalignNativeRecord> parseAlignmentsIntoRecords(String[] read1Alignments) {
+        List<NovoalignNativeRecord> read1AlignmentList = new ArrayList<NovoalignNativeRecord>();
+        for (String alignment : read1Alignments) {
+            String[] fields1 = alignment.split("\t");
+            NovoalignNativeRecord record1 = NovoalignNativeRecord.parseRecord(fields1);
+            read1AlignmentList.add(record1);
+        }
+        return read1AlignmentList;
     }
 
     public static double computeDeletionScore(int codedEndPosterior1, int codedEndPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD) {
