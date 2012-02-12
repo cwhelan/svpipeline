@@ -27,6 +27,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
     private String reference;
     private Reporter reporter;
     private static boolean done = false;
+    private String threshold;
 
     public OutputCollector<Text, Text> getOutput() {
         return output;
@@ -57,6 +58,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
             s1FileWriter = new BufferedWriter(new FileWriter(s1File));
 
             reference = job.get("novoalign.reference");
+            threshold = job.get("novoalign.threshold");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,7 +120,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
             System.err.println("index file length: " + indexFile.length());
         }
 
-        String[] commandLine = buildCommandLine(reference, s1File.getPath());
+        String[] commandLine = buildCommandLine(reference, s1File.getPath(), threshold);
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         System.err.println("Exec'd");
@@ -173,7 +175,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
         return firstErrorLine;
     }
 
-    protected static String[] buildCommandLine(String reference, String path1) {
+    protected static String[] buildCommandLine(String reference, String path1, String threshold) {
         String[] commandArray = {
                 "/g/whelanch/software/bin/" + "novoalign",
                 "-d", reference,
@@ -181,7 +183,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                 "-f", path1,
                 "-F", "ILMFQ",
                 "-k", "-K", "calfile.txt",
-                "-r", "Ex", "10", "-t", "250"
+                "-r", "Ex", "10", "-t", threshold
                 //"-a", "GATCGGAAGAGCGGTTCAGCA", "GATCGGAAGAGCGTCGTGTAGGGA",
         };
 //        String args = String.format("-d %s -c 1 -f %s %s -F ILMFQ -k -K calfile.txt -i MP %s,%s 150,50" +

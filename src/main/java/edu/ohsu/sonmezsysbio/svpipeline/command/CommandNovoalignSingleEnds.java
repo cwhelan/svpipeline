@@ -37,6 +37,9 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
 
     @Parameter(names = {"--reference"}, required = true)
     String reference;
+    
+    @Parameter(names = {"--threshold"}, required = true)
+    String threshold;
 
     public void runHadoopJob() throws IOException, URISyntaxException {
         JobConf conf = new JobConf();
@@ -61,6 +64,7 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
         conf.set("mapred.task.timeout", "3600000");
         conf.set("novoalign.reference", referenceBasename);
         conf.set("mapred.output.compress", "true");
+        conf.set("novoalign.threshold", threshold);
 
         conf.setMapperClass(NovoalignSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
