@@ -20,6 +20,13 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
+    private Double targetIsize;
+    private Double targetIsizeSD;
+    
+    // region to dump spans over
+    private String chromosome;
+    private int regionStart;
+    private int regionEnd;
 
     public Integer getMaxInsertSize() {
         return maxInsertSize;
@@ -54,9 +61,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         this.targetIsizeSD = targetIsizeSD;
     }
 
-    private Double targetIsize;
-    private Double targetIsizeSD;
-
     @Override
     public void configure(JobConf job) {
         super.configure(job);
@@ -65,6 +69,13 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
 
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
+        parseRegion(job.get("pileupDeletionScore.region"));
+    }
+
+    protected void parseRegion(String region) {
+        chromosome = region.split(":")[0];
+        regionStart = Integer.parseInt(region.split(":")[1].split("-")[0]);
+        regionEnd = Integer.parseInt(region.split(":")[1].split("-")[1]);
     }
 
     public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
@@ -102,8 +113,8 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
 
-        int endPosterior1 = record1.getPosteriorProb();
-        int endPosterior2 = record2.getPosteriorProb();
+        // todo: not handling inversions for now
+        if (!SingleEndAlignmentScorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
 
         int insertSize = -1;
         Double isizeMean;
@@ -114,8 +125,12 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         NovoalignNativeRecord rightRead = record1.getPosition() < record2.getPosition() ?
                 record2 : record1;
 
-        // todo: not handling inversions for now
-        if (!SingleEndAlignmentScorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
+        if (! (record1.getChromosomeName().equals(chromosome) &&
+               leftRead.getPosition() < regionEnd && rightRead.getPosition() > regionStart))
+            return;
+
+        int endPosterior1 = record1.getPosteriorProb();
+        int endPosterior2 = record2.getPosteriorProb();
 
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;

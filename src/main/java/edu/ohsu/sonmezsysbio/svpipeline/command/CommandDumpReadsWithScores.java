@@ -33,6 +33,9 @@ public class CommandDumpReadsWithScores implements SVPipelineCommand {
 
     @Parameter(names = {"--targetIsizeSD"}, required = true)
     int targetIsizeSD;
+    
+    @Parameter(names = {"--region"}, required = true)
+    String region;
 
     @Parameter(names = {"--isMatePairs"})
     boolean matePairs = false;
@@ -61,6 +64,7 @@ public class CommandDumpReadsWithScores implements SVPipelineCommand {
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
+        conf.set("pileupDeletionScore.region", region);
 
         conf.setMapperClass(SingleEndAlignmentsToBedSpansMapper.class);
         conf.setMapOutputKeyClass(Text.class);
