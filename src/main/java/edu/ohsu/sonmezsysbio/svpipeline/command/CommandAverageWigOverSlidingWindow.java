@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,13 +19,14 @@ import java.util.List;
 @Parameters(separators = "=", commandDescription = "compute a transformed wig file averaged over a sliding window")
 public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
     public static final int WINDOW_SIZE_IN_LINES = 1000;
+    public static final int GENOME_WINDOW_SIZE = 100;
     @Parameter(names = {"--InFile"}, required = true)
     String inFile;
 
     @Parameter(names = {"--OutFile"}, required = true)
     String outFile;
 
-    public void run() throws IOException {
+    public void run(Configuration conf) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(new File(inFile)));
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outFile)));
 
@@ -57,11 +59,11 @@ public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
 
                 String[] fields = line.split("\t");
                 Integer pos = Integer.parseInt(fields[0]);
-                if (pos - lastPos > 50) {
+                if (pos - lastPos > GENOME_WINDOW_SIZE) {
                     //System.err.println("hit a gap between " + lastPos + " and " + pos);
                 }
-                while (pos - lastPos > 50) {
-                    lastPos = lastPos + 50;
+                while (pos - lastPos > GENOME_WINDOW_SIZE) {
+                    lastPos = lastPos + GENOME_WINDOW_SIZE;
                     //System.err.println("adding "+ lastPos + ", " + 0);
                     window.put(lastPos,0d);
                     if (window.keySet().size() > WINDOW_SIZE_IN_LINES) {
@@ -88,22 +90,22 @@ public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
     private double writeVal(BufferedWriter writer, HashMap<Integer, Double> window, double windowTotal, Integer pos) throws IOException {
         Double avg = windowTotal / WINDOW_SIZE_IN_LINES;
 
-        if (! window.containsKey(pos -  (WINDOW_SIZE_IN_LINES / 2) * 50)) {
-            System.err.println("Current position = " + pos + ", but did not have mid position " + (pos - (WINDOW_SIZE_IN_LINES / 2) * 50));
+        if (! window.containsKey(pos -  (WINDOW_SIZE_IN_LINES / 2) * GENOME_WINDOW_SIZE)) {
+            System.err.println("Current position = " + pos + ", but did not have mid position " + (pos - (WINDOW_SIZE_IN_LINES / 2) * GENOME_WINDOW_SIZE));
         }
-        Double midVal = window.get(pos - (WINDOW_SIZE_IN_LINES / 2) * 50);
+        Double midVal = window.get(pos - (WINDOW_SIZE_IN_LINES / 2) * GENOME_WINDOW_SIZE);
 
         Double modVal = midVal - avg;
 
-        int positionToLeave = pos - WINDOW_SIZE_IN_LINES * 50;
-        if (! window.containsKey(pos -  WINDOW_SIZE_IN_LINES * 50)) {
-            System.err.println("Current position = " + pos + ", but did not have begin position " + (pos - WINDOW_SIZE_IN_LINES * 50));
+        int positionToLeave = pos - WINDOW_SIZE_IN_LINES * GENOME_WINDOW_SIZE;
+        if (! window.containsKey(pos -  WINDOW_SIZE_IN_LINES * GENOME_WINDOW_SIZE)) {
+            System.err.println("Current position = " + pos + ", but did not have begin position " + (pos - WINDOW_SIZE_IN_LINES * GENOME_WINDOW_SIZE));
             List positions = new ArrayList(window.keySet());
             Collections.sort(positions);
             System.err.println("lowest positions = " + positions.get(0) + ", " + positions.get(1));
         }
 
-        writer.write(Integer.toString(pos - (WINDOW_SIZE_IN_LINES / 2) * 50)  + "\t" + modVal + "\n");
+        writer.write(Integer.toString(pos - (WINDOW_SIZE_IN_LINES / 2) * GENOME_WINDOW_SIZE)  + "\t" + modVal + "\n");
 
 
         Double leaving = window.get(positionToLeave);

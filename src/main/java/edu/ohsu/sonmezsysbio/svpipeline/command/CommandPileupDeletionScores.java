@@ -4,10 +4,10 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.MappedPairToDeletionScoreMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
@@ -36,12 +36,12 @@ public class CommandPileupDeletionScores implements SVPipelineCommand {
     @Parameter(names = {"--targetIsizeSD"}, required = true)
     int targetIsizeSD;
 
-    public void run() throws IOException {
-        runHadoopJob();
+    public void run(Configuration conf) throws IOException {
+        runHadoopJob(conf);
     }
 
-    private void runHadoopJob() throws IOException {
-        JobConf conf = new JobConf();
+    private void runHadoopJob(Configuration configuration) throws IOException {
+        JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Pileup Deletion Score");
         conf.setJarByClass(SVPipeline.class);

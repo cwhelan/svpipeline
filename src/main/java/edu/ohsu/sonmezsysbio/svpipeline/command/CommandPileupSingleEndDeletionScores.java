@@ -5,6 +5,7 @@ import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToDeletionScoreMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.reducer.SingleEndDeletionScorePileupReducer;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
@@ -38,12 +39,15 @@ public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
     @Parameter(names = {"--isMatePairs"})
     boolean matePairs = false;
 
-    public void run() throws IOException {
-        runHadoopJob();
+    @Parameter(names = {"--maxInsertSize"})
+    int maxInsertSize = 500000;
+
+    public void run(Configuration conf) throws IOException {
+        runHadoopJob(conf);
     }
 
-    private void runHadoopJob() throws IOException {
-        JobConf conf = new JobConf();
+    private void runHadoopJob(Configuration configuration) throws IOException {
+        JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Pileup Single End Deletion Score");
         conf.setJarByClass(SVPipeline.class);
@@ -58,10 +62,13 @@ public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
+        conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
 
         conf.setMapperClass(SingleEndAlignmentsToDeletionScoreMapper.class);
         conf.setMapOutputKeyClass(Text.class);
         conf.setMapOutputValueClass(DoubleWritable.class);
+
+        conf.setCombinerClass(SingleEndDeletionScorePileupReducer.class);
 
         conf.setReducerClass(SingleEndDeletionScorePileupReducer.class);
         //conf.setReducerClass(IdentityReducer.class);

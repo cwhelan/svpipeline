@@ -22,7 +22,17 @@ import java.util.List;
  */
 public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
 
+    public static final int WINDOW_SIZE = 100;
+    private Integer maxInsertSize = 500000;
     private boolean matePairs;
+
+    public Integer getMaxInsertSize() {
+        return maxInsertSize;
+    }
+
+    public void setMaxInsertSize(Integer maxInsertSize) {
+        this.maxInsertSize = maxInsertSize;
+    }
 
     public Double getTargetIsize() {
         return targetIsize;
@@ -57,6 +67,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
         targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
 
+        maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
     }
 
@@ -141,7 +152,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
             isizeSD = targetIsizeSD;
         }
 
-        if (insertSize > 1000000) {
+        if (insertSize > maxInsertSize) {
             System.err.println("Pair " + record1.getReadId()  + ": Insert size would be greater than 100,000 - skipping");
             return;
         }
@@ -156,11 +167,11 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         );
         //System.err.println("computed deletion score : " + deletionScore);
 
-        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % 50;
+        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % WINDOW_SIZE;
 
-        insertSize = insertSize + leftRead.getPosition() % 50 + 50 - rightRead.getPosition() % 50;
+        insertSize = insertSize + leftRead.getPosition() % WINDOW_SIZE + WINDOW_SIZE - rightRead.getPosition() % WINDOW_SIZE;
 
-        for (int i = 0; i <= insertSize; i = i + 50) {
+        for (int i = 0; i <= insertSize; i = i + WINDOW_SIZE) {
             Text outKey = new Text(record1.getChromosomeName() + "\t" + (genomeOffset + i));
             DoubleWritable outVal = new DoubleWritable(deletionScore);
             output.collect(outKey, outVal);

@@ -36,7 +36,7 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
 
         mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
 
-        for (int i = 41821100; i <= 41823900; i = i + 50) {
+        for (int i = 41821100; i <= 41823900; i = i + 100) {
             verify(collector).collect(new Text("2\t" + i),
                     new DoubleWritable(-0.9998999999997488));
         }
@@ -61,9 +61,28 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
 
         mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
 
-        for (int i = 43039500; i <= 43049500; i = i + 50) {
+        for (int i = 43039500; i <= 43049500; i = i + 100) {
             verify(collector).collect(new Text("10\t" + i),
                     new DoubleWritable(9.999999999999969E-5));
+        }
+
+        verifyNoMoreInteractions(collector);
+
+        String complexInputLine ="@ERR000545.10000241 EAS139_44:1:93:535:874\t@ERR000545.10000241 EAS139_44:1:93:535:874/1\tS\tTAGGTAATGTTTGGGAGGGAGTTGTTGGTTTTGTTGATTTATTATATCTTG\t??==>79>=?@@==>9>>=5>:?<>?<<<>??>;?=<=>?7?>;?8=4>>8\tR\t0\t60\t>10\t81550461\tR\t.\t.\t.\tSVP_ALIGNMENT\t@ERR000545.10000241 EAS139_44:1:93:535:874/1\tS\tTAGGTAATGTTTGGGAGGGAGTTGTTGGTTTTGTTGATTTATTATATCTTG\t??==>79>=?@@==>9>>=5>:?<>?<<<>??>;?=<=>?7?>;?8=4>>8\tR\t60\t0\t>10\t89072620\tR\t.\t.\t.\t48A>C 49T>C\tSVP_READ\t@ERR000545.10000241 EAS139_44:1:93:535:874/2\tS\tTATTATATTTTTTAATTTGACAGAGTAGTGCAGGCAATAATGAAATGGTAT\t<>==>A?@=?@A@>=??>>;>>;-<==;:<<<:>;==>>8?<::<>;80;>\tR\t0\t3\t>10\t89072431\tF\t.\t.\t.\tSVP_ALIGNMENT\t@ERR000545.10000241 EAS139_44:1:93:535:874/2\tS\tTATTATATTTTTTAATTTGACAGAGTAGTGCAGGCAATAATGAAATGGTAT\t<>==>A?@=?@A@>=??>>;>>;-<==;:<<<:>;==>>8?<::<>;80;>\tR\t0\t3\t>10\t81550273\tF\t.\t.\t.";
+
+        collector = Mockito.mock(OutputCollector.class);
+        reporter = Mockito.mock(Reporter.class);
+
+        mapper.map(new LongWritable(1), new Text(complexInputLine), collector, reporter);
+
+        for (int i = 81550200; i <= 81550500; i = i + 100) {
+            verify(collector).collect(new Text("10\t" + i),
+                    new DoubleWritable(-0.4988122675599614));
+        }
+
+        for (int i = 89072400; i <= 89072700; i = i + 100) {
+            verify(collector).collect(new Text("10\t" + i),
+                    new DoubleWritable(-4.988127663727278E-5));
         }
 
         verifyNoMoreInteractions(collector);

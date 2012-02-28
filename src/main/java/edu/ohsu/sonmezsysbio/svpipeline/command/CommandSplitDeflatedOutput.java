@@ -2,15 +2,12 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import com.beust.jcommander.Parameter;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import edu.ohsu.sonmezsysbio.svpipeline.mapper.MappedPairToDeletionScoreMapper;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.IdentityMapper;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
-import org.apache.hadoop.mapred.lib.KeyFieldBasedComparator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,8 +26,8 @@ public class CommandSplitDeflatedOutput implements SVPipelineCommand {
     @Parameter(names = {"--numSplits"}, required = true)
     int numSplits;
 
-    public void run() throws Exception {
-        JobConf conf = new JobConf();
+    public void run(Configuration configuration) throws Exception {
+        JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Split deflated file");
         conf.setJarByClass(SVPipeline.class);

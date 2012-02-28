@@ -5,6 +5,7 @@ import com.beust.jcommander.ParameterException;
 import edu.ohsu.sonmezsysbio.svpipeline.command.*;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -28,7 +29,8 @@ public class SVPipeline extends Configured implements Tool
             String parsedCommand = jc.getParsedCommand();
 
             SVPipelineCommand command = (SVPipelineCommand) jc.getCommands().get(parsedCommand).getObjects().get(0);
-            command.run();
+            command.run(getConf());
+
             return 0;
         } catch (ParameterException pe) {
             System.err.println(pe.getMessage());

@@ -1,5 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline.command;
 
+import org.apache.hadoop.conf.Configuration;
+
 import java.io.IOException;
 
 /**
@@ -9,5 +11,5 @@ import java.io.IOException;
  * Time: 1:55 PM
  */
 public interface SVPipelineCommand {
-    public void run() throws Exception;
+    public void run(Configuration conf) throws Exception;
 }

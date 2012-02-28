@@ -7,7 +7,6 @@ import edu.ohsu.sonmezsysbio.svpipeline.mapper.NovoalignSingleEndMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
@@ -17,8 +16,6 @@ import org.apache.hadoop.mapred.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,8 +38,8 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
     @Parameter(names = {"--threshold"}, required = true)
     String threshold;
 
-    public void runHadoopJob() throws IOException, URISyntaxException {
-        JobConf conf = new JobConf();
+    public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
+        JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Single End Alignment");
         conf.setJarByClass(SVPipeline.class);
@@ -63,7 +60,6 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
         conf.set("novoalign.reference", referenceBasename);
-        conf.set("mapred.output.compress", "true");
         conf.set("novoalign.threshold", threshold);
 
         conf.setMapperClass(NovoalignSingleEndMapper.class);
@@ -75,7 +71,7 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(DoubleWritable.class);
-        //conf.setCompressMapOutput(true);
+        conf.setCompressMapOutput(true);
 
         conf.setReducerClass(NovoalignSingleEndAlignmentsToPairsReducer.class);
 
@@ -83,7 +79,7 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
 
     }
 
-    public void run() throws Exception {
-        runHadoopJob();
+    public void run(Configuration conf) throws Exception {
+        runHadoopJob(conf);
     }
 }

@@ -4,6 +4,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToBedSpansMapper;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -36,12 +37,12 @@ public class CommandDumpReadsWithScores implements SVPipelineCommand {
     @Parameter(names = {"--isMatePairs"})
     boolean matePairs = false;
 
-    public void run() throws IOException {
-        runHadoopJob();
+    public void run(Configuration configuration) throws IOException {
+        runHadoopJob(configuration);
     }
 
-    private void runHadoopJob() throws IOException {
-        JobConf conf = new JobConf();
+    private void runHadoopJob(Configuration configuration) throws IOException {
+        JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Pileup Deletion Score");
         conf.setJarByClass(SVPipeline.class);

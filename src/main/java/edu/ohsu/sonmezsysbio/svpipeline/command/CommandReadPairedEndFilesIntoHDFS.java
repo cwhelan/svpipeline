@@ -9,7 +9,6 @@ import org.apache.hadoop.fs.Path;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -86,7 +85,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements SVPipelineCommand {
         return lineBuffer.toString();
     }
 
-    public void run() throws Exception {
+    public void run(Configuration conf) throws Exception {
         copyReadFilesToHdfs();
         System.out.println("Loaded " + numRecords + " records.");
     }

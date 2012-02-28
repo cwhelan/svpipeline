@@ -38,11 +38,13 @@ public class NovoalignSingleEndAlignmentsToPairsReducer extends MapReduceBase
             }
         }
 
-        StringBuffer valueBuffer = new StringBuffer();
-        appendAligmentsToBuffer(read1Alignments, valueBuffer);
-        valueBuffer.append(SVPipeline.READ_SEPARATOR);
-        appendAligmentsToBuffer(read2Alignments, valueBuffer);
-        output.collect(key, new Text(valueBuffer.toString()));
+        if (read1Alignments.size() > 0 && read2Alignments.size() > 0) {
+            StringBuffer valueBuffer = new StringBuffer();
+            appendAligmentsToBuffer(read1Alignments, valueBuffer);
+            valueBuffer.append(SVPipeline.READ_SEPARATOR);
+            appendAligmentsToBuffer(read2Alignments, valueBuffer);
+            output.collect(key, new Text(valueBuffer.toString()));
+        }
     }
 
     private void appendAligmentsToBuffer(List<String> read1Alignments, StringBuffer valueBuffer) {

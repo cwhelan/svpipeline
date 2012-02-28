@@ -102,8 +102,8 @@ public class CommandNovoalignMatePair implements SVPipelineCommand {
         return lineBuffer.toString();
     }
 
-    public void runHadoopJob() throws IOException {
-        JobConf conf = new JobConf();
+    public void runHadoopJob(Configuration configuration) throws IOException {
+        JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Novoalign Mate Pair Alignment");
         conf.setJarByClass(SVPipeline.class);
@@ -137,9 +137,9 @@ public class CommandNovoalignMatePair implements SVPipelineCommand {
 
     }
 
-    public void run() throws IOException {
+    public void run(Configuration conf) throws IOException {
         copyReadFilesToHdfs();
-        runHadoopJob();
+        runHadoopJob(conf);
 
     }
 }
