@@ -37,6 +37,9 @@ public class CommandDumpReadsWithScores implements SVPipelineCommand {
     @Parameter(names = {"--isMatePairs"})
     boolean matePairs = false;
 
+    @Parameter(names = {"--maxInsertSize"})
+    int maxInsertSize = 500000;
+
     public void run(Configuration configuration) throws IOException {
         runHadoopJob(configuration);
     }
@@ -57,6 +60,7 @@ public class CommandDumpReadsWithScores implements SVPipelineCommand {
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
+        conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
 
         conf.setMapperClass(SingleEndAlignmentsToBedSpansMapper.class);
         conf.setMapOutputKeyClass(Text.class);

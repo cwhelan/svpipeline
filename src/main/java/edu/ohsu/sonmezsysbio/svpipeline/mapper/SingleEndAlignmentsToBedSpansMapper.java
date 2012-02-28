@@ -18,8 +18,16 @@ import java.util.List;
  */
 public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
-    private Integer maxInsertSize = 500000;
     private boolean matePairs;
+    private Integer maxInsertSize = 500000;
+
+    public Integer getMaxInsertSize() {
+        return maxInsertSize;
+    }
+
+    public void setMaxInsertSize(Integer maxInsertSize) {
+        this.maxInsertSize = maxInsertSize;
+    }
 
     public boolean isMatePairs() {
         return matePairs;
