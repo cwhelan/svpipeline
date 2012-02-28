@@ -1,6 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToDeletionScoreMapper;
+import edu.ohsu.sonmezsysbio.svpipeline.SingleEndAlignmentScorer;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -94,11 +94,11 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
     @Test
     public void testComputeDeletionScore() throws Exception {
         // bigger insert size: more likely deletion
-        assertTrue(SingleEndAlignmentsToDeletionScoreMapper.computeDeletionScore(185, 117, 5114, 3000.0, 300.0) >
-                   SingleEndAlignmentsToDeletionScoreMapper.computeDeletionScore(185, 117, 3114, 3000.0, 300.0));
+        assertTrue(SingleEndAlignmentScorer.computeDeletionScore(185, 117, 5114, 3000.0, 300.0) >
+                   SingleEndAlignmentScorer.computeDeletionScore(185, 117, 3114, 3000.0, 300.0));
         // higher quality: more likely deletion
-        assertTrue(SingleEndAlignmentsToDeletionScoreMapper.computeDeletionScore(185, 117, 3114, 3000.0, 300.0) <
-                   SingleEndAlignmentsToDeletionScoreMapper.computeDeletionScore(185, 20, 3114, 3000.0, 300.0));
+        assertTrue(SingleEndAlignmentScorer.computeDeletionScore(185, 117, 3114, 3000.0, 300.0) <
+                   SingleEndAlignmentScorer.computeDeletionScore(185, 20, 3114, 3000.0, 300.0));
     }
 
 }
