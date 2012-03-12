@@ -2,7 +2,8 @@ package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import edu.ohsu.sonmezsysbio.svpipeline.SingleEndAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.VotingPairedAlignmentScorer;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -27,6 +28,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
     private String chromosome;
     private int regionStart;
     private int regionEnd;
+    private PairedAlignmentScorer scorer;
 
     public Integer getMaxInsertSize() {
         return maxInsertSize;
@@ -94,6 +96,8 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         parseRegion(job.get("pileupDeletionScore.region"));
+
+        scorer = new VotingPairedAlignmentScorer();
     }
 
     protected void parseRegion(String region) {
@@ -138,7 +142,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
 
         // todo: not handling inversions for now
-        if (!SingleEndAlignmentScorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
+        if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
 
         int insertSize = -1;
         Double isizeMean;
@@ -159,7 +163,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;
         if (matePairs) {
-            if (!SingleEndAlignmentScorer.isMatePairNotSmallFragment(record1, record2)) {
+            if (!scorer.isMatePairNotSmallFragment(record1, record2)) {
                 isizeMean = 150.0;
                 isizeSD = 15.0;
             }
@@ -167,9 +171,9 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
 
         insertSize = rightRead.getPosition() - leftRead.getPosition();
 
-        if (SingleEndAlignmentScorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
+        if (scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double deletionScore = SingleEndAlignmentScorer.computeDeletionScore(
+        double deletionScore = scorer.computeDeletionScore(
                 endPosterior1,
                 endPosterior2,
                 insertSize,

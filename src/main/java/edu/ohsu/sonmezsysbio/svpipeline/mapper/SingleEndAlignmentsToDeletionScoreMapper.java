@@ -2,7 +2,8 @@ package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import edu.ohsu.sonmezsysbio.svpipeline.SingleEndAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.VotingPairedAlignmentScorer;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -22,6 +23,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
     public static final int WINDOW_SIZE = 100;
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
+    private PairedAlignmentScorer scorer;
 
     public Integer getMaxInsertSize() {
         return maxInsertSize;
@@ -55,6 +57,14 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         this.matePairs = matePairs;
     }
 
+    public PairedAlignmentScorer getScorer() {
+        return scorer;
+    }
+
+    public void setScorer(PairedAlignmentScorer scorer) {
+        this.scorer = scorer;
+    }
+
     private Double targetIsize;
     private Double targetIsizeSD;
 
@@ -66,6 +76,8 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
 
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
+
+        scorer = new VotingPairedAlignmentScorer();
     }
 
     public void map(LongWritable key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
@@ -113,13 +125,13 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
                 record2 : record1;
 
         // todo: not handling inversions for now
-        if (!SingleEndAlignmentScorer.validateMappingOrientations(record1, record2, matePairs)) return;
+        if (!scorer.validateMappingOrientations(record1, record2, matePairs)) return;
 
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;
         if (matePairs) {
             //System.err.println("insert size: " + insertSize);
-            if (!SingleEndAlignmentScorer.isMatePairNotSmallFragment(record1, record2)) {
+            if (!scorer.isMatePairNotSmallFragment(record1, record2)) {
                 isizeMean = 150.0;
                 isizeSD = 15.0;
             }
@@ -127,9 +139,9 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
 
         insertSize = rightRead.getPosition() - leftRead.getPosition();
 
-        if (SingleEndAlignmentScorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
+        if (scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double deletionScore = SingleEndAlignmentScorer.computeDeletionScore(
+        double deletionScore = scorer.computeDeletionScore(
                 endPosterior1,
                 endPosterior2,
                 insertSize,
