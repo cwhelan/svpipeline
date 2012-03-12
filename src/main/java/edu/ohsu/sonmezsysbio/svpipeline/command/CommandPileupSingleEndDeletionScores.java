@@ -23,7 +23,6 @@ import java.io.IOException;
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome")
 public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
 
-    // todo: rename
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 

@@ -74,7 +74,6 @@ public class CommandDumpReadsWithScores implements SVPipelineCommand {
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(Text.class);
-        conf.setCompressMapOutput(true);
 
         JobClient.runJob(conf);
 

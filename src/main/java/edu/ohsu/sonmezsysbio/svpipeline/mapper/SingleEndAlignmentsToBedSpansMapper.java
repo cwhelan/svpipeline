@@ -61,6 +61,30 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         this.targetIsizeSD = targetIsizeSD;
     }
 
+    public String getChromosome() {
+        return chromosome;
+    }
+
+    public void setChromosome(String chromosome) {
+        this.chromosome = chromosome;
+    }
+
+    public int getRegionStart() {
+        return regionStart;
+    }
+
+    public void setRegionStart(int regionStart) {
+        this.regionStart = regionStart;
+    }
+
+    public int getRegionEnd() {
+        return regionEnd;
+    }
+
+    public void setRegionEnd(int regionEnd) {
+        this.regionEnd = regionEnd;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
