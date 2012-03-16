@@ -12,7 +12,7 @@
 	      <scope>runtime</scope>
 	      <includes>
               <include>com.beust:jcommander</include>
-              <include>commons-math:commons-math</include>
+              <include>org.apache.commons:commons-math3</include>
 	      </includes>
 	    </dependencySet>
 	  </dependencySets>

@@ -16,10 +16,12 @@ public class NovoalignNativeRecord {
     int posteriorProb;
     boolean forward;
     String readId;
+    String sequence;
 
     public static NovoalignNativeRecord parseRecord(String[] fields) {
         NovoalignNativeRecord record = new NovoalignNativeRecord();
         record.setReadId(fields[0]);
+        record.setSequence(fields[2]);
         record.setMappingStatus(fields[4]);
         if (record.isMapped()) {
             String recordReferenceName = fields[7];
@@ -88,5 +90,13 @@ public class NovoalignNativeRecord {
 
     public void setReadId(String readId) {
         this.readId = readId;
+    }
+
+    public String getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(String sequence) {
+        this.sequence = sequence;
     }
 }

@@ -1,9 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
-import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
-import edu.ohsu.sonmezsysbio.svpipeline.VotingPairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.*;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -97,7 +94,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         parseRegion(job.get("pileupDeletionScore.region"));
 
-        scorer = new VotingPairedAlignmentScorer();
+        scorer = new ProbabilisticPairedAlignmentScorer();
     }
 
     protected void parseRegion(String region) {
@@ -169,9 +166,9 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
             }
         }
 
-        insertSize = rightRead.getPosition() - leftRead.getPosition();
+        insertSize = rightRead.getPosition() + rightRead.getSequence().length() - leftRead.getPosition();
 
-        if (scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
+        if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
         double deletionScore = scorer.computeDeletionScore(
                 endPosterior1,

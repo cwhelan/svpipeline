@@ -1,9 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.SAMRecord;
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -107,20 +105,16 @@ public class MappedPairToDeletionScoreMapper extends MapReduceBase implements Ma
     }
 
     public static double computeDeletionScore(double endPosterior1, double endPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD, boolean properPair) {
-        NormalDistribution insertSizeDist = new NormalDistributionImpl(targetIsize, targetIsizeSD);
+        NormalDistribution insertSizeDist = new NormalDistribution(targetIsize, targetIsizeSD);
         // deletion score = endPosterior1 * endPosterior2 * P(X < insertSize - 2 * targetIsizeSD)
         double deletionProb;
-        try {
-            deletionProb = insertSizeDist.cumulativeProbability(insertSize - 2 * targetIsizeSD);
-        } catch (MathException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        deletionProb = insertSizeDist.cumulativeProbability(insertSize - 2 * targetIsizeSD);
 
         return (1 - Math.pow(10, endPosterior1 / -10.0)) *
                 (1 - Math.pow(10.0, endPosterior2 / -10.0)) *
                 (properPair ? 1.0 : 1e-7) *
                 deletionProb;
+
     }
 
 }

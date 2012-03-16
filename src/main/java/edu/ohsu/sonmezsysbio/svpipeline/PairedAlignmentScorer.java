@@ -1,9 +1,5 @@
 package edu.ohsu.sonmezsysbio.svpipeline;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
@@ -12,13 +8,12 @@ import org.apache.commons.math.distribution.NormalDistributionImpl;
  */
 public abstract class PairedAlignmentScorer {
     public boolean validateInsertSize(int insertSize, String readPairId, Integer maxInsertSize1) {
-        boolean validInsertSize = true;
+        if (insertSize == 0) return false;
         if (insertSize > maxInsertSize1) {
             System.err.println("Pair " + readPairId + ": Insert size would be greater than " + maxInsertSize1 + " - skipping");
-            validInsertSize = false;
+            return false;
         }
-        if (! validInsertSize) return true;
-        return false;
+        return true;
     }
 
     public abstract double computeDeletionScore(int codedEndPosterior1, int codedEndPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD);

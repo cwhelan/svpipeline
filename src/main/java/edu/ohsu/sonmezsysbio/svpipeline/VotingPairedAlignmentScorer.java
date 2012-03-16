@@ -1,8 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.exception.MathIllegalArgumentException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,14 +12,14 @@ import org.apache.commons.math.distribution.NormalDistributionImpl;
 public class VotingPairedAlignmentScorer extends PairedAlignmentScorer {
     public double computeDeletionScore(int codedEndPosterior1, int codedEndPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD) {
         //System.err.println("target isize: " + targetIsize + ", sd " + targetIsizeSD);
-        NormalDistribution insertSizeDist = new NormalDistributionImpl(targetIsize, targetIsizeSD);
+        NormalDistribution insertSizeDist = new NormalDistribution(targetIsize, targetIsizeSD);
         // deletion score = codedEndPosterior1 * codedEndPosterior2 * P(X < insertSize - 2 * targetIsizeSD)
 
         double deletionProb;
         try {
             deletionProb = insertSizeDist.cumulativeProbability(Math.max(0, insertSize - 1.5 * targetIsizeSD));
             //System.err.println("Deletion prob: " + deletionProb);
-        } catch (MathException e) {
+        } catch (MathIllegalArgumentException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
