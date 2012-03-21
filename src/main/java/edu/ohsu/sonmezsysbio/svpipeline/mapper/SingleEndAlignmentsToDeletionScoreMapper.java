@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
 
-    public static final int WINDOW_SIZE = 100;
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
     private PairedAlignmentScorer scorer;
@@ -147,11 +146,11 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         );
         //System.err.println("computed deletion score : " + deletionScore);
 
-        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % WINDOW_SIZE;
+        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % SVPipeline.RESOLUTION;
 
-        insertSize = insertSize + leftRead.getPosition() % WINDOW_SIZE + WINDOW_SIZE - rightRead.getPosition() % WINDOW_SIZE;
+        insertSize = insertSize + leftRead.getPosition() % SVPipeline.RESOLUTION + SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION;
 
-        for (int i = 0; i <= insertSize; i = i + WINDOW_SIZE) {
+        for (int i = 0; i <= insertSize; i = i + SVPipeline.RESOLUTION) {
             Text outKey = new Text(record1.getChromosomeName() + "\t" + (genomeOffset + i));
             DoubleWritable outVal = new DoubleWritable(deletionScore);
             output.collect(outKey, outVal);

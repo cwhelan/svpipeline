@@ -14,6 +14,8 @@ public class SVPipeline extends Configured implements Tool
 
     public static final String ALIGMENT_SEPARATOR = "\tSVP_ALIGNMENT\t";
     public static final String READ_SEPARATOR = "\tSVP_READ\t";
+    public static final int RESOLUTION = 100;
+    public static final int WINDOW_SIZE_IN_LINES = 1000;
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new SVPipeline(), args);
@@ -61,8 +63,12 @@ public class SVPipeline extends Configured implements Tool
         CommandAverageWigOverSlidingWindow averageWigOverSlidingWindow = new CommandAverageWigOverSlidingWindow();
         jc.addCommand("averageWigOverSlidingWindow", averageWigOverSlidingWindow);
 
+        CommandExportWigAndBedFiles exportWigAndBedFiles = new CommandExportWigAndBedFiles();
+        jc.addCommand("exportWigAndBedFiles", exportWigAndBedFiles);
+
         CommandDumpReadsWithScores dumpReadsWithScores = new CommandDumpReadsWithScores();
         jc.addCommand("dumpReadsWithScores", dumpReadsWithScores);
+
 
         jc.setProgramName("SVPipeline");
         return jc;

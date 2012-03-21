@@ -11,6 +11,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.lib.KeyFieldBasedComparator;
 
 import java.io.IOException;
 
@@ -74,6 +75,9 @@ public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(DoubleWritable.class);
+        conf.setKeyFieldComparatorOptions("-k 1,1 -k 2,2n");
+        conf.setOutputKeyComparatorClass(KeyFieldBasedComparator.class);
+
         conf.setCompressMapOutput(true);
 
         JobClient.runJob(conf);
