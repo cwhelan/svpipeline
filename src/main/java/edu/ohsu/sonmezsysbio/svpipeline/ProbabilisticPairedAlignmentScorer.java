@@ -32,7 +32,7 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
         NormalDistribution normalDistribution = new NormalDistribution(targetIsize, targetIsizeSD);
 
         double pDeletion = Math.log(2432.0 / 3137161264.0);
-        double pISgivenDeletion = Math.log(gammaDistribution.density(insertSize));
+        double pISgivenDeletion = Math.log(gammaDistribution.density(insertSize));         // todo add fragment size
 
         double pNoDeletion = Math.log(1 - 2432.0 / 3137161264.0);
         double pISgivenNoDeletion = Math.log(normalDistribution.density(insertSize));
