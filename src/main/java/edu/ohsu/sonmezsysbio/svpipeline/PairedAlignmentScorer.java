@@ -16,7 +16,7 @@ public abstract class PairedAlignmentScorer {
         return true;
     }
 
-    public abstract double computeDeletionScore(int codedEndPosterior1, int codedEndPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD);
+    public abstract double computeDeletionScore(int insertSize, Double targetIsize, Double targetIsizeSD, Double pMappingCorrect);
 
     public boolean validateMappingOrientations(NovoalignNativeRecord record1, NovoalignNativeRecord record2, boolean matePairs) {
         if (matePairs) {
@@ -49,5 +49,16 @@ public abstract class PairedAlignmentScorer {
                     record1.getPosition() - record2.getPosition() < 500) matePair = false;
         }
         return matePair;
+    }
+
+    public double probabilityMappingIsCorrect(int codedEndPosterior1, int codedEndPosterior2) {
+        double endPosterior1 = Math.log(decodePosterior(codedEndPosterior1));
+        double endPosterior2 = Math.log(decodePosterior(codedEndPosterior2));
+
+        return endPosterior1 + endPosterior2;
+    }
+
+    double decodePosterior(double codedPosterior) {
+        return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
     }
 }

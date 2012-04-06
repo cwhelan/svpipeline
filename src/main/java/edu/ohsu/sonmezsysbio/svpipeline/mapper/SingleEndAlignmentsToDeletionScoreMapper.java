@@ -137,12 +137,13 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
+        Double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
+
         double deletionScore = scorer.computeDeletionScore(
-                endPosterior1,
-                endPosterior2,
                 insertSize,
                 isizeMean,
-                isizeSD
+                isizeSD,
+                pMappingCorrect
         );
         //System.err.println("computed deletion score : " + deletionScore);
 

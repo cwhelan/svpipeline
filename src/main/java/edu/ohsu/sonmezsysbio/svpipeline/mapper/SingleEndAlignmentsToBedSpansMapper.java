@@ -171,11 +171,10 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
         double deletionScore = scorer.computeDeletionScore(
-                endPosterior1,
-                endPosterior2,
                 insertSize,
                 isizeMean,
-                isizeSD
+                isizeSD,
+                scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2)
         );
 
         output.collect(new Text(leftRead.getReadId()),

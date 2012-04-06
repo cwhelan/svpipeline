@@ -1,6 +1,5 @@
 package edu.ohsu.sonmezsysbio.svpipeline;
 
-import org.apache.commons.math3.distribution.GammaDistribution;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -12,7 +11,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
  */
 public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
     @Override
-    public double computeDeletionScore(int codedEndPosterior1, int codedEndPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD) {
+    public double computeDeletionScore(int insertSize, Double targetIsize, Double targetIsizeSD, Double pMappingCorrect) {
         // calculate:
         //
         // p(Del | IS) = p( IS | Del) p(Del) / p (IS)
@@ -37,7 +36,6 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
         double pNoDeletion = Math.log(1 - 2432.0 / 2700000000.0);
 
         double pISgivenDeletion = Math.log(logNormalDistribution.density(insertSize));         // todo add fragment size
-
         double pISgivenNoDeletion = Math.log(normalDistribution.density(insertSize));
         // todo
         // need to cap p(IS | NoDel) because it goes to infinity as the insert size gets large
@@ -45,7 +43,6 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
             pISgivenNoDeletion = Math.log(normalDistribution.density(targetIsize + 30 * targetIsizeSD));
         }
 
-        double pMappingCorrect = probabilityMappingIsCorrect(codedEndPosterior1, codedEndPosterior2);
         double pMappingIncorrect = Math.log(1 - Math.exp(pMappingCorrect));
 
         double normalization = logAdd(pDeletion + pISgivenDeletion, pNoDeletion + pISgivenNoDeletion);
@@ -77,17 +74,6 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
 //        System.out.println("-----");
 
         return likelihoodRatio;
-    }
-
-    protected double probabilityMappingIsCorrect(int codedEndPosterior1, int codedEndPosterior2) {
-        double endPosterior1 = Math.log(decodePosterior(codedEndPosterior1));
-        double endPosterior2 = Math.log(decodePosterior(codedEndPosterior2));
-
-        return endPosterior1 + endPosterior2;
-    }
-
-    private double decodePosterior(double codedPosterior) {
-        return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
     }
 
     // from https://facwiki.cs.byu.edu/nlp/index.php/Log_Domain_Computations

@@ -128,7 +128,6 @@ public class WigFileHelper {
                 peakNum = 1;
                 
                 currentChromosome = line.split(" ")[1].split("=")[1];
-                stepSize = Integer.valueOf(line.split(" ")[2].split("=")[1]);
                 continue;
             }
         
@@ -151,7 +150,7 @@ public class WigFileHelper {
                 
             } else {
                 if (inPositivePeak) {
-                    long endPosition = pos + stepSize - 1;
+                    long endPosition = pos - 1;
                     bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores + "\n");
                     peakNum += 1;
                     inPositivePeak = false;

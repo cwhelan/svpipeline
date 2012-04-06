@@ -51,8 +51,9 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
 
     public void run(Configuration conf) throws Exception {
         String pileupFileName = outputPrefix + "_piledup_deletion_scores.wig";
+        String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
         String averagedFileName = outputPrefix + "_windowed_average_deletion_scores.wig";
-        String bedFileName = outputPrefix + "_positive_score_regions.bed";
+        String averagedBedFileName = outputPrefix + "_averaged_positive_score_regions.bed";
         
         File outputFile = new File(pileupFileName);
         if (! outputFile.createNewFile()) {
@@ -65,6 +66,16 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         writePiledUpDeletionScores(conf, outputFileWriter, inputHDFSDir);
         outputFileWriter.close();
 
+        System.err.println("Exporting regions with positive scores into " + pileupBedFileName);
+        BufferedReader pileupWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
+        BufferedWriter piledupBedFileWriter = new BufferedWriter(new FileWriter(new File(pileupBedFileName)));
+        try {
+            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter);
+        } finally {
+            pileupWigFileReader.close();
+            piledupBedFileWriter.close();
+        }
+
         System.err.println("Averaging scores over sliding window into " + averagedFileName);
         BufferedReader inFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
         BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(averagedFileName)));
@@ -75,14 +86,14 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
             outFileWriter.close();
         }
 
-        System.err.println("Exporting regions with positive scores into " + bedFileName);
+        System.err.println("Exporting averaged regions with positive scores into " + averagedBedFileName);
         BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
-        BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(bedFileName)));
+        BufferedWriter averageBedFileWriter = new BufferedWriter(new FileWriter(new File(averagedBedFileName)));
         try {
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, bedFileWriter);
+            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter);
         } finally {
             averagedWigFileReader.close();
-            bedFileWriter.close();
+            piledupBedFileWriter.close();
         }
 
     }

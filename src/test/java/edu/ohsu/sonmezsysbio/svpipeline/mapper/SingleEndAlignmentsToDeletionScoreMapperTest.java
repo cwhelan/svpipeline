@@ -99,7 +99,7 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
 
     static class TestScorer extends PairedAlignmentScorer {
         @Override
-        public double computeDeletionScore(int codedEndPosterior1, int codedEndPosterior2, int insertSize, Double targetIsize, Double targetIsizeSD) {
+        public double computeDeletionScore(int insertSize, Double targetIsize, Double targetIsizeSD, Double pMappingCorrect) {
             return 1;
         }
     }

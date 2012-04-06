@@ -58,6 +58,9 @@ public class SVPipeline extends Configured implements Tool
         CommandPileupSingleEndDeletionScores pileupSingleEndDeletionScores = new CommandPileupSingleEndDeletionScores();
         jc.addCommand("pileupSingleEndDeletionScores", pileupSingleEndDeletionScores);
 
+        CommandIncrementalUpdateSingleEndDeletionScores incrementalUpdateSingleEndDeletionScores = new CommandIncrementalUpdateSingleEndDeletionScores();
+        jc.addCommand("incrementalUpdateSingleEndDeletionScores", incrementalUpdateSingleEndDeletionScores);
+
         jc.addCommand("splitDeflatedOutput", new CommandSplitDeflatedOutput());
 
         CommandAverageWigOverSlidingWindow averageWigOverSlidingWindow = new CommandAverageWigOverSlidingWindow();
