@@ -17,6 +17,9 @@ public class GenomicLocation implements WritableComparable<GenomicLocation> {
     public Text chromosome;
     public int pos;
 
+    public GenomicLocation() {
+    }
+
     public GenomicLocation(Text chromosome, int pos) {
         this.chromosome = chromosome;
         this.pos = pos;
