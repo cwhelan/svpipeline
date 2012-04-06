@@ -12,7 +12,7 @@ import org.apache.hadoop.util.ToolRunner;
 public class SVPipeline extends Configured implements Tool
 {
 
-    public static final String ALIGMENT_SEPARATOR = "\tSVP_ALIGNMENT\t";
+    public static final String ALINGMENT_SEPARATOR = "\tSVP_ALIGNMENT\t";
     public static final String READ_SEPARATOR = "\tSVP_READ\t";
     public static final int RESOLUTION = 100;
     public static final int WINDOW_SIZE_IN_LINES = 1000;
@@ -69,6 +69,8 @@ public class SVPipeline extends Configured implements Tool
         CommandDumpReadsWithScores dumpReadsWithScores = new CommandDumpReadsWithScores();
         jc.addCommand("dumpReadsWithScores", dumpReadsWithScores);
 
+        CommandExtractPositiveRegionsFromWig commandExtractPositiveRegionsFromWig = new CommandExtractPositiveRegionsFromWig();
+        jc.addCommand("extractPositiveRegionsFromWig", commandExtractPositiveRegionsFromWig);
 
         jc.setProgramName("SVPipeline");
         return jc;

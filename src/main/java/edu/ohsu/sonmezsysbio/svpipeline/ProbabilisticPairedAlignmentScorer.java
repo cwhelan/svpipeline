@@ -1,6 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline;
 
 import org.apache.commons.math3.distribution.GammaDistribution;
+import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 /**
@@ -28,31 +29,87 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
         // p (noDel) =  1 - p(Del)
         // p (IS | NoDel) = density at IS in N(isize, isizeSD)
 
-        GammaDistribution gammaDistribution = new GammaDistribution(0.2, 40000);
+        //GammaDistribution gammaDistribution = new GammaDistribution(0.2, 40000);
+        LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
         NormalDistribution normalDistribution = new NormalDistribution(targetIsize, targetIsizeSD);
 
-        double pDeletion = Math.log(2432.0 / 3137161264.0);
-        double pISgivenDeletion = Math.log(gammaDistribution.density(insertSize));         // todo add fragment size
+        double pDeletion = Math.log(2432.0 / 2700000000.0);
+        double pNoDeletion = Math.log(1 - 2432.0 / 2700000000.0);
 
-        double pNoDeletion = Math.log(1 - 2432.0 / 3137161264.0);
+        double pISgivenDeletion = Math.log(logNormalDistribution.density(insertSize));         // todo add fragment size
+
         double pISgivenNoDeletion = Math.log(normalDistribution.density(insertSize));
-
         // todo
         // need to cap p(IS | NoDel) because it goes to infinity as the insert size gets large
-        if (insertSize > targetIsize + 10 * targetIsizeSD) {
-            pISgivenNoDeletion = Math.log(normalDistribution.density(targetIsize + 10 * targetIsizeSD));
+        if (insertSize > targetIsize + 30 * targetIsizeSD) {
+            pISgivenNoDeletion = Math.log(normalDistribution.density(targetIsize + 30 * targetIsizeSD));
         }
-        
-        double endPosterior1 = Math.log(decodePosterior(codedEndPosterior1));
-        double endPosterior2 = Math.log(decodePosterior(codedEndPosterior2));
-        
-        double likelihoodRatio = pDeletion + pISgivenDeletion + endPosterior1 + endPosterior2
-                - pNoDeletion - pISgivenNoDeletion;
+
+        double pMappingCorrect = probabilityMappingIsCorrect(codedEndPosterior1, codedEndPosterior2);
+        double pMappingIncorrect = Math.log(1 - Math.exp(pMappingCorrect));
+
+        double normalization = logAdd(pDeletion + pISgivenDeletion, pNoDeletion + pISgivenNoDeletion);
+        double pDeletionGivenIS = pDeletion + pISgivenDeletion - normalization;
+        double pNoDeletionGivenIS = pNoDeletion + pISgivenNoDeletion - normalization;
+
+        double pDeletionNew = logAdd(pDeletionGivenIS + pMappingCorrect, pDeletion + pMappingIncorrect);
+        double pNoDeletionNew = logAdd(pNoDeletionGivenIS + pMappingCorrect, pNoDeletion + pMappingIncorrect);
+
+        double likelihoodRatio = pDeletionNew
+                                - pNoDeletionNew;
+
+//        System.out.println("-----");
+//        System.out.println("pMappingCorrect:\t" + pMappingCorrect);
+//        System.out.println("pMappingIncorrect:\t" + pMappingIncorrect);
+//        System.out.println("pISgivenDeletion:\t" + pISgivenDeletion);
+//        System.out.println("pISgivenNoDeletion:\t" + pISgivenNoDeletion);
+//        System.out.println("pDeletionGivenIS:\t" + pDeletionGivenIS);
+//        System.out.println("pNoDeletionGivenIS:\t" + pNoDeletionGivenIS);
+//        System.out.println("pDeletion:\t" + pDeletion);
+//        System.out.println("pNoDeletion:\t" + pNoDeletion);
+//
+//        System.out.println("pDeletionGivenIS + pMappingCorrect:\t" + (pDeletionGivenIS + pMappingCorrect));
+//        System.out.println("pNoDeletionGivenIS + pMappingCorrect:\t" + (pNoDeletionGivenIS + pMappingCorrect));
+//
+//        System.out.println("pDeletionNew:\t" + pDeletionNew);
+//        System.out.println("pNoDeletionNew:\t" + pNoDeletionNew);
+//        System.out.println("likelihoodRatio:\t" + likelihoodRatio);
+//        System.out.println("-----");
 
         return likelihoodRatio;
     }
 
+    protected double probabilityMappingIsCorrect(int codedEndPosterior1, int codedEndPosterior2) {
+        double endPosterior1 = Math.log(decodePosterior(codedEndPosterior1));
+        double endPosterior2 = Math.log(decodePosterior(codedEndPosterior2));
+
+        return endPosterior1 + endPosterior2;
+    }
+
     private double decodePosterior(double codedPosterior) {
         return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
+    }
+
+    // from https://facwiki.cs.byu.edu/nlp/index.php/Log_Domain_Computations
+    public static double logAdd(double logX, double logY) {
+        // 1. make X the max
+        if (logY > logX) {
+            double temp = logX;
+            logX = logY;
+            logY = temp;
+        }
+        // 2. now X is bigger
+        if (logX == Double.NEGATIVE_INFINITY) {
+            return logX;
+        }
+        // 3. how far "down" (think decibels) is logY from logX?
+        //    if it's really small (20 orders of magnitude smaller), then ignore
+        double negDiff = logY - logX;
+        if (negDiff < -20) {
+            return logX;
+        }
+        // 4. otherwise use some nice algebra to stay in the log domain
+        //    (except for negDiff)
+        return logX + java.lang.Math.log(1.0 + java.lang.Math.exp(negDiff));
     }
 }

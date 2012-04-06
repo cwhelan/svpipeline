@@ -47,7 +47,7 @@ public class WigFileHelper {
                 String[] fields = line.split("\t");
                 Integer pos = Integer.parseInt(fields[0]);
                 if (pos - lastPos > resolution) {
-                    //System.err.println("hit a gap between " + lastPos + " and " + pos);
+                    // System.err.println("hit a gap between " + lastPos + " and " + pos);
                 }
                 while (pos - lastPos > resolution) {
                     lastPos = lastPos + resolution;
@@ -152,7 +152,7 @@ public class WigFileHelper {
             } else {
                 if (inPositivePeak) {
                     long endPosition = pos + stepSize - 1;
-                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores);
+                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores + "\n");
                     peakNum += 1;
                     inPositivePeak = false;
                 }

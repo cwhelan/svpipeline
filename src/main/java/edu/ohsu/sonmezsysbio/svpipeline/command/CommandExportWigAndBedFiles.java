@@ -75,9 +75,9 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
             outFileWriter.close();
         }
 
-        System.err.println("Exporing regions with positive scores into " + bedFileName);
+        System.err.println("Exporting regions with positive scores into " + bedFileName);
         BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
-        BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(averagedFileName)));
+        BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(bedFileName)));
         try {
             WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, bedFileWriter);
         } finally {
