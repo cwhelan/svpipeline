@@ -17,6 +17,9 @@ public class ReadPairInfo implements Writable {
     public int insertSize;
     public double pMappingCorrect;
 
+    public ReadPairInfo() {
+    }
+
     public ReadPairInfo(int insertSize, double pMappingCorrect) {
         this.insertSize = insertSize;
         this.pMappingCorrect = pMappingCorrect;

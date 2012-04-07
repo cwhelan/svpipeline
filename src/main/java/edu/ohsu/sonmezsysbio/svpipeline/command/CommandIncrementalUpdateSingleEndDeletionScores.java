@@ -5,11 +5,10 @@ import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
-import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToDeletionScoreMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToReadPairInfoMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.reducer.IncrementalDelBeliefUpdateReadPairInfoReducer;
-import edu.ohsu.sonmezsysbio.svpipeline.reducer.SingleEndDeletionScorePileupReducer;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
@@ -17,7 +16,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.KeyFieldBasedComparator;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,11 +48,14 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     @Parameter(names = {"--maxInsertSize"})
     int maxInsertSize = 500000;
 
-    public void run(Configuration conf) throws IOException {
+    @Parameter(names = {"--faidx"}, required=true)
+    String faidxFileName;
+
+    public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
     }
 
-    private void runHadoopJob(Configuration configuration) throws IOException {
+    private void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Incremental Update Single End Deletion Score");
@@ -61,7 +66,17 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
+
+        File faidxFile = new File(faidxFileName);
+        String faidxFileBasename = faidxFile.getName();
+        String faidxFileDir = faidxFile.getParent();
+
+        DistributedCache.addCacheFile(new URI(faidxFileDir + "/" + faidxFileBasename + "#" + faidxFileBasename),
+                conf);
+        DistributedCache.createSymlink(conf);
+
         conf.setInputFormat(TextInputFormat.class);
+        conf.set("alignment.faidx", faidxFileBasename);
 
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));

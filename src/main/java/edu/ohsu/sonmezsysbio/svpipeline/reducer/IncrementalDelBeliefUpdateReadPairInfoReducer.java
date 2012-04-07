@@ -8,8 +8,13 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,6 +27,8 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
     private double targetIsize;
     private double targetIsizeSD;
     private boolean matePairs;
+    private String faidxFileName;
+    private Map<Short, String> chromosomesByKey;
 
     public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<Text, DoubleWritable> output, Reporter reporter) throws IOException {
 
@@ -56,7 +63,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
 
         }
         double lr = pDeletion / pNoDeletion;
-        output.collect(new Text(key.chromosome.toString() + "\t" + key.pos), new DoubleWritable(lr));
+        output.collect(new Text(chromosomesByKey.get(key.chromosome) + "\t" + key.pos), new DoubleWritable(lr));
     }
 
     // from https://facwiki.cs.byu.edu/nlp/index.php/Log_Domain_Computations
@@ -89,6 +96,33 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
         targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
 
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
+        faidxFileName = job.get("alignment.faidx");
+        try {
+            chromosomesByKey = readFaidxFile(faidxFileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
     }
+
+    private Map<Short, String> readFaidxFile(String faidxFileName) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(faidxFileName));
+        return readFaidx(reader);
+    }
+
+    public Map<Short, String > readFaidx(BufferedReader bufferedReader) throws IOException {
+        String line;
+        short chrIdx = 0;
+        Map<Short, String> chrTable = new HashMap<Short, String>();
+        while ((line = bufferedReader.readLine()) != null) {
+            String chromosomeName = line.split("\\s+")[0];
+            chrTable.put(chrIdx, chromosomeName);
+            chrIdx++;
+        }
+        return chrTable;
+    }
+
 }

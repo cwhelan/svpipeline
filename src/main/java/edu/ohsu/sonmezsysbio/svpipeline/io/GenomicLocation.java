@@ -14,30 +14,32 @@ import java.io.IOException;
  * Time: 1:05 PM
  */
 public class GenomicLocation implements WritableComparable<GenomicLocation> {
-    public Text chromosome;
+    public short chromosome;
     public int pos;
 
     public GenomicLocation() {
     }
 
-    public GenomicLocation(Text chromosome, int pos) {
+    public GenomicLocation(short chromosome, int pos) {
         this.chromosome = chromosome;
         this.pos = pos;
     }
 
     public void write(DataOutput out) throws IOException {
-        chromosome.write(out);
+        out.writeShort(chromosome);
         out.writeInt(pos);
     }
 
     public void readFields(DataInput in) throws IOException {
-        chromosome.readFields(in);
+        chromosome = in.readShort();
         pos = in.readInt();
     }
 
     public int compareTo(GenomicLocation o) {
-        if (chromosome.toString().compareTo(o.chromosome.toString()) != 0) {
-            return chromosome.toString().compareTo(o.chromosome.toString());
+        if (chromosome < o.chromosome) {
+            return -1;
+        } else if (chromosome > o.chromosome) {
+            return 1;
         } else {
             if (pos < o.pos) return -1;
             if (pos > o.pos) return 1;
