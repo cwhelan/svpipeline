@@ -32,6 +32,38 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
     private Map<String, Short> chromosomeKeys;
     private String faidxFileName;
 
+    public boolean isMatePairs() {
+        return matePairs;
+    }
+
+    public void setMatePairs(boolean matePairs) {
+        this.matePairs = matePairs;
+    }
+
+    public Integer getMaxInsertSize() {
+        return maxInsertSize;
+    }
+
+    public void setMaxInsertSize(Integer maxInsertSize) {
+        this.maxInsertSize = maxInsertSize;
+    }
+
+    public PairedAlignmentScorer getScorer() {
+        return scorer;
+    }
+
+    public void setScorer(PairedAlignmentScorer scorer) {
+        this.scorer = scorer;
+    }
+
+    public Map<String, Short> getChromosomeKeys() {
+        return chromosomeKeys;
+    }
+
+    public void setChromosomeKeys(Map<String, Short> chromosomeKeys) {
+        this.chromosomeKeys = chromosomeKeys;
+    }
+
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         int firstTabIndex = line.indexOf('\t');

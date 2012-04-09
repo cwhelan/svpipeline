@@ -34,4 +34,12 @@ public class ReadPairInfo implements Writable {
         insertSize = in.readInt();
         pMappingCorrect = in.readDouble();
     }
+
+    @Override
+    public String toString() {
+        return "ReadPairInfo{" +
+                "insertSize=" + insertSize +
+                ", pMappingCorrect=" + pMappingCorrect +
+                '}';
+    }
 }

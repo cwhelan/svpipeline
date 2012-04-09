@@ -46,4 +46,12 @@ public class GenomicLocation implements WritableComparable<GenomicLocation> {
         }
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "GenomicLocation{" +
+                "chromosome=" + chromosome +
+                ", pos=" + pos +
+                '}';
+    }
 }

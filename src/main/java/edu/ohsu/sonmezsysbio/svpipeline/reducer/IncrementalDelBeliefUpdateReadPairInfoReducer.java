@@ -30,6 +30,46 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
     private String faidxFileName;
     private Map<Short, String> chromosomesByKey;
 
+    public double getTargetIsize() {
+        return targetIsize;
+    }
+
+    public void setTargetIsize(double targetIsize) {
+        this.targetIsize = targetIsize;
+    }
+
+    public double getTargetIsizeSD() {
+        return targetIsizeSD;
+    }
+
+    public void setTargetIsizeSD(double targetIsizeSD) {
+        this.targetIsizeSD = targetIsizeSD;
+    }
+
+    public boolean isMatePairs() {
+        return matePairs;
+    }
+
+    public void setMatePairs(boolean matePairs) {
+        this.matePairs = matePairs;
+    }
+
+    public String getFaidxFileName() {
+        return faidxFileName;
+    }
+
+    public void setFaidxFileName(String faidxFileName) {
+        this.faidxFileName = faidxFileName;
+    }
+
+    public Map<Short, String> getChromosomesByKey() {
+        return chromosomesByKey;
+    }
+
+    public void setChromosomesByKey(Map<Short, String> chromosomesByKey) {
+        this.chromosomesByKey = chromosomesByKey;
+    }
+
     public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<Text, DoubleWritable> output, Reporter reporter) throws IOException {
 
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
@@ -62,7 +102,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
             pNoDeletion = logAdd(pNoDeletionGivenIS + pMappingCorrect, pNoDeletion + pMappingIncorrect);
 
         }
-        double lr = pDeletion / pNoDeletion;
+        double lr = pDeletion - pNoDeletion;
         output.collect(new Text(chromosomesByKey.get(key.chromosome) + "\t" + key.pos), new DoubleWritable(lr));
     }
 
