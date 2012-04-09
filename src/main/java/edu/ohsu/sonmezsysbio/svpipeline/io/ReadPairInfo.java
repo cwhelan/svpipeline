@@ -26,7 +26,7 @@ public class ReadPairInfo implements Writable {
     }
 
     public void write(DataOutput out) throws IOException {
-        out.writeLong(insertSize);
+        out.writeInt(insertSize);
         out.writeDouble(pMappingCorrect);
     }
 

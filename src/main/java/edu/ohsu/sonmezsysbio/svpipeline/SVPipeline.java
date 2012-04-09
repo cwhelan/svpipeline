@@ -75,6 +75,9 @@ public class SVPipeline extends Configured implements Tool
         CommandExtractPositiveRegionsFromWig commandExtractPositiveRegionsFromWig = new CommandExtractPositiveRegionsFromWig();
         jc.addCommand("extractPositiveRegionsFromWig", commandExtractPositiveRegionsFromWig);
 
+        CommandDebugReadPairInfo commandDebugReadPairInfo = new CommandDebugReadPairInfo();
+        jc.addCommand("debugReadPairInfo", commandDebugReadPairInfo);
+
         jc.setProgramName("SVPipeline");
         return jc;
     }

@@ -32,6 +32,35 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
     private Map<String, Short> chromosomeKeys;
     private String faidxFileName;
 
+    // for debugging, restrict output to a particular region
+    private String chromosomeFilter;
+    private Long startFilter;
+    private Long endFilter;
+
+    public String getChromosomeFilter() {
+        return chromosomeFilter;
+    }
+
+    public void setChromosomeFilter(String chromosomeFilter) {
+        this.chromosomeFilter = chromosomeFilter;
+    }
+
+    public Long getStartFilter() {
+        return startFilter;
+    }
+
+    public void setStartFilter(Long startFilter) {
+        this.startFilter = startFilter;
+    }
+
+    public Long getEndFilter() {
+        return endFilter;
+    }
+
+    public void setEndFilter(Long endFilter) {
+        this.endFilter = endFilter;
+    }
+
     public boolean isMatePairs() {
         return matePairs;
     }
@@ -120,8 +149,19 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
             if (chromosome == null) {
                 throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
             }
-            GenomicLocation genomicLocation = new GenomicLocation(chromosome, genomeOffset + i);
+
+            int pos = genomeOffset + i;
+
+            if (getChromosomeFilter() != null) {
+                if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
+                    pos < getStartFilter() || pos > getEndFilter()) {
+                    return;
+                }
+            }
+
+            GenomicLocation genomicLocation = new GenomicLocation(chromosome, pos);
             output.collect(genomicLocation, readPairInfo);
+
         }
 
     }
@@ -139,6 +179,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (job.get("alignments.filterchr") != null) {
+            setChromosomeFilter(job.get("alignments.filterchr"));
+            setStartFilter(Long.parseLong(job.get("alignments.filterstart")));
+            setEndFilter(Long.parseLong(job.get("alignments.filterend")));
         }
     }
 

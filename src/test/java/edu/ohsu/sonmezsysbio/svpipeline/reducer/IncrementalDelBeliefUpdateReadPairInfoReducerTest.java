@@ -48,7 +48,8 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
         assertEquals(1, outputCollector.keys.size());
         assertEquals(1, outputCollector.values.size());
 
-        assertEquals("chr3\t10000", outputCollector.keys.get(0).toString());
+        assertEquals((short) 1, outputCollector.keys.get(0).chromosome);
+        assertEquals(10000, outputCollector.keys.get(0).pos);
         assertEquals(1.550446e-06, outputCollector.values.get(0).get(), 0.01);
 
         readPairInfos.add(readPairInfo2);
@@ -59,16 +60,17 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
         assertEquals(1, outputCollector.keys.size());
         assertEquals(1, outputCollector.values.size());
 
-        assertEquals("chr3\t10000", outputCollector.keys.get(0).toString());
+        assertEquals((short) 1, outputCollector.keys.get(0).chromosome);
+        assertEquals(10000, outputCollector.keys.get(0).pos);
         assertEquals(0.0065, outputCollector.values.get(0).get(), 0.1);
     }
 
-    private static class MockOutputCollector implements OutputCollector<Text, DoubleWritable> {
+    private static class MockOutputCollector implements OutputCollector<GenomicLocation, DoubleWritable> {
 
-        List<Text> keys = new ArrayList<Text>();
+        List<GenomicLocation> keys = new ArrayList<GenomicLocation>();
         List<DoubleWritable> values = new ArrayList<DoubleWritable>();
 
-        public void collect(Text key, DoubleWritable value) throws IOException {
+        public void collect(GenomicLocation key, DoubleWritable value) throws IOException {
             keys.add(key);
             values.add(value);
         }

@@ -5,7 +5,6 @@ import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
 import java.io.BufferedReader;
@@ -22,7 +21,7 @@ import java.util.Map;
  * Date: 4/6/12
  * Time: 1:35 PM
  */
-public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, Text, DoubleWritable> {
+public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, GenomicLocation, DoubleWritable> {
 
     private double targetIsize;
     private double targetIsizeSD;
@@ -70,7 +69,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
         this.chromosomesByKey = chromosomesByKey;
     }
 
-    public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<Text, DoubleWritable> output, Reporter reporter) throws IOException {
+    public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
 
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
         NormalDistribution normalDistribution = new NormalDistribution(targetIsize, targetIsizeSD);
@@ -103,7 +102,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
 
         }
         double lr = pDeletion - pNoDeletion;
-        output.collect(new Text(chromosomesByKey.get(key.chromosome) + "\t" + key.pos), new DoubleWritable(lr));
+        output.collect(key, new DoubleWritable(lr));
     }
 
     // from https://facwiki.cs.byu.edu/nlp/index.php/Log_Domain_Computations
