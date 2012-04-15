@@ -1,22 +1,14 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
-import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
-import edu.ohsu.sonmezsysbio.svpipeline.ProbabilisticPairedAlignmentScorer;
-import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
+import edu.ohsu.sonmezsysbio.svpipeline.*;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,13 +21,21 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
     private PairedAlignmentScorer scorer;
-    private Map<String, Short> chromosomeKeys;
     private String faidxFileName;
+    FaidxFileHelper faix;
 
     // for debugging, restrict output to a particular region
     private String chromosomeFilter;
     private Long startFilter;
     private Long endFilter;
+
+    public FaidxFileHelper getFaix() {
+        return faix;
+    }
+
+    public void setFaix(FaidxFileHelper faix) {
+        this.faix = faix;
+    }
 
     public String getChromosomeFilter() {
         return chromosomeFilter;
@@ -83,14 +83,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
 
     public void setScorer(PairedAlignmentScorer scorer) {
         this.scorer = scorer;
-    }
-
-    public Map<String, Short> getChromosomeKeys() {
-        return chromosomeKeys;
-    }
-
-    public void setChromosomeKeys(Map<String, Short> chromosomeKeys) {
-        this.chromosomeKeys = chromosomeKeys;
     }
 
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
@@ -145,7 +137,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
         ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2));
 
         for (int i = 0; i <= insertSize; i = i + SVPipeline.RESOLUTION) {
-            Short chromosome = chromosomeKeys.get(record1.getChromosomeName());
+            Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
             if (chromosome == null) {
                 throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
             }
@@ -173,35 +165,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
         scorer = new ProbabilisticPairedAlignmentScorer();
 
         faidxFileName = job.get("alignment.faidx");
-        try {
-            chromosomeKeys = readFaidxFile(faidxFileName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        faix = new FaidxFileHelper(faidxFileName);
 
         if (job.get("alignments.filterchr") != null) {
             setChromosomeFilter(job.get("alignments.filterchr"));
             setStartFilter(Long.parseLong(job.get("alignments.filterstart")));
             setEndFilter(Long.parseLong(job.get("alignments.filterend")));
         }
-    }
-
-    private Map<String, Short> readFaidxFile(String faidxFileName) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(faidxFileName));
-        return readFaidx(reader);
-    }
-
-    public Map<String, Short> readFaidx(BufferedReader bufferedReader) throws IOException {
-        String line;
-        short chrIdx = 0;
-        Map<String, Short> chrTable = new HashMap<String, Short>();
-        while ((line = bufferedReader.readLine()) != null) {
-            String chromosomeName = line.split("\\s+")[0];
-            chrTable.put(chromosomeName, chrIdx);
-            chrIdx++;
-        }
-        return chrTable;
     }
 }

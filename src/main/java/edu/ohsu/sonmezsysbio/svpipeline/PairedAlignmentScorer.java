@@ -10,7 +10,7 @@ public abstract class PairedAlignmentScorer {
     public boolean validateInsertSize(int insertSize, String readPairId, Integer maxInsertSize1) {
         if (insertSize == 0) return false;
         if (insertSize > maxInsertSize1) {
-            System.err.println("Pair " + readPairId + ": Insert size would be greater than " + maxInsertSize1 + " - skipping");
+            // System.err.println("Pair " + readPairId + ": Insert size would be greater than " + maxInsertSize1 + " - skipping");
             return false;
         }
         return true;

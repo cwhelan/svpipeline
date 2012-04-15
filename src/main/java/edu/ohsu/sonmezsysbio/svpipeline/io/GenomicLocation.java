@@ -1,6 +1,5 @@
 package edu.ohsu.sonmezsysbio.svpipeline.io;
 
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -45,6 +44,26 @@ public class GenomicLocation implements WritableComparable<GenomicLocation> {
             if (pos > o.pos) return 1;
         }
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GenomicLocation that = (GenomicLocation) o;
+
+        if (chromosome != that.chromosome) return false;
+        if (pos != that.pos) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) chromosome;
+        result = 31 * result + pos;
+        return result;
     }
 
     @Override

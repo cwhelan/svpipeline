@@ -3,15 +3,12 @@ package edu.ohsu.sonmezsysbio.svpipeline.reducer;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -34,11 +31,6 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
         IncrementalDelBeliefUpdateReadPairInfoReducer reducer = new IncrementalDelBeliefUpdateReadPairInfoReducer();
         reducer.setTargetIsize(200);
         reducer.setTargetIsizeSD(30);
-
-        Map<Short, String> chrMap = new HashMap<Short, String>();
-        chrMap.put((short) 1, "chr3");
-
-        reducer.setChromosomesByKey(chrMap);
 
         List<ReadPairInfo> readPairInfos = new ArrayList<ReadPairInfo>();
         readPairInfos.add(readPairInfo1);
