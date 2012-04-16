@@ -31,7 +31,7 @@ public class CommandExtractPositiveRegionsFromWig implements SVPipelineCommand {
     private String faidxFileName;
 
     @Parameter(names = {"--threshold"})
-    double threshold = 0;
+    Double threshold = 0.0;
 
     public void run(Configuration conf) throws Exception {
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);

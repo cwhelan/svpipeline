@@ -92,11 +92,11 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
 
         String[] readAligments = lineValues.split(SVPipeline.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(SVPipeline.ALINGMENT_SEPARATOR);
+        String[] read1Alignments = read1AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALINGMENT_SEPARATOR);
+        String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
 
         emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);

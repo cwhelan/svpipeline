@@ -51,7 +51,7 @@ public class NovoalignSingleEndAlignmentsToPairsReducer extends MapReduceBase
         boolean firstAlignment = true;
         for (String alignment : read1Alignments) {
                 if (! firstAlignment) {
-                    valueBuffer.append(SVPipeline.ALINGMENT_SEPARATOR);
+                    valueBuffer.append(SVPipeline.ALIGNMENT_SEPARATOR);
                 } else {
                     firstAlignment = false;
                 }

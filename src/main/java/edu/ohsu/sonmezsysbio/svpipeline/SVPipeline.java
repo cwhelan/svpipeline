@@ -12,7 +12,7 @@ import org.apache.hadoop.util.ToolRunner;
 public class SVPipeline extends Configured implements Tool
 {
 
-    public static final String ALINGMENT_SEPARATOR = "\tSVP_ALIGNMENT\t";
+    public static final String ALIGNMENT_SEPARATOR = "\tSVP_ALIGNMENT\t";
     public static final String READ_SEPARATOR = "\tSVP_READ\t";
     public static final int RESOLUTION = 100;
     public static final int WINDOW_SIZE_IN_LINES = 1000;
