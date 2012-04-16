@@ -100,8 +100,8 @@ public class WigFileHelper {
         return windowTotal;
     }
 
-    public static void exportPositiveRegionsFromWig(String outputPrefix, BufferedReader averagedWigFileReader, BufferedWriter bedFileWriter) throws IOException {
-        String trackName = outputPrefix + " positive peaks"; 
+    public static void exportPositiveRegionsFromWig(String outputPrefix, BufferedReader averagedWigFileReader, BufferedWriter bedFileWriter, double threshold, FaidxFileHelper faidx) throws IOException {
+        String trackName = outputPrefix + " peaks over " + threshold;
         bedFileWriter.write("track name = \"" + trackName + "\"\n");
 
         boolean inPositivePeak = false;
@@ -109,10 +109,9 @@ public class WigFileHelper {
         double sumPeakScores = 0;
         long peakStart = 0;
         int peakNum = 1;
-        
+
         String line;
         String currentChromosome = "";
-        int stepSize = 0;
 
         while ((line = averagedWigFileReader.readLine()) != null) {
             if (line.startsWith("track")) {
@@ -120,13 +119,17 @@ public class WigFileHelper {
             }
             
             if (line.startsWith("variableStep")) {
+                if (inPositivePeak) {
+                    long endPosition = faidx.getLengthForChromName(currentChromosome) - 1;
+                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores + "\n");
+                    peakNum += 1;
+                }
                 // reset counters
                 inPositivePeak = false;
                 maxScoreInPeak = 0;
                 sumPeakScores = 0;
                 peakStart = 0;
-                peakNum = 1;
-                
+
                 currentChromosome = line.split(" ")[1].split("=")[1];
                 continue;
             }
@@ -134,8 +137,8 @@ public class WigFileHelper {
             String[] fields = line.split("\t");
             long pos = Long.valueOf(fields[0]);
             double val = Double.valueOf(fields[1]);
-            
-            if (val > 0) {
+
+            if (val > threshold) {
                 if (inPositivePeak) {
                     if (val > maxScoreInPeak) {
                         maxScoreInPeak = val;

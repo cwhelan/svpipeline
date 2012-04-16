@@ -52,7 +52,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
 
     public void run(Configuration conf) throws Exception {
 
-        FaidxFileHelper faix = new FaidxFileHelper(faidxFileName);
+        FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
         String pileupFileName = outputPrefix + "_piledup_deletion_scores.wig";
         String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
@@ -67,14 +67,14 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
 
         System.err.println("Writing file " + pileupFileName);
         BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(outputFile));
-        writePiledUpDeletionScores(conf, outputFileWriter, inputHDFSDir, faix, text);
+        writePiledUpDeletionScores(conf, outputFileWriter, inputHDFSDir, faidx, text);
         outputFileWriter.close();
 
         System.err.println("Exporting regions with positive scores into " + pileupBedFileName);
         BufferedReader pileupWigFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
         BufferedWriter piledupBedFileWriter = new BufferedWriter(new FileWriter(new File(pileupBedFileName)));
         try {
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter);
+            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter, 0, faidx);
         } finally {
             pileupWigFileReader.close();
             piledupBedFileWriter.close();
@@ -94,7 +94,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
         BufferedWriter averageBedFileWriter = new BufferedWriter(new FileWriter(new File(averagedBedFileName)));
         try {
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter);
+            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx);
         } finally {
             averagedWigFileReader.close();
             piledupBedFileWriter.close();

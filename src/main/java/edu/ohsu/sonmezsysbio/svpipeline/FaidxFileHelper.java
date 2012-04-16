@@ -17,6 +17,7 @@ public class FaidxFileHelper {
     Map<Short, String> chromNamesByKey;
     Map<String, Short> chromKeysByName;
     private String faidxFileName;
+    private Map<String, Long> chromLengthsByName;
 
     public FaidxFileHelper(String faidxFileName) {
         this.faidxFileName = faidxFileName;
@@ -36,9 +37,21 @@ public class FaidxFileHelper {
         return chromKeysByName.get(name);
     }
 
+    public Long getLengthForChromName(String name) throws IOException {
+        if (chromLengthsByName == null) {
+            chromLengthsByName = readChromLengthsByName(faidxFileName);
+        }
+        return chromLengthsByName.get(name);
+    }
+
     public Map<Short, String> readChromNamesByKey(String faidxFileName) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(faidxFileName));
         return readChromNamesByKey(reader);
+    }
+
+    public Map<String, Long> readChromLengthsByName(String faidxFileName) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(faidxFileName));
+        return readChromLengthsByName(reader);
     }
 
     public Map<Short, String> readChromNamesByKey(BufferedReader bufferedReader) throws IOException {
@@ -68,6 +81,18 @@ public class FaidxFileHelper {
             chrIdx++;
         }
         return chrTable;
+    }
+
+    public Map<String, Long> readChromLengthsByName(BufferedReader bufferedReader) throws IOException {
+        String line;
+        Map<String, Long> chrLengths = new HashMap<String, Long>();
+        while ((line = bufferedReader.readLine()) != null) {
+            String[] fields = line.split("\\s+");
+            String chromosomeName = fields[0];
+            Long length = Long.parseLong(fields[1]);
+            chrLengths.put(chromosomeName, length);
+        }
+        return chrLengths;
     }
 
 }
