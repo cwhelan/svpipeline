@@ -78,6 +78,9 @@ public class SVPipeline extends Configured implements Tool
         CommandDebugReadPairInfo commandDebugReadPairInfo = new CommandDebugReadPairInfo();
         jc.addCommand("debugReadPairInfo", commandDebugReadPairInfo);
 
+        CommandSummarizeAlignments commandSummarizeAlignments = new CommandSummarizeAlignments();
+        jc.addCommand("summarizeAlignments", commandSummarizeAlignments);
+
         jc.setProgramName("SVPipeline");
         return jc;
     }
