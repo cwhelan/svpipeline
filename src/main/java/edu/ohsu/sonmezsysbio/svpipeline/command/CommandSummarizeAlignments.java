@@ -1,7 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToDeletionScoreMapper;
 import edu.ohsu.sonmezsysbio.svpipeline.reducer.SingleEndDeletionScorePileupReducer;
@@ -13,40 +12,24 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.KeyFieldBasedComparator;
 
-import java.io.IOException;
-
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
- * Date: 5/23/11
- * Time: 10:02 AM
+ * Date: 4/16/12
+ * Time: 1:39 PM
  */
-@Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome")
-public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
-
+public class CommandSummarizeAlignments implements SVPipelineCommand {
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 
     @Parameter(names = {"--outputHDFSDir"}, required = true)
     String outputHDFSDir;
 
-    @Parameter(names = {"--targetIsize"}, required = true)
-    int targetIsize;
-
-    @Parameter(names = {"--targetIsizeSD"}, required = true)
-    int targetIsizeSD;
-
-    @Parameter(names = {"--isMatePairs"})
-    boolean matePairs = false;
-
-    @Parameter(names = {"--maxInsertSize"})
-    int maxInsertSize = 500000;
-
-    public void run(Configuration conf) throws IOException {
+    public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
     }
 
-    private void runHadoopJob(Configuration configuration) throws IOException {
+    private void runHadoopJob(Configuration configuration) {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Pileup Single End Deletion Score");
