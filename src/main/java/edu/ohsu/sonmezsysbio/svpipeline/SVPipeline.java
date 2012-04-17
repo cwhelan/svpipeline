@@ -30,6 +30,7 @@ public class SVPipeline extends Configured implements Tool
 
         try {
             jc.parse(args);
+
             parsedCommand = jc.getParsedCommand();
 
             if (parsedCommand == null) {
@@ -42,11 +43,6 @@ public class SVPipeline extends Configured implements Tool
             return 0;
         } catch (ParameterException pe) {
             System.err.println(pe.getMessage());
-            if (parsedCommand != null) {
-                jc.usage(parsedCommand);
-            } else {
-                jc.usage();
-            }
             return 1;
         } catch (Exception e) {
             e.printStackTrace();

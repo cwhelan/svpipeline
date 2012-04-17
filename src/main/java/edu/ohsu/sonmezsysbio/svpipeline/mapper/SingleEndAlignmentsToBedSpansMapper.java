@@ -170,15 +170,16 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
+        double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,
                 isizeMean,
                 isizeSD,
-                scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2)
+                pMappingCorrect
         );
 
         output.collect(new Text(leftRead.getReadId()),
-                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + deletionScore));
+                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + pMappingCorrect + "\t" + deletionScore));
 
     }
 }
