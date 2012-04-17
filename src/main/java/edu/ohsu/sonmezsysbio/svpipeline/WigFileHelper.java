@@ -121,6 +121,7 @@ public class WigFileHelper {
             if (line.startsWith("variableStep")) {
                 if (inPositivePeak) {
                     long endPosition = faidx.getLengthForChromName(currentChromosome) - 1;
+                    if (endPosition < peakStart) continue;
                     bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores + "\n");
                     peakNum += 1;
                 }

@@ -15,7 +15,11 @@ import java.util.Iterator;
 public class SingleEndAlignmentSummaryReducer extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
     public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
         Long[] totals = new Long[2];
-        for (Text val = values.next(); values.hasNext();) {
+        for (int i = 0; i < totals.length; i++) {
+            totals[i] = 0l;
+        }
+        while (values.hasNext()) {
+            Text val = values.next();
             String[] fields = val.toString().split("\t");
             for (int i = 0; i < fields.length; i++) {
                 totals[i] += Long.parseLong(fields[i]);

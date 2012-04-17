@@ -32,7 +32,7 @@ public class CommandSummarizeAlignments implements SVPipelineCommand {
     private void runHadoopJob(Configuration configuration) throws IOException {
         JobConf conf = new JobConf(configuration);
 
-        conf.setJobName("Pileup Single End Deletion Score");
+        conf.setJobName("Summarize Single End Alignments");
         conf.setJarByClass(SVPipeline.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
         Path outputDir = new Path(outputHDFSDir);

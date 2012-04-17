@@ -26,17 +26,27 @@ public class SVPipeline extends Configured implements Tool
     public int run(String[] args) throws Exception {
         JCommander jc = buildJCommander();
 
+        String parsedCommand = null;
+
         try {
             jc.parse(args);
-            String parsedCommand = jc.getParsedCommand();
+            parsedCommand = jc.getParsedCommand();
 
+            if (parsedCommand == null) {
+                jc.usage();
+                return 1;
+            }
             SVPipelineCommand command = (SVPipelineCommand) jc.getCommands().get(parsedCommand).getObjects().get(0);
             command.run(getConf());
 
             return 0;
         } catch (ParameterException pe) {
             System.err.println(pe.getMessage());
-            jc.usage();
+            if (parsedCommand != null) {
+                jc.usage(parsedCommand);
+            } else {
+                jc.usage();
+            }
             return 1;
         } catch (Exception e) {
             e.printStackTrace();

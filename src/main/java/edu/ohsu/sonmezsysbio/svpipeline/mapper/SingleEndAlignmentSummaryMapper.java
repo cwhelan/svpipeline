@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
@@ -14,8 +15,11 @@ import java.util.List;
  * Date: 4/16/12
  * Time: 1:44 PM
  */
-public class SingleEndAlignmentSummaryMapper extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
-    public void map(Text key, Text value, OutputCollector output, Reporter reporter) throws IOException {
+public class SingleEndAlignmentSummaryMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+
+    Text outKey = new Text("k");
+
+    public void map(LongWritable key, Text value, OutputCollector output, Reporter reporter) throws IOException {
         String line = value.toString();
         int firstTabIndex = line.indexOf('\t');
         String lineValues = line.substring(firstTabIndex + 1);
@@ -29,16 +33,8 @@ public class SingleEndAlignmentSummaryMapper extends MapReduceBase implements Ma
         String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
 
-        emitReadPairInfoForAllPairs(key, read1AlignmentRecords, read2AlignmentRecords, output);
+        output.collect(outKey, new Text("1\t" + (read1AlignmentRecords.size() * read2AlignmentRecords.size())));
 
     }
-    private void emitReadPairInfoForAllPairs(Text key, List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<Text, Text> output) throws IOException {
-        int pairs = 0;
-        for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
-            for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
-                pairs += 1;
-            }
-        }
-        output.collect(key, new Text("1\t" + pairs));
-    }
+
 }
