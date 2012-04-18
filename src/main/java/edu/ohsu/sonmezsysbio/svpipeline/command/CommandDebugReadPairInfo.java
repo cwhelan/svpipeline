@@ -87,6 +87,7 @@ public class CommandDebugReadPairInfo implements SVPipelineCommand {
 
         conf.setOutputKeyClass(GenomicLocation.class);
         conf.setOutputValueClass(ReadPairInfo.class);
+        conf.setOutputFormat(SequenceFileOutputFormat.class);
 
         JobClient.runJob(conf);
 

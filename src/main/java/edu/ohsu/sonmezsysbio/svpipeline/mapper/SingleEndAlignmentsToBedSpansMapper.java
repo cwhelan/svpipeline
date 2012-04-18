@@ -179,7 +179,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         );
 
         output.collect(new Text(leftRead.getReadId()),
-                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + pMappingCorrect + "\t" + deletionScore));
+                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + insertSize + "\t" + pMappingCorrect + "\t" + deletionScore));
 
     }
 }

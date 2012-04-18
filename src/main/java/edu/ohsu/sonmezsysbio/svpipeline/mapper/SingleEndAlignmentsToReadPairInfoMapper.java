@@ -133,10 +133,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
 
         int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % SVPipeline.RESOLUTION;
 
-        insertSize = insertSize + leftRead.getPosition() % SVPipeline.RESOLUTION + SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION;
+
+        int genomicWindow = insertSize +
+                leftRead.getPosition() % SVPipeline.RESOLUTION +
+                SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION;
+
         ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2));
 
-        for (int i = 0; i <= insertSize; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 0; i <= genomicWindow; i = i + SVPipeline.RESOLUTION) {
             Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
             if (chromosome == null) {
                 throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
