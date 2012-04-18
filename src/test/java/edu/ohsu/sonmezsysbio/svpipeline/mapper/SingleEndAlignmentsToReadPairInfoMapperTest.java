@@ -53,7 +53,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
             assertEquals((short) 9, collector.keys.get(idx).chromosome);
             assertEquals(i, collector.keys.get(idx).pos);
 
-            assertEquals(10051, collector.values.get(idx).insertSize);
+            assertEquals(10017, collector.values.get(idx).insertSize);
             assertEquals(-9.2103, collector.values.get(idx).pMappingCorrect, .0001);
 
             idx++;
