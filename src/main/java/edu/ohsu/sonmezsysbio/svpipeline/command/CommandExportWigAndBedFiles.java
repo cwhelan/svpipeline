@@ -45,6 +45,9 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
     @Parameter(names = {"--medianFilterWindow"})
     int medianFilterWindow = 1;
 
+    @Parameter(names = {"--averageOverSlidingWindow"})
+    boolean averageOverSlidingWindow = false;
+
     public String getFaidxFileName() {
         return faidxFileName;
     }
@@ -84,24 +87,26 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
             piledupBedFileWriter.close();
         }
 
-        System.err.println("Averaging scores over sliding window into " + averagedFileName);
-        BufferedReader inFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
-        BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(averagedFileName)));
-        try {
-            WigFileHelper.averageWigOverSlidingWindow(SVPipeline.RESOLUTION, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
-        } finally {
-            inFileReader.close();
-            outFileWriter.close();
-        }
+        if (averageOverSlidingWindow) {
+            System.err.println("Averaging scores over sliding window into " + averagedFileName);
+            BufferedReader inFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
+            BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(averagedFileName)));
+            try {
+                WigFileHelper.averageWigOverSlidingWindow(SVPipeline.RESOLUTION, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
+            } finally {
+                inFileReader.close();
+                outFileWriter.close();
+            }
 
-        System.err.println("Exporting averaged regions with positive scores into " + averagedBedFileName);
-        BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
-        BufferedWriter averageBedFileWriter = new BufferedWriter(new FileWriter(new File(averagedBedFileName)));
-        try {
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx, medianFilterWindow);
-        } finally {
-            averagedWigFileReader.close();
-            piledupBedFileWriter.close();
+            System.err.println("Exporting averaged regions with positive scores into " + averagedBedFileName);
+            BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
+            BufferedWriter averageBedFileWriter = new BufferedWriter(new FileWriter(new File(averagedBedFileName)));
+            try {
+                WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx, medianFilterWindow);
+            } finally {
+                averagedWigFileReader.close();
+                piledupBedFileWriter.close();
+            }
         }
 
     }
