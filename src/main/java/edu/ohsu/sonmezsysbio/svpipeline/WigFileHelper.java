@@ -3,10 +3,7 @@ package edu.ohsu.sonmezsysbio.svpipeline;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -100,66 +97,98 @@ public class WigFileHelper {
         return windowTotal;
     }
 
-    public static void exportPositiveRegionsFromWig(String outputPrefix, BufferedReader averagedWigFileReader, BufferedWriter bedFileWriter, double threshold, FaidxFileHelper faidx) throws IOException {
+    public static void exportPositiveRegionsFromWig(String outputPrefix, BufferedReader averagedWigFileReader, BufferedWriter bedFileWriter, double threshold, FaidxFileHelper faidx, int medianFilterWindow) throws IOException {
         String trackName = outputPrefix + " peaks over " + threshold;
         bedFileWriter.write("track name = \"" + trackName + "\"\n");
 
-        boolean inPositivePeak = false;
-        double maxScoreInPeak = 0;
-        double sumPeakScores = 0;
-        long peakStart = 0;
-        int peakNum = 1;
-
         String line;
         String currentChromosome = "";
+
+        int[] values = null;
+        int resolution = 0;
+        int peakNum = 1;
 
         while ((line = averagedWigFileReader.readLine()) != null) {
             if (line.startsWith("track")) {
                 continue;
             }
-            
             if (line.startsWith("variableStep")) {
-                if (inPositivePeak) {
-                    long endPosition = faidx.getLengthForChromName(currentChromosome) - 1;
-                    if (endPosition < peakStart) continue;
-                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores + "\n");
-                    peakNum += 1;
+
+                if (values != null) {
+                    int[] filteredVals = medianFilterValues(values, medianFilterWindow);
+                    peakNum = writePositiveRegions(filteredVals, bedFileWriter, currentChromosome, faidx, resolution, peakNum);
                 }
-                // reset counters
-                inPositivePeak = false;
-                maxScoreInPeak = 0;
-                sumPeakScores = 0;
-                peakStart = 0;
-
                 currentChromosome = line.split(" ")[1].split("=")[1];
-                continue;
-            }
-        
-            String[] fields = line.split("\t");
-            long pos = Long.valueOf(fields[0]);
-            double val = Double.valueOf(fields[1]);
+                resolution = Integer.valueOf(line.split(" ")[2].split("=")[1]);
+                int numTiles = (int) Math.ceil(((double) faidx.getLengthForChromName(currentChromosome)) / resolution);
+                values = new int[numTiles];
 
-            if (val > threshold) {
-                if (inPositivePeak) {
-                    if (val > maxScoreInPeak) {
-                        maxScoreInPeak = val;
-                    }
-                    sumPeakScores += val;
-                } else {
+            } else {
+                String[] fields = line.split("\t");
+                long pos = Long.valueOf(fields[0]);
+                if (pos > faidx.getLengthForChromName(currentChromosome)) continue;
+                double val = Double.valueOf(fields[1]);
+                int tileNum = (int) pos / resolution;
+                values[tileNum] = val > threshold ? 1 : 0;
+            }
+        }
+        int[] filteredVals = medianFilterValues(values, medianFilterWindow);
+        writePositiveRegions(filteredVals, bedFileWriter, currentChromosome, faidx, resolution, peakNum);
+
+    }
+
+    private static int[] medianFilterValues(int[] values, int medianFilterWindow) {
+        int[] filteredValues = new int[values.length];
+        int idx = 0;
+        while (idx <= medianFilterWindow / 2) {
+            filteredValues[idx] = values[idx];
+            idx++;
+        }
+
+        while (idx < filteredValues.length - medianFilterWindow / 2) {
+            int[] filterWindow = Arrays.copyOfRange(values, idx - medianFilterWindow / 2, idx + medianFilterWindow / 2 + 1);
+            Arrays.sort(filterWindow);
+            filteredValues[idx] = filterWindow[medianFilterWindow / 2];
+            idx++;
+        }
+
+        while (idx < filteredValues.length) {
+            filteredValues[idx] = values[idx];
+            idx++;
+        }
+        return filteredValues;
+    }
+
+    private static int writePositiveRegions(int[] filteredVals, BufferedWriter bedFileWriter, String currentChromosome, FaidxFileHelper faidx, int resolution, int peakNum) throws IOException {
+        boolean inPositivePeak = false;
+        long peakStart = 0;
+        int idx = 0;
+
+        while (idx < filteredVals.length) {
+            long pos = idx * resolution;
+
+            if (filteredVals[idx] > 0) {
+                if (!inPositivePeak) {
                     peakStart = pos;
                     inPositivePeak = true;
-                    maxScoreInPeak = val;
-                    sumPeakScores = val;
                 }
-                
             } else {
                 if (inPositivePeak) {
                     long endPosition = pos - 1;
-                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + sumPeakScores + "\n");
+                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + 0 + "\n");
                     peakNum += 1;
                     inPositivePeak = false;
                 }
             }
+            idx = idx + 1;
         }
+        if (inPositivePeak) {
+            long endPosition = faidx.getLengthForChromName(currentChromosome) - 1;
+            if (endPosition < peakStart) return peakNum;
+            bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + 0 + "\n");
+            peakNum += 1;
+        }
+        return peakNum;
     }
+
 }

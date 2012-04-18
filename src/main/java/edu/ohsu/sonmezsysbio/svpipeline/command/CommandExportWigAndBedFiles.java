@@ -42,6 +42,9 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
     @Parameter(names = {"--text"})
     private boolean text = false;
 
+    @Parameter(names = {"--medianFilterWindow"})
+    int medianFilterWindow = 1;
+
     public String getFaidxFileName() {
         return faidxFileName;
     }
@@ -74,7 +77,8 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         BufferedReader pileupWigFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
         BufferedWriter piledupBedFileWriter = new BufferedWriter(new FileWriter(new File(pileupBedFileName)));
         try {
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter, 0, faidx);
+            medianFilterWindow = 1;
+            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter, 0, faidx, medianFilterWindow);
         } finally {
             pileupWigFileReader.close();
             piledupBedFileWriter.close();
@@ -94,7 +98,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
         BufferedWriter averageBedFileWriter = new BufferedWriter(new FileWriter(new File(averagedBedFileName)));
         try {
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx);
+            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx, medianFilterWindow);
         } finally {
             averagedWigFileReader.close();
             piledupBedFileWriter.close();

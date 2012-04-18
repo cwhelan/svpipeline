@@ -33,6 +33,9 @@ public class CommandExtractPositiveRegionsFromWig implements SVPipelineCommand {
     @Parameter(names = {"--threshold"})
     Double threshold = 0.0;
 
+    @Parameter(names = {"--medianFilterWindow"})
+    int medianFilterWindow = 1;
+
     public void run(Configuration conf) throws Exception {
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
@@ -44,7 +47,7 @@ public class CommandExtractPositiveRegionsFromWig implements SVPipelineCommand {
         }
         BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(outputBedFile)));
         try {
-            WigFileHelper.exportPositiveRegionsFromWig(name, wigFileReader, bedFileWriter, threshold, faidx);
+            WigFileHelper.exportPositiveRegionsFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow);
         } finally {
             wigFileReader.close();
             bedFileWriter.close();
