@@ -182,7 +182,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                 "-c", "1",
                 "-f", path1,
                 "-F", "ILMFQ",
-                "-k", "-K", "calfile.txt",
+                "-k", "-K", "calfile.txt", "-q", "5",
                 "-r", "Ex", "10 ", "-t", threshold
                 //"-a", "GATCGGAAGAGCGGTTCAGCA", "GATCGGAAGAGCGTCGTGTAGGGA",
         };
