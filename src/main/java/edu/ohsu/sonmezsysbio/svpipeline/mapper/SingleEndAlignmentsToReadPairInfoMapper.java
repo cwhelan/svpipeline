@@ -115,8 +115,8 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
 
-        int endPosterior1 = record1.getPosteriorProb();
-        int endPosterior2 = record2.getPosteriorProb();
+        double endPosterior1 = record1.getPosteriorProb();
+        double endPosterior2 = record2.getPosteriorProb();
 
         int insertSize;
         NovoalignNativeRecord leftRead = record1.getPosition() < record2.getPosition() ?
@@ -136,7 +136,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
 
         int genomicWindow = insertSize +
                 leftRead.getPosition() % SVPipeline.RESOLUTION +
-                SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION;
+                (SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION);
 
         ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2));
 

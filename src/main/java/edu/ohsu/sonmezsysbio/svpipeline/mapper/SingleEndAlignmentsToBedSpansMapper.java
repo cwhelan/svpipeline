@@ -1,6 +1,9 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.*;
+import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
+import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.ProbabilisticPairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -141,7 +144,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
         // todo: not handling inversions for now
         if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
 
-        int insertSize = -1;
+        int insertSize;
         Double isizeMean;
         Double isizeSD;
 
@@ -154,8 +157,8 @@ public class SingleEndAlignmentsToBedSpansMapper extends MapReduceBase implement
                leftRead.getPosition() < regionEnd && rightRead.getPosition() > regionStart))
             return;
 
-        int endPosterior1 = record1.getPosteriorProb();
-        int endPosterior2 = record2.getPosteriorProb();
+        double endPosterior1 = record1.getPosteriorProb();
+        double endPosterior2 = record2.getPosteriorProb();
 
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;

@@ -1,6 +1,9 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.*;
+import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
+import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.ProbabilisticPairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -108,8 +111,8 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
 
-        int endPosterior1 = record1.getPosteriorProb();
-        int endPosterior2 = record2.getPosteriorProb();
+        double endPosterior1 = record1.getPosteriorProb();
+        double endPosterior2 = record2.getPosteriorProb();
 
         int insertSize = -1;
         Double isizeMean;

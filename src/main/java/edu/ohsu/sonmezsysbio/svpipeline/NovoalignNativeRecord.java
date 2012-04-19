@@ -13,7 +13,7 @@ public class NovoalignNativeRecord {
     String referenceName;
     int position;
     String mappingStatus;
-    int posteriorProb;
+    double posteriorProb;
     boolean forward;
     String readId;
     String sequence;
@@ -32,7 +32,7 @@ public class NovoalignNativeRecord {
             record.setReferenceName(recordReferenceName);
 
             record.setPosition(Integer.parseInt(fields[8]));
-            record.setPosteriorProb(Integer.parseInt(fields[6]));
+            record.setPosteriorProb(Double.parseDouble(fields[6]));
             record.setForward("F".equals(fields[9]));
         }
 
@@ -68,11 +68,11 @@ public class NovoalignNativeRecord {
         this.mappingStatus = mappingStatus;
     }
 
-    public int getPosteriorProb() {
+    public double getPosteriorProb() {
         return posteriorProb;
     }
 
-    public void setPosteriorProb(int posteriorProb) {
+    public void setPosteriorProb(double posteriorProb) {
         this.posteriorProb = posteriorProb;
     }
 

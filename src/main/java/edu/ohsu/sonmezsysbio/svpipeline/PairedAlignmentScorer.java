@@ -51,7 +51,7 @@ public abstract class PairedAlignmentScorer {
         return matePair;
     }
 
-    public double probabilityMappingIsCorrect(int codedEndPosterior1, int codedEndPosterior2) {
+    public double probabilityMappingIsCorrect(double codedEndPosterior1, double codedEndPosterior2) {
         double endPosterior1 = Math.log(decodePosterior(codedEndPosterior1));
         double endPosterior2 = Math.log(decodePosterior(codedEndPosterior2));
 

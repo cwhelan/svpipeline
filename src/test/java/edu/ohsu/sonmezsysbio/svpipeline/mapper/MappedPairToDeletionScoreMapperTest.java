@@ -76,10 +76,10 @@ public class MappedPairToDeletionScoreMapperTest {
     @Test
     public void testComputeDeletionScore() throws Exception {
         // bigger insert size: more likely deletion
-        assertTrue(MappedPairToDeletionScoreMapper.computeDeletionScore(185, 117, 5114, 3000.0, 300.0, true) >
-                   MappedPairToDeletionScoreMapper.computeDeletionScore(185, 117, 3114, 3000.0, 300.0, true));
+        assertTrue(MappedPairToDeletionScoreMapper.computeDeletionScore(185.2, 117.1, 5114, 3000.0, 300.0, true) >
+                   MappedPairToDeletionScoreMapper.computeDeletionScore(185.2, 117.1, 3114, 3000.0, 300.0, true));
         // higher quality: more likely deletion
-        assertTrue(MappedPairToDeletionScoreMapper.computeDeletionScore(185, 117, 3114, 3000.0, 300.0, true) >
-                   MappedPairToDeletionScoreMapper.computeDeletionScore(185, 20, 3114, 3000.0, 300.0, true));
+        assertTrue(MappedPairToDeletionScoreMapper.computeDeletionScore(185.2, 117.1, 3114, 3000.0, 300.0, true) >
+                   MappedPairToDeletionScoreMapper.computeDeletionScore(185.2, 20.1231, 3114, 3000.0, 300.0, true));
     }
 }
