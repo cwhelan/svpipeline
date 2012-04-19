@@ -15,6 +15,10 @@
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.mahout.hadoop:hadoop-core:0.20.2" level="project" />
     <orderEntry type="library" name="Maven: org.biojava:biojava3-core:3.0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.biojava:biojava3-genome:3.0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.biojava:biojava3-alignment:3.0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.biojava:biojava3-phylo:3.0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org:forester:0.955" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.2" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.beust:jcommander:1.23" level="project" />

@@ -58,6 +58,9 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     @Parameter(names = {"--endFilter"})
     Long endFilter;
 
+    @Parameter(names = {"--excludePairsMappingIn"})
+    String exclusionRegionsFileName;
+
     public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
     }
@@ -80,10 +83,21 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
 
         DistributedCache.addCacheFile(new URI(faidxFileDir + "/" + faidxFileBasename + "#" + faidxFileBasename),
                 conf);
-        DistributedCache.createSymlink(conf);
 
-        conf.setInputFormat(TextInputFormat.class);
         conf.set("alignment.faidx", faidxFileBasename);
+
+        if (exclusionRegionsFileName != null) {
+            File exclusionRegionsFile = new File(exclusionRegionsFileName);
+            String exclusionRegionsFileBasename = exclusionRegionsFile.getName();
+            String exclusionRegionsFileDir = exclusionRegionsFile.getParent();
+
+            DistributedCache.addCacheFile(new URI(exclusionRegionsFileDir + "/" + exclusionRegionsFileBasename + "#" + exclusionRegionsFileBasename),
+                    conf);
+
+            conf.set("alignment.exclusionRegions", exclusionRegionsFileBasename);
+        }
+
+        DistributedCache.createSymlink(conf);
 
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
@@ -95,6 +109,8 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
             conf.set("alignments.filterstart", startFilter.toString());
             conf.set("alignments.filterend", endFilter.toString());
         }
+
+        conf.setInputFormat(TextInputFormat.class);
 
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocation.class);

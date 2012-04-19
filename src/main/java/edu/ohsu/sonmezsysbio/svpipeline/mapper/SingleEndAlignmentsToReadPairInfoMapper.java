@@ -28,6 +28,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
     private String chromosomeFilter;
     private Long startFilter;
     private Long endFilter;
+    private GFFFileHelper exclusionRegions;
 
     public FaidxFileHelper getFaix() {
         return faix;
@@ -85,6 +86,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
         this.scorer = scorer;
     }
 
+    public GFFFileHelper getExclusionRegions() {
+        return exclusionRegions;
+    }
+
+    public void setExclusionRegions(GFFFileHelper exclusionRegions) {
+        this.exclusionRegions = exclusionRegions;
+    }
+
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         int firstTabIndex = line.indexOf('\t');
@@ -99,12 +108,24 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
         String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
 
-        emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
+        try {
+            emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
-    private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
+    private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output) throws Exception {
         for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
             for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
+                if (exclusionRegions != null) {
+                    if (exclusionRegions.doesLocationOverlap(record1.getChromosomeName(), record1.getPosition(), record1.getPosition() + record1.getSequence().length()) &&
+                        exclusionRegions.doesLocationOverlap(record2.getChromosomeName(), record2.getPosition(), record2.getPosition() + record2.getSequence().length())) {
+                        return;
+                    }
+
+                }
                 emitReadPairInfoForPair(record1, record2, output);
             }
         }
@@ -175,6 +196,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
             setChromosomeFilter(job.get("alignments.filterchr"));
             setStartFilter(Long.parseLong(job.get("alignments.filterstart")));
             setEndFilter(Long.parseLong(job.get("alignments.filterend")));
+        }
+
+        if (job.get("alignment.exclusionRegions") != null) {
+            String exclusionRegionsFileName = job.get("alignment.exclusionRegions");
+            try {
+                exclusionRegions = new GFFFileHelper(exclusionRegionsFileName);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
         }
     }
 }
