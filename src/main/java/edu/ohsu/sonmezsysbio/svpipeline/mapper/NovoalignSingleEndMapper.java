@@ -183,7 +183,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                 "-f", path1,
                 "-F", "ILMFQ",
                 "-k", "-K", "calfile.txt", "-q", "5",
-                "-r", "Ex", "10 ", "-t", threshold
+                "-r", "Ex", "10", "-t", threshold
                 //"-a", "GATCGGAAGAGCGGTTCAGCA", "GATCGGAAGAGCGTCGTGTAGGGA",
         };
 //        String args = String.format("-d %s -c 1 -f %s %s -F ILMFQ -k -K calfile.txt -i MP %s,%s 150,50" +
