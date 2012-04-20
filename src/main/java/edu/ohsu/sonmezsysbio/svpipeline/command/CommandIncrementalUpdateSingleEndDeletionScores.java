@@ -91,7 +91,9 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
             String exclusionRegionsFileBasename = exclusionRegionsFile.getName();
             String exclusionRegionsFileDir = exclusionRegionsFile.getParent();
 
-            DistributedCache.addCacheFile(new URI(exclusionRegionsFileDir + "/" + exclusionRegionsFileBasename + "#" + exclusionRegionsFileBasename),
+            URI uri = new URI(exclusionRegionsFileDir + "/" + exclusionRegionsFileBasename + "#" + exclusionRegionsFileBasename);
+            System.err.println("URI: " + uri);
+            DistributedCache.addCacheFile(uri,
                     conf);
 
             conf.set("alignment.exclusionRegions", exclusionRegionsFileBasename);

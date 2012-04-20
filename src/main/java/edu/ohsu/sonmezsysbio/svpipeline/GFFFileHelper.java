@@ -1,10 +1,12 @@
 package edu.ohsu.sonmezsysbio.svpipeline;
 
-import org.biojava3.genome.parsers.gff.FeatureList;
-import org.biojava3.genome.parsers.gff.GFF3Reader;
-import org.biojava3.genome.parsers.gff.Location;
+import org.biojava3.genome.parsers.gff.*;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,18 +16,29 @@ import java.io.IOException;
  */
 public class GFFFileHelper {
 
-    FeatureList features;
+    Map<String, FeatureList> featuresByChrom = new HashMap<String, FeatureList>();
 
     public GFFFileHelper() {
 
     }
 
     public GFFFileHelper(String filename) throws IOException {
-        features = GFF3Reader.read(filename);
+        FeatureList features = GFF3Reader.read(filename);
+        Iterator<FeatureI> iterator = features.iterator();
+        while (iterator.hasNext()) {
+            FeatureI feature = iterator.next();
+            String chrom = feature.seqname();
+            if (! featuresByChrom.containsKey(chrom)) {
+                featuresByChrom.put(chrom, new FeatureList());
+            }
+            FeatureList featureList = featuresByChrom.get(chrom);
+            featureList.add(feature);
+        }
     }
 
     public boolean doesLocationOverlap(String chrom, int start, int end) throws Exception {
         Location query = new Location(start, end);
-        return features.selectOverlapping(chrom, query, true).size() > 0;
+        if (! featuresByChrom.containsKey(chrom)) return false;
+        return featuresByChrom.get(chrom).selectOverlapping(chrom, query, true).size() > 0;
     }
 }

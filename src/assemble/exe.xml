@@ -13,6 +13,7 @@
 	      <includes>
               <include>com.beust:jcommander</include>
               <include>org.apache.commons:commons-math3</include>
+              <include>org.biojava:biojava3-genome</include>
 	      </includes>
 	    </dependencySet>
 	  </dependencySets>

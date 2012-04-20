@@ -76,6 +76,41 @@ public class NovoalignNativeRecord {
         this.posteriorProb = posteriorProb;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NovoalignNativeRecord that = (NovoalignNativeRecord) o;
+
+        if (forward != that.forward) return false;
+        if (position != that.position) return false;
+        if (Double.compare(that.posteriorProb, posteriorProb) != 0) return false;
+        if (mappingStatus != null ? !mappingStatus.equals(that.mappingStatus) : that.mappingStatus != null)
+            return false;
+        if (readId != null ? !readId.equals(that.readId) : that.readId != null) return false;
+        if (referenceName != null ? !referenceName.equals(that.referenceName) : that.referenceName != null)
+            return false;
+        if (sequence != null ? !sequence.equals(that.sequence) : that.sequence != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = referenceName != null ? referenceName.hashCode() : 0;
+        result = 31 * result + position;
+        result = 31 * result + (mappingStatus != null ? mappingStatus.hashCode() : 0);
+        temp = posteriorProb != +0.0d ? Double.doubleToLongBits(posteriorProb) : 0L;
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (forward ? 1 : 0);
+        result = 31 * result + (readId != null ? readId.hashCode() : 0);
+        result = 31 * result + (sequence != null ? sequence.hashCode() : 0);
+        return result;
+    }
+
     public boolean isForward() {
         return forward;
     }

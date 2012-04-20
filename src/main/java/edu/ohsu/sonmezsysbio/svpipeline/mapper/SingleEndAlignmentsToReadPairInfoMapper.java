@@ -8,7 +8,9 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -108,24 +110,39 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
         String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
 
+        Set<NovoalignNativeRecord> recordsInExcludedAreas = new HashSet<NovoalignNativeRecord>();
         try {
-            emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
+            if (exclusionRegions != null) {
+                for (NovoalignNativeRecord record : read1AlignmentRecords) {
+                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
+                        recordsInExcludedAreas.add(record);
+                    }
+                }
+
+                for (NovoalignNativeRecord record : read2AlignmentRecords) {
+                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
+                        recordsInExcludedAreas.add(record);
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
+            emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output, recordsInExcludedAreas);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output) throws Exception {
+    private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<NovoalignNativeRecord> recordsInExcludedAreas) throws Exception {
         for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
             for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
-                if (exclusionRegions != null) {
-                    if (exclusionRegions.doesLocationOverlap(record1.getChromosomeName(), record1.getPosition(), record1.getPosition() + record1.getSequence().length()) &&
-                        exclusionRegions.doesLocationOverlap(record2.getChromosomeName(), record2.getPosition(), record2.getPosition() + record2.getSequence().length())) {
-                        return;
-                    }
-
-                }
+                if (recordsInExcludedAreas.contains(record1) && recordsInExcludedAreas.contains(record2)) return;
                 emitReadPairInfoForPair(record1, record2, output);
             }
         }
@@ -204,7 +221,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
                 exclusionRegions = new GFFFileHelper(exclusionRegionsFileName);
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new RuntimeException(e);
             }
         }
     }
