@@ -177,19 +177,28 @@ class SequenceVarier(val variations : List[Variation], val inputChars : Iterator
   }
 }
 
-if (args.length > 4) {
-  
-  val numSVs = args(0).toInt
-  val alus = readAlus(args(2))
-  val variations = genSVs(numSVs, alus)
+def parseGffFile(filename : String) : List[Variation] = {
+  var variations = new scala.collection.mutable.ListBuffer[Variation]
+  for(line <- Source.fromFile(filename).getLines()) {
+    val fields = line.split("\t")
+    // gff is one-based
+    val start = fields(3).toInt - 1
+    val end = fields(4).toInt - 1
+    variations += new Deletion(start, end)
+  }
+  return variations.toList
+}
 
-  val out = new FileWriter(args(3))
+if (args.length == 3) {
 
-  printToFile(new File(args(4)))(p => {
-    variations.foreach(p.println)
-  })
+  val gffFileName = args(0)
+  val chrFastaFile = args(1)
+
+  val variations = parseGffFile(gffFileName)
+
+  val out = new FileWriter(args(2))
   
-  val inputChars = Source.fromFile(args(1))
+  val inputChars = Source.fromFile(chrFastaFile)
 
   try {
     val s = new SequenceVarier(variations, inputChars, out)
@@ -199,5 +208,6 @@ if (args.length > 4) {
     out.close()
   }
 } else {
-  println("usage: teSim num ref alubed newref svs")
+  println("usage: applyVariantsToFasta.scala gffFile ref newref")
 }
+
