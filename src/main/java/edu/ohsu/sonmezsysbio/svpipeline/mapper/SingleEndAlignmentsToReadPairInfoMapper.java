@@ -142,7 +142,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
     private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<NovoalignNativeRecord> recordsInExcludedAreas) throws Exception {
         for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
             for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
-                if (recordsInExcludedAreas.contains(record1) && recordsInExcludedAreas.contains(record2)) return;
+                if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
                 emitReadPairInfoForPair(record1, record2, output);
             }
         }
