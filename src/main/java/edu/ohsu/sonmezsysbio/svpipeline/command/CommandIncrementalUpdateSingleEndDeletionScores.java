@@ -6,6 +6,7 @@ import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToReadPairInfoMapper;
+import edu.ohsu.sonmezsysbio.svpipeline.partitioner.GenomicLocationPartitioner;
 import edu.ohsu.sonmezsysbio.svpipeline.reducer.IncrementalDelBeliefUpdateReadPairInfoReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -117,6 +118,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocation.class);
         conf.setMapOutputValueClass(ReadPairInfo.class);
+        conf.setPartitionerClass(GenomicLocationPartitioner.class);
 
         conf.setReducerClass(IncrementalDelBeliefUpdateReadPairInfoReducer.class);
         //conf.setReducerClass(IdentityReducer.class);
