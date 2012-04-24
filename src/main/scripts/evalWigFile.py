@@ -31,17 +31,20 @@ for line in wig_file:
     if val > lower_threshold:
         values_above_threshold.append(val)
 
-print "values above threshold: " + str(len(values_above_threshold))
+#print "values above threshold: " + str(len(values_above_threshold))
 values_above_threshold.sort()
 
-num_quantiles = 400
+num_quantiles = 500
 quantiles = [0] * (num_quantiles + 1)
 q_num = 0
 
 for i in xrange(len(values_above_threshold)):    
     if i % (len(values_above_threshold) / num_quantiles) == 0:
-        #print "i: " + str(i)
+        if (q_num > num_quantiles):
+            continue
+#        sys.stderr.write("i: " + str(i))
         qv = values_above_threshold[i]
+#        sys.stderr.write("q_num: " + str(q_num) + " = " + str(qv))
         quantiles[q_num] = qv
         #print "quantiles " + str(q_num) + " = " + str(values_above_threshold[i])
         q_num += 1
@@ -57,10 +60,11 @@ def process_quantile(q):
     num_predictions = int(result_fields[1])
     predicted_region = int(result_fields[2])
     num_matches = int(result_fields[3])
-    return (q, num_predictions, predicted_region, num_matches)
+    return (q, num_predictions, predicted_region, num_matches, float(num_matches) / num_predictions)
     
 p=Pool(50)
 results = p.map(process_quantile, quantiles)
 
+print "\t".join(["Thresh", "Calls", "Region", "TP", "TPR"])
 for q in results:
     print "\t".join(map(str, q))

@@ -44,7 +44,8 @@ for line in open_file(temp_file_name):
 compare_bed_to_truth_cmd = ['intersectBed', '-b', temp_file_name, '-a', truth_filename, '-wa', '-u']
     
 num_matches = sum(1 for _ in subprocess.Popen(compare_bed_to_truth_cmd, stdout=subprocess.PIPE).stdout)
+tpr = float(num_matches) / num_predictions
     
 #sys.stderr.write("matches = " + str(num_matches) + "\n")
 temp_file.close()
-print "\t".join(map(str, [q, num_predictions, predicted_region, num_matches]))
+print "\t".join(map(str, [q, num_predictions, predicted_region, num_matches, tpr]))
