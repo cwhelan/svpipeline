@@ -33,7 +33,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     String inputHDFSDir;
 
     @Parameter(names = {"--outputHDFSDir"}, required = true)
-    String ouptutHDFSDir;
+    String outputHDFSDir;
 
     @Parameter(names = {"--targetIsize"}, required = true)
     int targetIsize;
@@ -63,7 +63,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     String exclusionRegionsFileName;
 
     @Parameter(names = {"--resolution"})
-    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    int resolution = SVPipeline.DEFAULT_RESOLUTION;
 
     public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
@@ -75,7 +75,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
         conf.setJobName("Incremental Update Single End Deletion Score");
         conf.setJarByClass(SVPipeline.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
-        Path outputDir = new Path(ouptutHDFSDir);
+        Path outputDir = new Path(outputHDFSDir);
         FileSystem.get(conf).delete(outputDir);
 
         FileOutputFormat.setOutputPath(conf, outputDir);
