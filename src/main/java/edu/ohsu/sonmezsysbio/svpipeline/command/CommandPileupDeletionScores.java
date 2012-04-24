@@ -36,6 +36,9 @@ public class CommandPileupDeletionScores implements SVPipelineCommand {
     @Parameter(names = {"--targetIsizeSD"}, required = true)
     int targetIsizeSD;
 
+    @Parameter(names = {"--resolution"})
+    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+
     public void run(Configuration conf) throws IOException {
         runHadoopJob(conf);
     }
@@ -52,6 +55,8 @@ public class CommandPileupDeletionScores implements SVPipelineCommand {
         FileOutputFormat.setOutputPath(conf, outputDir);
 
         conf.setInputFormat(TextInputFormat.class);
+
+        conf.set("svpipeline.resolution", String.valueOf(resolution));
 
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));

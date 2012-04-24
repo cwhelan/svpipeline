@@ -1,9 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
-import edu.ohsu.sonmezsysbio.svpipeline.PairedAlignmentScorer;
-import edu.ohsu.sonmezsysbio.svpipeline.ProbabilisticPairedAlignmentScorer;
-import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
+import edu.ohsu.sonmezsysbio.svpipeline.*;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -18,7 +15,7 @@ import java.util.List;
  * Date: 5/23/11
  * Time: 10:12 AM
  */
-public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
+public class SingleEndAlignmentsToDeletionScoreMapper extends SVPipelineMapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
@@ -150,11 +147,11 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends MapReduceBase impl
         );
         //System.err.println("computed deletion score : " + deletionScore);
 
-        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % SVPipeline.RESOLUTION;
+        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % resolution;
 
-        insertSize = insertSize + leftRead.getPosition() % SVPipeline.RESOLUTION + SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION;
+        insertSize = insertSize + leftRead.getPosition() % resolution + resolution - rightRead.getPosition() % resolution;
 
-        for (int i = 0; i <= insertSize; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 0; i <= insertSize; i = i + resolution) {
             Text outKey = new Text(record1.getChromosomeName() + "\t" + (genomeOffset + i));
             DoubleWritable outVal = new DoubleWritable(deletionScore);
             output.collect(outKey, outVal);

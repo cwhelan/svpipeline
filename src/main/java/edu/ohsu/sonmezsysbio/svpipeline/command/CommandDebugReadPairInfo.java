@@ -48,6 +48,9 @@ public class CommandDebugReadPairInfo implements SVPipelineCommand {
     @Parameter(names = {"--endFilter"}, required = true)
     Long endFilter;
 
+    @Parameter(names = {"--resolution"})
+    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+
     public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
     }
@@ -73,6 +76,9 @@ public class CommandDebugReadPairInfo implements SVPipelineCommand {
         DistributedCache.createSymlink(conf);
 
         conf.setInputFormat(TextInputFormat.class);
+
+        conf.set("svpipeline.resolution", String.valueOf(resolution));
+
         conf.set("alignment.faidx", faidxFileBasename);
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
         conf.set("alignments.filterchr", chrFilter);

@@ -23,11 +23,14 @@ public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
     @Parameter(names = {"--OutFile"}, required = true)
     String outFile;
 
+    @Parameter(names = {"--resolution"})
+    int resolution = SVPipeline.DEFAULT_RESOLUTION;
+
     public void run(Configuration conf) throws IOException {
         BufferedReader inFileReader = new BufferedReader(new FileReader(new File(inFile)));
         BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(outFile)));
         try {
-            WigFileHelper.averageWigOverSlidingWindow(SVPipeline.RESOLUTION, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
+            WigFileHelper.averageWigOverSlidingWindow(resolution, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
         } finally {
             inFileReader.close();
             outFileWriter.close();

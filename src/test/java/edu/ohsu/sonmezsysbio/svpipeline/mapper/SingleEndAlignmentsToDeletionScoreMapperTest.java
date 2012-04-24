@@ -39,7 +39,7 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
 
         mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
 
-        for (int i = 41821100; i <= 41823900; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 41821100; i <= 41823900; i = i + SVPipeline.DEFAULT_RESOLUTION) {
             verify(collector).collect(new Text("2\t" + i),
                     new DoubleWritable(1));
         }
@@ -65,7 +65,7 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
 
         mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
 
-        for (int i = 43039500; i <= 43049500; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 43039500; i <= 43049500; i = i + SVPipeline.DEFAULT_RESOLUTION) {
             verify(collector).collect(new Text("10\t" + i),
                     new DoubleWritable(1));
         }
@@ -82,12 +82,12 @@ public class SingleEndAlignmentsToDeletionScoreMapperTest {
 
         mapper.map(new LongWritable(1), new Text(complexInputLine), collector, reporter);
 
-        for (int i = 81550200; i <= 81550500; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 81550200; i <= 81550500; i = i + SVPipeline.DEFAULT_RESOLUTION) {
             verify(collector).collect(new Text("10\t" + i),
                     new DoubleWritable(1));
         }
 
-        for (int i = 89072400; i <= 89072700; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 89072400; i <= 89072700; i = i + SVPipeline.DEFAULT_RESOLUTION) {
             verify(collector).collect(new Text("10\t" + i),
                     new DoubleWritable(1));
         }

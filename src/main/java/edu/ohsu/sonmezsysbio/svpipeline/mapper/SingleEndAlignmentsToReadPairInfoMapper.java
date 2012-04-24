@@ -5,7 +5,10 @@ import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -18,7 +21,7 @@ import java.util.Set;
  * Date: 4/6/12
  * Time: 1:03 PM
  */
-public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase implements Mapper<LongWritable, Text, GenomicLocation, ReadPairInfo> {
+public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduceBase implements Mapper<LongWritable, Text, GenomicLocation, ReadPairInfo> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
@@ -169,16 +172,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends MapReduceBase imple
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % SVPipeline.RESOLUTION;
+        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % resolution;
 
 
         int genomicWindow = insertSize +
-                leftRead.getPosition() % SVPipeline.RESOLUTION +
-                (SVPipeline.RESOLUTION - rightRead.getPosition() % SVPipeline.RESOLUTION);
+                leftRead.getPosition() % resolution +
+                (resolution - rightRead.getPosition() % resolution);
 
         ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2));
 
-        for (int i = 0; i <= genomicWindow; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 0; i <= genomicWindow; i = i + resolution) {
             Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
             if (chromosome == null) {
                 throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());

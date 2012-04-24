@@ -48,6 +48,9 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
     @Parameter(names = {"--averageOverSlidingWindow"})
     boolean averageOverSlidingWindow = false;
 
+    @Parameter(names = {"--resolution"})
+    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+
     public String getFaidxFileName() {
         return faidxFileName;
     }
@@ -92,7 +95,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
             BufferedReader inFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
             BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(averagedFileName)));
             try {
-                WigFileHelper.averageWigOverSlidingWindow(SVPipeline.RESOLUTION, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
+                WigFileHelper.averageWigOverSlidingWindow(resolution, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
             } finally {
                 inFileReader.close();
                 outFileWriter.close();
@@ -156,7 +159,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         while (! fileReaders.isEmpty()) {
             ReaderAndLine minNextLine = fileReaders.poll();
             if (currentChromosome != minNextLine.getGenomicLocation().chromosome) {
-                outputFileWriter.write("variableStep chrom=" + faix.getNameForChromKey(minNextLine.getGenomicLocation().chromosome) + " span=" + SVPipeline.RESOLUTION + "\n");
+                outputFileWriter.write("variableStep chrom=" + faix.getNameForChromKey(minNextLine.getGenomicLocation().chromosome) + " span=" + resolution + "\n");
                 currentChromosome = minNextLine.getGenomicLocation().chromosome;
             }
             outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue() + "\n");

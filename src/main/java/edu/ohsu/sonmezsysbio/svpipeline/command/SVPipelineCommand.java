@@ -2,8 +2,6 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import org.apache.hadoop.conf.Configuration;
 
-import java.io.IOException;
-
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan

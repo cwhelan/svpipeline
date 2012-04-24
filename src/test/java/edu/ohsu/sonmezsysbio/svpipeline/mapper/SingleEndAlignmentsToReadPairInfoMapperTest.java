@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +49,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
 
         int idx = 0;
-        for (int i = 43039500; i <= 43049500; i = i + SVPipeline.RESOLUTION) {
+        for (int i = 43039500; i <= 43049500; i = i + SVPipeline.DEFAULT_RESOLUTION) {
             assertEquals((short) 9, collector.keys.get(idx).chromosome);
             assertEquals(i, collector.keys.get(idx).pos);
 
@@ -72,12 +71,12 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
 //
 //        mapper.map(new LongWritable(1), new Text(complexInputLine), collector, reporter);
 //
-//        for (int i = 81550200; i <= 81550500; i = i + SVPipeline.RESOLUTION) {
+//        for (int i = 81550200; i <= 81550500; i = i + SVPipeline.DEFAULT_RESOLUTION) {
 //            verify(collector).collect(new Text("10\t" + i),
 //                    new DoubleWritable(1));
 //        }
 //
-//        for (int i = 89072400; i <= 89072700; i = i + SVPipeline.RESOLUTION) {
+//        for (int i = 89072400; i <= 89072700; i = i + SVPipeline.DEFAULT_RESOLUTION) {
 //            verify(collector).collect(new Text("10\t" + i),
 //                    new DoubleWritable(1));
 //        }

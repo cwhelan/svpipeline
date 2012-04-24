@@ -62,6 +62,9 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     @Parameter(names = {"--excludePairsMappingIn"})
     String exclusionRegionsFileName;
 
+    @Parameter(names = {"--resolution"})
+    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+
     public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
     }
@@ -101,6 +104,8 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
         }
 
         DistributedCache.createSymlink(conf);
+
+        conf.set("svpipeline.resolution", String.valueOf(resolution));
 
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));

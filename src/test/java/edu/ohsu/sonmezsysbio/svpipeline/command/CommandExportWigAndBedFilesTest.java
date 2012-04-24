@@ -2,14 +2,11 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import edu.ohsu.sonmezsysbio.svpipeline.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringBufferInputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -68,11 +65,11 @@ public class CommandExportWigAndBedFilesTest {
 
         command.mergeSortedInputStreams(dfs, writer, faix, true, inputStreams);
 
-        String expectedOutput = "variableStep chrom=chr1 span=" + SVPipeline.RESOLUTION + "\n" +
+        String expectedOutput = "variableStep chrom=chr1 span=" + SVPipeline.DEFAULT_RESOLUTION + "\n" +
                 "1000\t-2.0\n" +
                 "2000\t-4.0\n" +
                 "3000\t-1.0\n" +
-                "variableStep chrom=chr2 span=" + SVPipeline.RESOLUTION + "\n" +
+                "variableStep chrom=chr2 span=" + SVPipeline.DEFAULT_RESOLUTION + "\n" +
                 "1000\t-3.0\n" +
                 "2000\t-6.0\n" +
                 "3000\t-5.0\n";
