@@ -3,7 +3,7 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import edu.ohsu.sonmezsysbio.svpipeline.WigFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.WigFileHelper;
 import org.apache.hadoop.conf.Configuration;
 
 import java.io.*;

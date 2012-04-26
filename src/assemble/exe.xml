@@ -14,6 +14,8 @@
               <include>com.beust:jcommander</include>
               <include>org.apache.commons:commons-math3</include>
               <include>org.biojava:biojava3-genome</include>
+              <include>org.broad:bigwig</include>
+              <include>log4j:log4j</include>
 	      </includes>
 	    </dependencySet>
 	  </dependencySets>

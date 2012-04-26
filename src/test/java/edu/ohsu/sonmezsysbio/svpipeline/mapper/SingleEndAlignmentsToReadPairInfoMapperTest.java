@@ -1,7 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
-import edu.ohsu.sonmezsysbio.svpipeline.FaidxFileHelper;
-import edu.ohsu.sonmezsysbio.svpipeline.GFFFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.ProbabilisticPairedAlignmentScorer;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;

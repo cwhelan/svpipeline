@@ -1,6 +1,9 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.*;
+import edu.ohsu.sonmezsysbio.svpipeline.file.BigWigFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.hadoop.io.LongWritable;
@@ -34,6 +37,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
     private Long startFilter;
     private Long endFilter;
     private GFFFileHelper exclusionRegions;
+    private BigWigFileHelper mapabilityWeighting;
 
     public FaidxFileHelper getFaix() {
         return faix;
@@ -179,7 +183,23 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
                 leftRead.getPosition() % resolution +
                 (resolution - rightRead.getPosition() % resolution);
 
-        ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2));
+
+        double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
+
+        if (mapabilityWeighting != null) {
+            String chrom = record1.getChromosomeName();
+            int leftReadStart = leftRead.getPosition();
+            int leftReadEnd = leftRead.getPosition() + leftRead.getSequence().length();
+            double leftReadMapability = mapabilityWeighting.getAverageValueForRegion(chrom, leftReadStart, leftReadEnd);
+
+            int rightReadStart = rightRead.getPosition() - rightRead.getSequence().length();
+            int rightReadEnd = rightRead.getPosition();
+            double rightReadMapability = mapabilityWeighting.getAverageValueForRegion(chrom, rightReadStart, rightReadEnd);
+
+            pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
+        }
+
+        ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect);
 
         for (int i = 0; i <= genomicWindow; i = i + resolution) {
             Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
@@ -222,6 +242,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
             String exclusionRegionsFileName = job.get("alignment.exclusionRegions");
             try {
                 exclusionRegions = new GFFFileHelper(exclusionRegionsFileName);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (job.get("alignment.mapabilityWeighting") != null) {
+            String mapabilityWeightingFileName = job.get("alignment.mapabilityWeighting");
+            mapabilityWeighting = new BigWigFileHelper();
+            try {
+                mapabilityWeighting.open(mapabilityWeightingFileName);
             } catch (IOException e) {
                 e.printStackTrace();
             }

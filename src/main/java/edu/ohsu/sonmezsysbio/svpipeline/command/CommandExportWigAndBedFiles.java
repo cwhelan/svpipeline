@@ -2,9 +2,9 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import edu.ohsu.sonmezsysbio.svpipeline.FaidxFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
-import edu.ohsu.sonmezsysbio.svpipeline.WigFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.WigFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReaderAndLine;
 import edu.ohsu.sonmezsysbio.svpipeline.io.SequenceReaderAndLine;

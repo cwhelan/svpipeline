@@ -65,6 +65,9 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     @Parameter(names = {"--resolution"})
     int resolution = SVPipeline.DEFAULT_RESOLUTION;
 
+    @Parameter(names = {"--mapabilityWeighting"})
+    String mapabilityWeightingFileName;
+
     public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
     }
@@ -101,6 +104,19 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
                     conf);
 
             conf.set("alignment.exclusionRegions", exclusionRegionsFileBasename);
+        }
+
+        if (mapabilityWeightingFileName != null) {
+            File mapabilityWeightingFile = new File(mapabilityWeightingFileName);
+            String mapabilityWeightingFileBasename = mapabilityWeightingFile.getName();
+            String mapabilityWeightingFileDir = mapabilityWeightingFile.getParent();
+
+            URI uri = new URI(mapabilityWeightingFileDir + "/" + mapabilityWeightingFileBasename + "#" + mapabilityWeightingFileBasename);
+            System.err.println("URI: " + uri);
+            DistributedCache.addCacheFile(uri,
+                    conf);
+
+            conf.set("alignment.mapabilityWeighting", mapabilityWeightingFileBasename);
         }
 
         DistributedCache.createSymlink(conf);

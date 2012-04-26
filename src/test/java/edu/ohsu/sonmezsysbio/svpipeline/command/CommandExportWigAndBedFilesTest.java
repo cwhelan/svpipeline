@@ -1,6 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.command;
 
-import edu.ohsu.sonmezsysbio.svpipeline.FaidxFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
