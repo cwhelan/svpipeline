@@ -3,6 +3,7 @@ package edu.ohsu.sonmezsysbio.svpipeline.file;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**

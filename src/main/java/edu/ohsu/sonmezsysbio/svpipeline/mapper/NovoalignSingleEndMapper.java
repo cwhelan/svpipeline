@@ -1,16 +1,13 @@
 package edu.ohsu.sonmezsysbio.svpipeline.mapper;
 
 import edu.ohsu.sonmezsysbio.svpipeline.NovoalignNativeRecord;
-import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
-import javax.sound.sampled.Line;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,9 +50,9 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 
         this.localDir = job.get("mapred.child.tmp");
         try {
-            s1File = new File(localDir + "/temp1_sequence.txt").getAbsoluteFile();
+            s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
             s1File.createNewFile();
-            s1FileWriter = new BufferedWriter(new FileWriter(s1File));
+            s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
 
             reference = job.get("novoalign.reference");
             threshold = job.get("novoalign.threshold");

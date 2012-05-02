@@ -38,6 +38,8 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
     private Long endFilter;
     private GFFFileHelper exclusionRegions;
     private BigWigFileHelper mapabilityWeighting;
+    private double targetIsize;
+    private double targetIsizeSD;
 
     public FaidxFileHelper getFaix() {
         return faix;
@@ -158,7 +160,13 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
     private void emitReadPairInfoForPair(NovoalignNativeRecord record1, NovoalignNativeRecord record2, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
 
         // todo: not handling translocations for now
-        if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
+        if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
+            return;
+        }
+
+        if (getChromosomeFilter() != null) {
+            if (! record1.getChromosomeName().equals(getChromosomeFilter())) return;
+        }
 
         double endPosterior1 = record1.getPosteriorProb();
         double endPosterior2 = record2.getPosteriorProb();
@@ -187,16 +195,22 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
         double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
 
         if (mapabilityWeighting != null) {
-            String chrom = record1.getChromosomeName();
-            int leftReadStart = leftRead.getPosition();
-            int leftReadEnd = leftRead.getPosition() + leftRead.getSequence().length();
-            double leftReadMapability = mapabilityWeighting.getAverageValueForRegion(chrom, leftReadStart, leftReadEnd);
+            if (insertSize > targetIsize + 6 * targetIsizeSD) {
+                String chrom = record1.getChromosomeName();
+                int leftReadStart = leftRead.getPosition();
+                int leftReadEnd = leftRead.getPosition() + leftRead.getSequence().length();
+                double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
+                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequence().length()) + " = " + leftReadMapability);
 
-            int rightReadStart = rightRead.getPosition() - rightRead.getSequence().length();
-            int rightReadEnd = rightRead.getPosition();
-            double rightReadMapability = mapabilityWeighting.getAverageValueForRegion(chrom, rightReadStart, rightReadEnd);
+                int rightReadStart = rightRead.getPosition() - rightRead.getSequence().length();
+                int rightReadEnd = rightRead.getPosition();
+                double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
+                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequence().length()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
 
-            pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
+                //System.err.println("old pmc: " + pMappingCorrect);
+                pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
+                //System.err.println("new pmc: " + pMappingCorrect);
+            }
         }
 
         ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect);
@@ -216,6 +230,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
                 }
             }
 
+            //System.err.println("Emitting insert size " + insertSize);
             GenomicLocation genomicLocation = new GenomicLocation(chromosome, pos);
             output.collect(genomicLocation, readPairInfo);
 
@@ -255,6 +270,8 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
+            targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
         }
     }
 }

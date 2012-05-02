@@ -34,6 +34,16 @@ public class BigWigFileHelper {
         return valueSum / basesCovered;
     }
 
+    public double getMinValueForRegion(String chromosome, int start, int end) throws IOException {
+        BigWigIterator iterator = reader.getBigWigIterator(chromosome, start, chromosome, end, false);
+        double lowestValue = Double.MAX_VALUE;
+        while (iterator.hasNext()) {
+            WigItem item = iterator.next();
+            if (item.getWigValue() < lowestValue) lowestValue = item.getWigValue();
+        }
+        return lowestValue;
+    }
+
     public void close() throws IOException {
         reader.getBBFis().close();
     }

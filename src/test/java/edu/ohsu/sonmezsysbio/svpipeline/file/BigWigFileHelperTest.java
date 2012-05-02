@@ -26,6 +26,8 @@ public class BigWigFileHelperTest {
                         "chr21", 9411296, 9411313),
                 0.0001);
 
+        assertEquals(20.0, helper.getMinValueForRegion("chr21", 9411296, 9411313), 0.0001);
+
     }
 
 

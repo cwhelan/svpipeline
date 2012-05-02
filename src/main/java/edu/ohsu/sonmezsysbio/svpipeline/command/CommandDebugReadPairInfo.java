@@ -51,6 +51,13 @@ public class CommandDebugReadPairInfo implements SVPipelineCommand {
     @Parameter(names = {"--resolution"})
     final int resolution = SVPipeline.DEFAULT_RESOLUTION;
 
+    @Parameter(names = {"--excludePairsMappingIn"})
+    String exclusionRegionsFileName;
+
+    @Parameter(names = {"--mapabilityWeighting"})
+    String mapabilityWeightingFileName;
+
+
     public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
     }
@@ -73,6 +80,33 @@ public class CommandDebugReadPairInfo implements SVPipelineCommand {
 
         DistributedCache.addCacheFile(new URI(faidxFileDir + "/" + faidxFileBasename + "#" + faidxFileBasename),
                 conf);
+
+        if (exclusionRegionsFileName != null) {
+            File exclusionRegionsFile = new File(exclusionRegionsFileName);
+            String exclusionRegionsFileBasename = exclusionRegionsFile.getName();
+            String exclusionRegionsFileDir = exclusionRegionsFile.getParent();
+
+            URI uri = new URI(exclusionRegionsFileDir + "/" + exclusionRegionsFileBasename + "#" + exclusionRegionsFileBasename);
+            System.err.println("URI: " + uri);
+            DistributedCache.addCacheFile(uri,
+                    conf);
+
+            conf.set("alignment.exclusionRegions", exclusionRegionsFileBasename);
+        }
+
+        if (mapabilityWeightingFileName != null) {
+            File mapabilityWeightingFile = new File(mapabilityWeightingFileName);
+            String mapabilityWeightingFileBasename = mapabilityWeightingFile.getName();
+            String mapabilityWeightingFileDir = mapabilityWeightingFile.getParent();
+
+            URI uri = new URI(mapabilityWeightingFileDir + "/" + mapabilityWeightingFileBasename + "#" + mapabilityWeightingFileBasename);
+            System.err.println("URI: " + uri);
+            DistributedCache.addCacheFile(uri,
+                    conf);
+
+            conf.set("alignment.mapabilityWeighting", mapabilityWeightingFileBasename);
+        }
+
         DistributedCache.createSymlink(conf);
 
         conf.setInputFormat(TextInputFormat.class);
