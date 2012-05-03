@@ -5,6 +5,7 @@ import subprocess
 
 breakdancer_filename = sys.argv[1]
 truth_filename = sys.argv[2]
+#bed_file = sys.argv[3]
 
 score_values = []
 
@@ -19,7 +20,6 @@ breakdancer_file.close()
 
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
-
 
 print "\t".join(["Thresh", "Calls", "TP", "Long", "WrongType", "TPR"])
 for v in unique_score_values:

@@ -1,11 +1,8 @@
 import sys
 
-#
-# Now deprecated - use method exportPositiveRegionsFromWig in WigFileHelper!
-#
-
 print "track name=\"positive peaks\""
 
+sys.stdin.readline()
 sys.stdin.readline()
 
 in_pos_peak = False

@@ -8,12 +8,14 @@ import tempfile
 import os
 from multiprocessing import Pool
 import sys
+from decimal import *
+import math
 
 wig_filename = sys.argv[1]
 truth_filename = sys.argv[2]
 faidx_filename = sys.argv[3]
 medianFilterWindow = sys.argv[4]
-lower_threshold = float(sys.argv[5])
+lower_threshold = Decimal(sys.argv[5])
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
@@ -27,14 +29,15 @@ wig_file = open_file(wig_filename)
 for line in wig_file:
     if line.startswith("track") or line.startswith("variable"):
         continue
-    val = float(line.split()[1])
-    if val > lower_threshold:
+    val = Decimal(line.split()[1]).quantize(Decimal('.00001'), rounding=ROUND_UP)
+    if not math.isnan(val) and val > lower_threshold:
         values_above_threshold.append(val)
 
 #print "values above threshold: " + str(len(values_above_threshold))
+values_above_threshold = list(set(values_above_threshold))
 values_above_threshold.sort()
 
-num_quantiles = 500
+num_quantiles = 200
 quantiles = [0] * (num_quantiles + 1)
 q_num = 0
 
@@ -62,7 +65,7 @@ def process_quantile(q):
     num_matches = int(result_fields[3])
     return (q, num_predictions, predicted_region, num_matches, float(num_matches) / num_predictions)
     
-p=Pool(50)
+p=Pool(100)
 results = p.map(process_quantile, quantiles)
 
 print "\t".join(["Thresh", "Calls", "Region", "TP", "TPR"])

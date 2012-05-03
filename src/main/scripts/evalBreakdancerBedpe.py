@@ -18,27 +18,37 @@ breakdancer_file.close()
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "Long", "TPR", "WrongType"])
 for v in unique_score_values:
     calls_gte_threshold = []
     breakdancer_file = open(breakdancer_filename, "r")
     long_calls = 0
+    wrong_type = 0
     for line in breakdancer_file:
-        if float(line.split("\t")[7]) >= v:
-            sv_len = int(line.split("\t")[5]) - int(line.split("\t")[1])
-            if sv_len > 10000:
+        fields = line.split("\t")
+        if float(fields[7]) >= v:
+            s1 = fields[8]
+            s2 = fields[9]
+            if not ((s1 == "+" and s2 == "-") or (s1 == "-" and s2 == "+")):
+                wrong_type += 1
+                continue
+            sv_len = int(fields[5]) - int(fields[1])
+            if sv_len > 100000:
                 long_calls += 1
                 continue
             calls_gte_threshold.append(line)
     bedtoolsProcess = subprocess.Popen(["pairToBed", "-type", "ispan",  "-a", "stdin", "-b", truth_filename], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    bedpe_lines = ""
     for hline in calls_gte_threshold:
-        bedtoolsProcess.stdin.write(hline)
-    bedtoolsProcess.stdin.close()
+        bedpe_lines = bedpe_lines + hline + "\n"
+#        bedtoolsProcess.stdin.write(hline)
+#    bedtoolsProcess.stdin.close()
+    pstdout = bedtoolsProcess.communicate(bedpe_lines)[0]
     matches = 0
-    for line in bedtoolsProcess.stdout:        
+    for line in pstdout.split("\n"):
         #print line
         matches += 1
     bedtoolsProcess.stdout.close()
-    print "\t".join(map(str, [v, long_calls + len(calls_gte_threshold), matches, long_calls, float(matches) / (long_calls + len(calls_gte_threshold))]))
+    print "\t".join(map(str, [v, long_calls + len(calls_gte_threshold), matches, long_calls, float(matches) / (long_calls + len(calls_gte_threshold)), wrong_type]))
     
     
