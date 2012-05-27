@@ -1,6 +1,6 @@
 drawPerfLine <- function(perf, col, maxFP) {
-  calls <- c(max(max(perf$Calls), maxFP + max(perf$TP)), perf$Calls, min(perf$Calls) - min(perf$TP), 0)
-  tp <- c(max(perf$TP), perf$TP, 0, 0)
+  calls <- c(perf$Calls, min(perf$Calls) - min(perf$TP), 0)
+  tp <- c(perf$TP, 0, 0)
   fp <- calls - tp
   lines(fp[fp <= maxFP], tp[fp <= maxFP], col=col, lwd=3)
 }
@@ -10,7 +10,7 @@ plotROC <- function(perfs, perfNames, totalDels, main, sim=TRUE) {
   plot(0, type="n", ylim=c(0, totalDels), xlim=c(0,maxFP), xlab=ifelse(sim, "False Positives", "Novel Predictions"), ylab="True Positives", main=main)
   perfCols <- rainbow(length(perfs))
   mapply(drawPerfLine, perfs, perfCols, MoreArgs=list(maxFP=maxFP))  
-  legend("top", legend=perfNames, col=perfCols, lwd=3, cex=.5)
+  legend("top", legend=perfNames, col=perfCols, lwd=3, cex=.75)
 }
 
 #chr2 gt 125
@@ -25,46 +25,79 @@ plotROC(perfsList, c("SVPipeline", "Hydra", "Breakdancer"), totalDels)
 #chr2 gt 50
 totalDels <- 372
 hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/hydra2_perf_gt50.txt', header=TRUE)
-mo3Perf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/mo3_r25_gt50_quant_perf.txt', header=TRUE)
-mo5Perf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/mo5_r25_gt50_quant_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
 breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/breakdancer2_perf_gt50.txt', header=TRUE)
 gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/gasv_perf_gt50.txt', header=TRUE)
 
-perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, mo3=mo3Perf)
-plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "SVP"), totalDels, "chr2 Simulated (30X)")
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, mo3=cloudbreak)
+pdf('~/Documents/svpipeline/CHR2SIM_ROC.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer","GASV", "Cloudbreak"), totalDels, "chr2 Simulated (30X)")
+dev.off()
+
+#chr2 gt 50 LOW COVERAGE
+totalDels <- 372
+hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/hydra_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_perf.txt', header=TRUE)
+breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/gasv_perf.txt', header=TRUE)
+
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak)
+pdf('~/Documents/svpipeline/CHR2SIMLC_ROC.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "chr2 Simulated (5X)")
+dev.off()
+
+#chr2 gt 50 V. LOW COVERAGE
+totalDels <- 372
+hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc/hydra_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc/breakdancer_rmdup_perf.txt', header=TRUE)
+breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc/gasv_perf.txt', header=TRUE)
+
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak)
+pdf('~/Documents/svpipeline/CHR2SIM_VLC_ROC.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "chr2 Simulated (3X)")
+dev.off()
+
+
+#chr2 gt 50 V. LOW COVERAGE w / mutations
+totalDels <- 372
+hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc_mut/hydra_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc_mut/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc_mut/breakdancer_rmdup_perf.txt', header=TRUE)
+breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc_mut/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_vlc_mut/gasv_perf.txt', header=TRUE)
+
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak)
+pdf('~/Documents/svpipeline/CHR2SIM_VLC_MUT_ROC.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "chr2 Simulated (3X)")
+dev.off()
 
 # chr17
 totalDels <- 199
 hydra <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/hydra2_perf_gt50.txt', header=TRUE)
 breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/breakdancer2_perf_gt50.txt', header=TRUE)
 gasv <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/gasv_perf_gt50.txt', header=TRUE)
-mo3 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/mo3_gt50_quant_perf.txt', header=TRUE)
-mo3blgn <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/mo3_biglognorm_mw3_perf.txt', header=TRUE)
 
-aa3 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_avg_cutoff_nosd_and_mw3_perf.txt', header=TRUE)
-ma3 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_min_cutoff_nosd_and_mw3_perf.txt', header=TRUE)
-aa5 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_avg_cutoff_nosd_and_mw5_perf.txt', header=TRUE)
-ma5 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_min_cutoff_nosd_and_mw5_perf.txt', header=TRUE)
+cloudBreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
 
-ao3 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_avg_cutoff_nosd_or_mw3_perf.txt', header=TRUE)
-#mo3 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_min_cutoff_nosd_or_mw3_perf.txt', header=TRUE)
-ao5 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_avg_cutoff_nosd_or_mw5_perf.txt', header=TRUE)
-mo5 <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_mapability_weighting_min_cutoff_nosd_or_mw5_perf.txt', header=TRUE)
-
-perfsList <- list(hydra, breakdancer, aa3, ma3, aa5, ma5, ao3, mo3, ao5, mo5)
-#mo3short <- mo3[mo3$FP < totalDels,]
 perfsList <- list(hydra, breakdancer, gasv, mo3)
+pdf('~/Documents/svpipeline/CHR17SIM_ROC.pdf')
 plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "SVP"), totalDels, "chr17 Simulated (100X)")
+dev.off()
 
 # NA07051
 totalDels <- 2548
 hydra <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/hydra_perf.txt', header=TRUE)
 breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/breakdancer_perf.txt', header=TRUE)
-#gasv <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/gasv_perf_gt50.txt', header=TRUE)
-mo3 <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/mo3_mw3_perf.txt', header=TRUE)
+gasv <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/gasv_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
 
-perfsList <- list(hydra, breakdancer, mo3)
-plotROC(perfsList, c("Hydra", "Breakdancer", "SVP"), totalDels, "NA07051 (3X)")
+perfsList <- list(hydra, breakdancer, gasv, cloudbreak)
 
+pdf('~/Documents/svpipeline/NA07051_ROC.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "NA07051 (3X)", sim=FALSE)
+dev.off()
 
 
