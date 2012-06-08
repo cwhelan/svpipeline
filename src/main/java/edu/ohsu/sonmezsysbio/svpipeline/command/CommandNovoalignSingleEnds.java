@@ -38,6 +38,9 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
     @Parameter(names = {"--threshold"}, required = true)
     String threshold;
 
+    @Parameter(names = {"--qualityFormat"})
+    String qualityFormat = "ILMFQ";
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -61,6 +64,7 @@ public class CommandNovoalignSingleEnds implements SVPipelineCommand {
         conf.set("mapred.task.timeout", "3600000");
         conf.set("novoalign.reference", referenceBasename);
         conf.set("novoalign.threshold", threshold);
+        conf.set("novoalign.quality.format", qualityFormat);
 
         conf.setMapperClass(NovoalignSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
