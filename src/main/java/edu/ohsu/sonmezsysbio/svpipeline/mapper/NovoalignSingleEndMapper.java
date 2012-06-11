@@ -119,7 +119,6 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
             System.err.println("index file length: " + indexFile.length());
         }
 
-        baseQualityFormat = "ILMFQ";
         String[] commandLine = buildCommandLine(reference, s1File.getPath(), threshold, baseQualityFormat);
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
@@ -183,7 +182,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                 "-f", path1,
                 "-F", baseQualityFormat,
                 "-k", "-K", "calfile.txt", "-q", "5",
-                "-r", "Ex", "10", "-t", threshold
+                "-r", "Ex", "10", "-t", threshold, "-x", "10"
                 //"-a", "GATCGGAAGAGCGGTTCAGCA", "GATCGGAAGAGCGTCGTGTAGGGA",
         };
 //        String args = String.format("-d %s -c 1 -f %s %s -F ILMFQ -k -K calfile.txt -i MP %s,%s 150,50" +
