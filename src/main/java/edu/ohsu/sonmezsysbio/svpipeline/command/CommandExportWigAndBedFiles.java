@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import edu.ohsu.sonmezsysbio.svpipeline.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import edu.ohsu.sonmezsysbio.svpipeline.file.WigFileHelper;
@@ -199,17 +200,4 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         return gotLine;
     }
 
-    static class DFSFacade {
-        FileSystem dfs;
-        Configuration conf;
-
-        DFSFacade(FileSystem dfs, Configuration conf) {
-            this.dfs = dfs;
-            this.conf = conf;
-        }
-
-        public InputStream openPath(Path p) throws IOException {
-            return new BufferedInputStream(dfs.open(p));
-        }
-    }
 }

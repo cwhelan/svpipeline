@@ -264,11 +264,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
         for (Short readGroupInfoId : readGroupInfos.keySet()) {
             if (inputFile.startsWith(readGroupInfos.get(readGroupInfoId).hdfsPath)) {
                 this.readGroupId = readGroupInfoId;
+                ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupInfoId);
+                matePairs = readGroupInfo.matePair;
+                targetIsize = readGroupInfo.isize;
+                targetIsizeSD = readGroupInfo.isizeSD;
             }
         }
 
 
-        matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         scorer = new ProbabilisticPairedAlignmentScorer();
 
         faidxFileName = job.get("alignment.faidx");
@@ -297,8 +300,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
-            targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
         }
     }
 }

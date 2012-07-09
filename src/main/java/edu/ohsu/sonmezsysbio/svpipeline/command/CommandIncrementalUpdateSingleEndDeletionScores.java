@@ -2,7 +2,10 @@ package edu.ohsu.sonmezsysbio.svpipeline.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import edu.ohsu.sonmezsysbio.svpipeline.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
+import edu.ohsu.sonmezsysbio.svpipeline.file.DFSFacade;
+import edu.ohsu.sonmezsysbio.svpipeline.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.mapper.SingleEndAlignmentsToReadPairInfoMapper;
@@ -12,13 +15,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapred.*;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,20 +36,11 @@ import java.net.URISyntaxException;
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome via Incremental Belief Update")
 public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipelineCommand {
 
-    @Parameter(names = {"--inputHDFSDir"}, required = true)
-    String inputHDFSDir;
+    @Parameter(names = {"--inputFileDescriptor"}, required = true)
+    String inputFileDescriptor;
 
     @Parameter(names = {"--outputHDFSDir"}, required = true)
     String outputHDFSDir;
-
-    @Parameter(names = {"--targetIsize"}, required = true)
-    int targetIsize;
-
-    @Parameter(names = {"--targetIsizeSD"}, required = true)
-    int targetIsizeSD;
-
-    @Parameter(names = {"--isMatePairs"})
-    boolean matePairs = false;
 
     @Parameter(names = {"--maxInsertSize"})
     int maxInsertSize = 500000;
@@ -77,55 +75,40 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
 
         conf.setJobName("Incremental Update Single End Deletion Score");
         conf.setJarByClass(SVPipeline.class);
-        FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
+
+        ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
+        FileSystem dfs = DistributedFileSystem.get(conf);
+
+        Map<Short, ReadGroupInfo> readGroupInfoMap = readGroupInfoFileHelper.readReadGroupsById(
+                new BufferedReader(
+                        new InputStreamReader(
+                                new DFSFacade(dfs, conf).openPath(new Path(inputFileDescriptor)))));
+
+        for (ReadGroupInfo readGroupInfo : readGroupInfoMap.values()) {
+            FileInputFormat.addInputPath(conf, new Path(readGroupInfo.hdfsPath));
+        }
+
         Path outputDir = new Path(outputHDFSDir);
+
         FileSystem.get(conf).delete(outputDir);
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
-
-        File faidxFile = new File(faidxFileName);
-        String faidxFileBasename = faidxFile.getName();
-        String faidxFileDir = faidxFile.getParent();
-
-        DistributedCache.addCacheFile(new URI(faidxFileDir + "/" + faidxFileBasename + "#" + faidxFileBasename),
-                conf);
-
-        conf.set("alignment.faidx", faidxFileBasename);
+        setupDistributedCacheFile(conf, inputFileDescriptor, "read.group.info.file");
+        setupDistributedCacheFile(conf, faidxFileName, "alignment.faidx");
 
         if (exclusionRegionsFileName != null) {
-            File exclusionRegionsFile = new File(exclusionRegionsFileName);
-            String exclusionRegionsFileBasename = exclusionRegionsFile.getName();
-            String exclusionRegionsFileDir = exclusionRegionsFile.getParent();
-
-            URI uri = new URI(exclusionRegionsFileDir + "/" + exclusionRegionsFileBasename + "#" + exclusionRegionsFileBasename);
-            System.err.println("URI: " + uri);
-            DistributedCache.addCacheFile(uri,
-                    conf);
-
-            conf.set("alignment.exclusionRegions", exclusionRegionsFileBasename);
+            setupDistributedCacheFile(conf, exclusionRegionsFileName, "alignment.exclusionRegions");
         }
 
         if (mapabilityWeightingFileName != null) {
-            File mapabilityWeightingFile = new File(mapabilityWeightingFileName);
-            String mapabilityWeightingFileBasename = mapabilityWeightingFile.getName();
-            String mapabilityWeightingFileDir = mapabilityWeightingFile.getParent();
-
-            URI uri = new URI(mapabilityWeightingFileDir + "/" + mapabilityWeightingFileBasename + "#" + mapabilityWeightingFileBasename);
-            System.err.println("URI: " + uri);
-            DistributedCache.addCacheFile(uri,
-                    conf);
-
-            conf.set("alignment.mapabilityWeighting", mapabilityWeightingFileBasename);
+            setupDistributedCacheFile(conf, mapabilityWeightingFileName, "alignment.mapabilityWeighting");
         }
 
         DistributedCache.createSymlink(conf);
 
         conf.set("svpipeline.resolution", String.valueOf(resolution));
 
-        conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
-        conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
-        conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
 
         if (chrFilter != null) {
@@ -152,5 +135,16 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
 
         JobClient.runJob(conf);
 
+    }
+
+    private void setupDistributedCacheFile(JobConf conf, String fileName, String confPropertyName) throws URISyntaxException {
+        File file = new File(fileName);
+        String fileBasename = file.getName();
+        String fileDir = file.getParent();
+
+        DistributedCache.addCacheFile(new URI(fileDir + "/" + fileBasename + "#" + fileBasename),
+                conf);
+
+        conf.set(confPropertyName, fileBasename);
     }
 }

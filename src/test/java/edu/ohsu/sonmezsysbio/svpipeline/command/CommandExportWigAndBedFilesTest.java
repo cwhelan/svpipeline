@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.command;
 
+import edu.ohsu.sonmezsysbio.svpipeline.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.SVPipeline;
 import org.apache.hadoop.fs.Path;
@@ -59,7 +60,7 @@ public class CommandExportWigAndBedFilesTest {
             }
         };
 
-        CommandExportWigAndBedFiles.DFSFacade dfs = Mockito.mock(CommandExportWigAndBedFiles.DFSFacade.class);
+        DFSFacade dfs = Mockito.mock(DFSFacade.class);
         when(dfs.openPath(p1)).thenReturn(new StringBufferInputStream(file1));
         when(dfs.openPath(p2)).thenReturn(new StringBufferInputStream(file2));
 
