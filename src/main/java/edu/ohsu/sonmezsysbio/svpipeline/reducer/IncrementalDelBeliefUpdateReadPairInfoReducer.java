@@ -1,5 +1,7 @@
 package edu.ohsu.sonmezsysbio.svpipeline.reducer;
 
+import edu.ohsu.sonmezsysbio.svpipeline.ReadGroupInfo;
+import edu.ohsu.sonmezsysbio.svpipeline.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
@@ -9,6 +11,7 @@ import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,38 +21,20 @@ import java.util.Iterator;
  */
 public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, GenomicLocation, DoubleWritable> {
 
-    private double targetIsize;
-    private double targetIsizeSD;
-    private boolean matePairs;
 
-    public double getTargetIsize() {
-        return targetIsize;
+    private Map<Short,ReadGroupInfo> readGroupInfos;
+
+    public Map<Short, ReadGroupInfo> getReadGroupInfos() {
+        return readGroupInfos;
     }
 
-    public void setTargetIsize(double targetIsize) {
-        this.targetIsize = targetIsize;
-    }
-
-    public double getTargetIsizeSD() {
-        return targetIsizeSD;
-    }
-
-    public void setTargetIsizeSD(double targetIsizeSD) {
-        this.targetIsizeSD = targetIsizeSD;
-    }
-
-    public boolean isMatePairs() {
-        return matePairs;
-    }
-
-    public void setMatePairs(boolean matePairs) {
-        this.matePairs = matePairs;
+    public void setReadGroupInfos(Map<Short, ReadGroupInfo> readGroupInfos) {
+        this.readGroupInfos = readGroupInfos;
     }
 
     public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
 
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
-        NormalDistribution normalDistribution = new NormalDistribution(targetIsize, targetIsizeSD);
 
         double pDeletion = Math.log(2432.0 / 2700000000.0);
         double pNoDeletion = Math.log(1 - 2432.0 / 2700000000.0);
@@ -59,7 +44,14 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
             ReadPairInfo readPairInfo = values.next();
             int insertSize = readPairInfo.insertSize;
             double pMappingCorrect = readPairInfo.pMappingCorrect;
+            short readGroupId = readPairInfo.readGroupId;
 
+            ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupId);
+            int targetIsize = readGroupInfo.isize;
+            int targetIsizeSD = readGroupInfo.isizeSD;
+            boolean matePairs = readGroupInfo.matePair;
+
+            NormalDistribution normalDistribution = new NormalDistribution(targetIsize, targetIsizeSD);
             double pISgivenDeletion = Math.log(logNormalDistribution.density(insertSize));         // todo add fragment size
             double pISgivenNoDeletion = Math.log(normalDistribution.density(insertSize));
             // todo
@@ -108,10 +100,14 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
     @Override
     public void configure(JobConf job) {
         super.configure(job);
-        targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
-        targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
 
-        matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
+        String readGroupInfoFile = job.get("read.group.info.file");
+        ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
+        try {
+            readGroupInfos = readGroupInfoFileHelper.readReadGroupsById(readGroupInfoFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }

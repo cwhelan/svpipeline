@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.svpipeline.reducer;
 
+import edu.ohsu.sonmezsysbio.svpipeline.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.hadoop.io.DoubleWritable;
@@ -8,7 +9,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -28,9 +31,15 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
 
         MockOutputCollector outputCollector = new MockOutputCollector();
 
+        Map<Short, ReadGroupInfo> readGroupInfos = new HashMap<Short, ReadGroupInfo>();
+        ReadGroupInfo rg1 = new ReadGroupInfo();
+        rg1.isize = 200;
+        rg1.isizeSD = 30;
+        rg1.matePair = false;
+        readGroupInfos.put((short) 0, rg1);
+
         IncrementalDelBeliefUpdateReadPairInfoReducer reducer = new IncrementalDelBeliefUpdateReadPairInfoReducer();
-        reducer.setTargetIsize(200);
-        reducer.setTargetIsizeSD(30);
+        reducer.setReadGroupInfos(readGroupInfos);
 
         List<ReadPairInfo> readPairInfos = new ArrayList<ReadPairInfo>();
         readPairInfos.add(readPairInfo1);
