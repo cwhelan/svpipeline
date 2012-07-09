@@ -21,19 +21,19 @@ import static org.junit.Assert.assertTrue;
 public class ReadGroupInfoFileHelperTest {
 
     public static final String READ_GROUP_INFO_FILE =
-            "READGROUP1\tLIBRARY1\t200\t30\tfalse\n" +
-            "READGROUP2\tLIBRARY1\t200\t30\tfalse\n" +
-            "READGROUP3\tLIBRARY2\t300\t50\tfalse\n" +
-            "READGROUP4\tLIBRARY3\t2000\t300\ttrue\n";
+            "READGROUP1\tLIBRARY1\t200\t30\tfalse\t/path/in/hdfs/to/rg1\n" +
+            "READGROUP2\tLIBRARY1\t200\t30\tfalse\t/path/in/hdfs/to/rg2\n" +
+            "READGROUP3\tLIBRARY2\t300\t50\tfalse\t/path/in/hdfs/to/rg3\n" +
+            "READGROUP4\tLIBRARY3\t2000\t300\ttrue\t/path/in/hdfs/to/rg4\n";
 
     @Test
-    public void testReadReadGroupIdsByName() throws IOException {
+    public void testReadReadGroupIdsByHDFSPath() throws IOException {
         ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
-        Map readGroups = readGroupInfoFileHelper.readReadGroupIdsByName(new BufferedReader(new StringReader(READ_GROUP_INFO_FILE)));
-        assertEquals((short) 0, readGroups.get("READGROUP1"));
-        assertEquals((short) 1, readGroups.get("READGROUP2"));
-        assertEquals((short) 2, readGroups.get("READGROUP3"));
-        assertEquals((short) 3, readGroups.get("READGROUP4"));
+        Map readGroups = readGroupInfoFileHelper.readReadGroupIdsByHDFSPath(new BufferedReader(new StringReader(READ_GROUP_INFO_FILE)));
+        assertEquals((short) 0, readGroups.get("/path/in/hdfs/to/rg1"));
+        assertEquals((short) 1, readGroups.get("/path/in/hdfs/to/rg2"));
+        assertEquals((short) 2, readGroups.get("/path/in/hdfs/to/rg3"));
+        assertEquals((short) 3, readGroups.get("/path/in/hdfs/to/rg4"));
     }
 
     @Test
@@ -46,6 +46,7 @@ public class ReadGroupInfoFileHelperTest {
         assertEquals(200, rg.isize);
         assertEquals(30, rg.isizeSD);
         assertFalse(rg.matePair);
+        assertEquals("/path/in/hdfs/to/rg2", rg.hdfsPath);
 
         rg = readGroups.get((short) 3);
         assertEquals("READGROUP4", rg.readGroupName);
@@ -53,7 +54,7 @@ public class ReadGroupInfoFileHelperTest {
         assertEquals(2000, rg.isize);
         assertEquals(300, rg.isizeSD);
         assertTrue(rg.matePair);
-
+        assertEquals("/path/in/hdfs/to/rg4", rg.hdfsPath);
     }
 
 }

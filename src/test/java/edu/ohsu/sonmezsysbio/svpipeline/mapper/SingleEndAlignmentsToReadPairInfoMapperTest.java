@@ -42,6 +42,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
             }
         });
         mapper.setScorer(new ProbabilisticPairedAlignmentScorer());
+        mapper.setReadGroupId((short) 3);
 
         MockOutputCollector collector = new MockOutputCollector();
         Reporter reporter = Mockito.mock(Reporter.class);
@@ -55,7 +56,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
 
             assertEquals(10017, collector.values.get(idx).insertSize);
             assertEquals(-9.2103, collector.values.get(idx).pMappingCorrect, .0001);
-
+            assertEquals((short) 3, (short) collector.values.get(idx).readGroupId);
             idx++;
         }
 

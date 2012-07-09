@@ -23,8 +23,8 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
     public void testReduce() throws Exception {
         GenomicLocation genomicLocation = new GenomicLocation((short) 1,10000);
 
-        ReadPairInfo readPairInfo1 = new ReadPairInfo(3000, -0.69);
-        ReadPairInfo readPairInfo2 = new ReadPairInfo(3000, -9.2103);
+        ReadPairInfo readPairInfo1 = new ReadPairInfo(3000, -0.69, (short) 0);
+        ReadPairInfo readPairInfo2 = new ReadPairInfo(3000, -9.2103, (short) 0);
 
         MockOutputCollector outputCollector = new MockOutputCollector();
 

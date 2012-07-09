@@ -16,25 +16,25 @@ import java.util.Map;
  */
 public class ReadGroupInfoFileHelper {
 
-    public Map<String,Short> readReadGroupIdsByName(String filename) throws IOException {
+    public Map<String,Short> readReadGroupIdsByHDFSPath(String filename) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         try {
-            return readReadGroupIdsByName(reader);
+            return readReadGroupIdsByHDFSPath(reader);
         } finally {
             reader.close();
         }
     }
 
-    public Map<String,Short> readReadGroupIdsByName(BufferedReader reader) throws IOException {
+    public Map<String,Short> readReadGroupIdsByHDFSPath(BufferedReader reader) throws IOException {
          String line;
          short rgIdx = 0;
-         Map<String,Short> rgsByName = new HashMap<String,Short>();
+         Map<String,Short> rgsByPath = new HashMap<String,Short>();
          while ((line = reader.readLine()) != null) {
-             String rgName = line.split("\t")[0];
-             rgsByName.put(rgName, rgIdx);
+             String rgPath = line.split("\t")[5];
+             rgsByPath.put(rgPath, rgIdx);
              rgIdx++;
          }
-         return rgsByName;
+         return rgsByPath;
     }
 
     public Map<Short, ReadGroupInfo> readReadGroupsById(String filename) throws IOException {
@@ -58,6 +58,7 @@ public class ReadGroupInfoFileHelper {
             readGroupInfo.isize = Integer.parseInt(fields[2]);
             readGroupInfo.isizeSD = Integer.parseInt(fields[3]);
             readGroupInfo.matePair = Boolean.parseBoolean(fields[4]);
+            readGroupInfo.hdfsPath = fields[5];
             rgsById.put(rgIdx, readGroupInfo);
             rgIdx++;
         }

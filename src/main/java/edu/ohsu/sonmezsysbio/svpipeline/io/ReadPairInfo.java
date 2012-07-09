@@ -16,23 +16,27 @@ import java.io.IOException;
 public class ReadPairInfo implements Writable {
     public int insertSize;
     public double pMappingCorrect;
+    public Short readGroupId;
 
     public ReadPairInfo() {
     }
 
-    public ReadPairInfo(int insertSize, double pMappingCorrect) {
+    public ReadPairInfo(int insertSize, double pMappingCorrect, Short readGroupId) {
         this.insertSize = insertSize;
         this.pMappingCorrect = pMappingCorrect;
+        this.readGroupId = readGroupId;
     }
 
     public void write(DataOutput out) throws IOException {
         out.writeInt(insertSize);
         out.writeDouble(pMappingCorrect);
+        out.writeShort(readGroupId);
     }
 
     public void readFields(DataInput in) throws IOException {
         insertSize = in.readInt();
         pMappingCorrect = in.readDouble();
+        readGroupId = in.readShort();
     }
 
     @Override
@@ -40,6 +44,7 @@ public class ReadPairInfo implements Writable {
         return "ReadPairInfo{" +
                 "insertSize=" + insertSize +
                 ", pMappingCorrect=" + pMappingCorrect +
+                ", readGroupId=" + readGroupId +
                 '}';
     }
 }

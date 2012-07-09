@@ -4,6 +4,7 @@ import edu.ohsu.sonmezsysbio.svpipeline.*;
 import edu.ohsu.sonmezsysbio.svpipeline.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.file.GFFFileHelper;
+import edu.ohsu.sonmezsysbio.svpipeline.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
 import org.apache.hadoop.io.LongWritable;
@@ -14,9 +15,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,6 +39,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
     private BigWigFileHelper mapabilityWeighting;
     private double targetIsize;
     private double targetIsizeSD;
+    private Short readGroupId;
 
     public FaidxFileHelper getFaix() {
         return faix;
@@ -103,6 +103,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
 
     public void setExclusionRegions(GFFFileHelper exclusionRegions) {
         this.exclusionRegions = exclusionRegions;
+    }
+
+    public Short getReadGroupId() {
+        return readGroupId;
+    }
+
+    public void setReadGroupId(Short readGroupId) {
+        this.readGroupId = readGroupId;
     }
 
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
@@ -213,7 +221,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
             }
         }
 
-        ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect);
+        ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, readGroupId);
 
         for (int i = 0; i <= genomicWindow; i = i + resolution) {
             Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
@@ -241,6 +249,25 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
 
     public void configure(JobConf job) {
         super.configure(job);
+
+        // todo: if we change to the non-deprecated API, need to update this as described here
+        // todo: https://issues.apache.org/jira/browse/MAPREDUCE-2166
+        String inputFile = job.get("map.input.file");
+        String readGroupInfoFile = job.get("read.group.info.file");
+        ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
+        Map<Short, ReadGroupInfo> readGroupInfos = null;
+        try {
+            readGroupInfos = readGroupInfoFileHelper.readReadGroupsById(readGroupInfoFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (Short readGroupInfoId : readGroupInfos.keySet()) {
+            if (inputFile.startsWith(readGroupInfos.get(readGroupInfoId).hdfsPath)) {
+                this.readGroupId = readGroupInfoId;
+            }
+        }
+
+
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         scorer = new ProbabilisticPairedAlignmentScorer();
 
