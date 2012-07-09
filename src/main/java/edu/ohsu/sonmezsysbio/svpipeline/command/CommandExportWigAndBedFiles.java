@@ -50,7 +50,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
     boolean averageOverSlidingWindow = false;
 
     @Parameter(names = {"--resolution"})
-    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    int resolution = SVPipeline.DEFAULT_RESOLUTION;
 
     public String getFaidxFileName() {
         return faidxFileName;
@@ -68,7 +68,7 @@ public class CommandExportWigAndBedFiles implements SVPipelineCommand {
         String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
         String averagedFileName = outputPrefix + "_windowed_average_deletion_scores.wig";
         String averagedBedFileName = outputPrefix + "_averaged_positive_score_regions.bed";
-        
+
         File outputFile = new File(pileupFileName);
         if (! outputFile.createNewFile()) {
             System.err.println("Failed to create file " + outputFile);
