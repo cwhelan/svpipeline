@@ -43,7 +43,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipeli
     String outputHDFSDir;
 
     @Parameter(names = {"--maxInsertSize"})
-    int maxInsertSize = 500000;
+    int maxInsertSize = SVPipeline.DEFAULT_MAX_INSERT_SIZE;
 
     @Parameter(names = {"--faidx"}, required=true)
     String faidxFileName;

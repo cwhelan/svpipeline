@@ -27,7 +27,7 @@ import java.util.*;
 public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduceBase implements Mapper<LongWritable, Text, GenomicLocation, ReadPairInfo> {
 
     private boolean matePairs;
-    private Integer maxInsertSize = 500000;
+    private Integer maxInsertSize = SVPipeline.DEFAULT_MAX_INSERT_SIZE;
     private PairedAlignmentScorer scorer;
     private String faidxFileName;
     FaidxFileHelper faix;
@@ -310,6 +310,10 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        if (job.get("pileupDeletionScore.maxInsertSize") != null) {
+            maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         }
     }
 
