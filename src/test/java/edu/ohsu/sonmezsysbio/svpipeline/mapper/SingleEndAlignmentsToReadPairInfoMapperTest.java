@@ -143,4 +143,9 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         }
     }
 
+    @Test
+    public void testGetInputPath() throws Exception {
+        assertEquals("/user/whelanch/svpipeline/jcvi_chr2_lc/se_alignments_t180/part-00000",
+                SingleEndAlignmentsToReadPairInfoMapper.getInputPath("hdfs://bigbird51.csee.ogi.edu:50030/user/whelanch/svpipeline/jcvi_chr2_lc/se_alignments_t180/part-00000"));
+    }
 }

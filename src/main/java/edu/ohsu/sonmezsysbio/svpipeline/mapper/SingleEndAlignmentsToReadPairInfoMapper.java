@@ -7,6 +7,7 @@ import edu.ohsu.sonmezsysbio.svpipeline.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.svpipeline.io.ReadPairInfo;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
@@ -252,7 +253,8 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
 
         // todo: if we change to the non-deprecated API, need to update this as described here
         // todo: https://issues.apache.org/jira/browse/MAPREDUCE-2166
-        String inputFile = job.get("map.input.file");
+        String inputFile = getInputPath(job.get("map.input.file"));
+
         String readGroupInfoFile = job.get("read.group.info.file");
         ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
         Map<Short, ReadGroupInfo> readGroupInfos = null;
@@ -261,15 +263,23 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.err.println("Looking up the read group for input file: " + inputFile);
+        boolean configuredReadGroup = false;
         for (Short readGroupInfoId : readGroupInfos.keySet()) {
+            System.err.println("comparing to: " + readGroupInfos.get(readGroupInfoId).hdfsPath);
             if (inputFile.startsWith(readGroupInfos.get(readGroupInfoId).hdfsPath)) {
+                System.err.println("got it!");
                 this.readGroupId = readGroupInfoId;
                 ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupInfoId);
                 matePairs = readGroupInfo.matePair;
                 targetIsize = readGroupInfo.isize;
                 targetIsizeSD = readGroupInfo.isizeSD;
+                configuredReadGroup = true;
+                break;
             }
         }
+        if (! configuredReadGroup) throw new RuntimeException("Unable to configure read group for " + inputFile);
 
 
         scorer = new ProbabilisticPairedAlignmentScorer();
@@ -301,5 +311,10 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
                 e.printStackTrace();
             }
         }
+    }
+
+    protected static String getInputPath(String mapInputProperty) {
+        String path = new Path(mapInputProperty).toUri().getPath();
+        return path;
     }
 }
