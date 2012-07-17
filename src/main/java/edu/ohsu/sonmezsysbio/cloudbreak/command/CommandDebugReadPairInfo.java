@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
  * Time: 11:12 AM
  */
 @Parameters(separators = "=", commandDescription = "View read pair infos")
-public class CommandDebugReadPairInfo implements SVPipelineCommand {
+public class CommandDebugReadPairInfo implements CloudbreakCommand {
 
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;

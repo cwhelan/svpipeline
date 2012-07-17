@@ -24,7 +24,7 @@ import java.net.URISyntaxException;
  * Time: 2:01 PM
  */
 @Parameters(separators = "=", commandDescription = "Run a novoalign mate pair alignment")
-public class CommandNovoalignSingleEnds implements SVPipelineCommand {
+public class CommandNovoalignSingleEnds implements CloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;

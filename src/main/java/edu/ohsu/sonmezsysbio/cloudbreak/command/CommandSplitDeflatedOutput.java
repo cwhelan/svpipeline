@@ -15,7 +15,7 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
  * Date: 2/6/12
  * Time: 10:29 PM
  */
-public class CommandSplitDeflatedOutput implements SVPipelineCommand {
+public class CommandSplitDeflatedOutput implements CloudbreakCommand {
 
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;

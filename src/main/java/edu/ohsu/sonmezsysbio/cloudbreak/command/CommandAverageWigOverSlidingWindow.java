@@ -15,7 +15,7 @@ import java.io.*;
  * Time: 3:42 PM
  */
 @Parameters(separators = "=", commandDescription = "compute a transformed wig file averaged over a sliding window")
-public class CommandAverageWigOverSlidingWindow implements SVPipelineCommand {
+public class CommandAverageWigOverSlidingWindow implements CloudbreakCommand {
 
     @Parameter(names = {"--InFile"}, required = true)
     String inFile;

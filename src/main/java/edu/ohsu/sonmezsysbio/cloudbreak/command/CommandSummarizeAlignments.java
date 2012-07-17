@@ -18,7 +18,7 @@ import java.io.IOException;
  * Date: 4/16/12
  * Time: 1:39 PM
  */
-public class CommandSummarizeAlignments implements SVPipelineCommand {
+public class CommandSummarizeAlignments implements CloudbreakCommand {
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 

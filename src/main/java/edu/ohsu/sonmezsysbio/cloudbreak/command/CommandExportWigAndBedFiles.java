@@ -30,7 +30,7 @@ import java.util.PriorityQueue;
  * Time: 9:30 AM
  */
 @Parameters(separators = "=", commandDescription = "Export Wig files and Bed file of deletions")
-public class CommandExportWigAndBedFiles implements SVPipelineCommand {
+public class CommandExportWigAndBedFiles implements CloudbreakCommand {
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 

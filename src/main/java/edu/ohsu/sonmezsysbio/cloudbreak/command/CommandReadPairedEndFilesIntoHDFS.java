@@ -17,7 +17,7 @@ import java.util.zip.GZIPInputStream;
  * Time: 3:38 PM
  */
 @Parameters(separators = "=", commandDescription = "Load paired fastq files into HDFS")
-public class CommandReadPairedEndFilesIntoHDFS implements SVPipelineCommand {
+public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;

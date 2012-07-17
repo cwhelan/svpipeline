@@ -8,7 +8,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class SVPipeline extends Configured implements Tool
+public class Cloudbreak extends Configured implements Tool
 {
 
     public static final String ALIGNMENT_SEPARATOR = "\tSVP_ALIGNMENT\t";
@@ -18,7 +18,7 @@ public class SVPipeline extends Configured implements Tool
     public static final int DEFAULT_MAX_INSERT_SIZE = 500000;
 
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new SVPipeline(), args);
+        int res = ToolRunner.run(new Configuration(), new Cloudbreak(), args);
 
         System.exit(res);
     }

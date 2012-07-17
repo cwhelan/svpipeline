@@ -8,6 +8,6 @@ import org.apache.hadoop.conf.Configuration;
  * Date: 5/20/11
  * Time: 1:55 PM
  */
-public interface SVPipelineCommand {
+public interface CloudbreakCommand {
     public void run(Configuration conf) throws Exception;
 }

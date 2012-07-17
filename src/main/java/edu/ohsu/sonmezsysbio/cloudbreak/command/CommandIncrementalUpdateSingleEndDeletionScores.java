@@ -34,7 +34,7 @@ import java.util.Map;
  * Time: 2:53 PM
  */
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome via Incremental Belief Update")
-public class CommandIncrementalUpdateSingleEndDeletionScores implements SVPipelineCommand {
+public class CommandIncrementalUpdateSingleEndDeletionScores implements CloudbreakCommand {
 
     @Parameter(names = {"--inputFileDescriptor"}, required = true)
     String inputFileDescriptor;

@@ -22,7 +22,7 @@ import java.io.IOException;
  * Time: 10:02 AM
  */
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome")
-public class CommandPileupSingleEndDeletionScores implements SVPipelineCommand {
+public class CommandPileupSingleEndDeletionScores implements CloudbreakCommand {
 
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;

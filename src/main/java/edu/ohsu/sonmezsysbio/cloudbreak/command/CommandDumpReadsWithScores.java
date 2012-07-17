@@ -20,7 +20,7 @@ import java.io.IOException;
  * Time: 10:02 AM
  */
 @Parameters(separators = "=", commandDescription = "Dump all spanning read pairs with their deletion scores to BED format (debugging)")
-public class CommandDumpReadsWithScores implements SVPipelineCommand {
+public class CommandDumpReadsWithScores implements CloudbreakCommand {
 
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;

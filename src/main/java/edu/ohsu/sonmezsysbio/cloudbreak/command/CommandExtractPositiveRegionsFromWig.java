@@ -16,7 +16,7 @@ import java.util.zip.GZIPInputStream;
  * Time: 10:33 PM
  */
 @Parameters(separators = "=", commandDescription = "Extract positive regions from a WIG file into a BED file")
-public class CommandExtractPositiveRegionsFromWig implements SVPipelineCommand {
+public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
 
     @Parameter(names = {"--name"}, required = true)
     String name;
