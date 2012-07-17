@@ -115,7 +115,7 @@
 			<configuration>
 				<archive>
 					<manifest>
-						<mainClass>edu.ohsu.sonmezsysbio.svpipeline.SVPipeline</mainClass>
+						<mainClass>edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline</mainClass>
 					</manifest>
 				</archive>
 			</configuration>

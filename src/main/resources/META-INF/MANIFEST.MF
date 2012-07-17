@@ -1,1 +1,1 @@
-Main-Class: edu.ohsu.sonmezsysbio.svpipeline.SVPipeline
+Main-Class: edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline
