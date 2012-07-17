@@ -27,7 +27,7 @@ median_filter_window = sys.argv[5]
 #temp_file_name = "tmp/tmp_" + str(q) + ".bed"
 temp_file = tempfile.NamedTemporaryFile()
 temp_file_name = temp_file.name
-extract_regions_cmd = ['hadoop', 'jar', '/l2/users/whelanch/gene_rearrange/svpipeline/lib/svpipeline-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window]    
+extract_regions_cmd = ['hadoop', 'jar', '/l2/users/whelanch/gene_rearrange/svpipeline/lib/cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window]
 subprocess.call(extract_regions_cmd)
 
 num_predictions = 0
