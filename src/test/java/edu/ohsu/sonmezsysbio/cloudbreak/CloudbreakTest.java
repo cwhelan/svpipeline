@@ -13,26 +13,22 @@ import static org.junit.Assert.*;
  * Date: 5/18/11
  * Time: 2:12 PM
  */
-public class SVPipelineTest {
+public class CloudbreakTest {
     @Test
     public void testBuildJCommander() throws Exception {
-        String[] argv = { "novoalignMatePair" };
-        JCommander jc = SVPipeline.buildJCommander();
+        String[] argv = { "alignSingleEnds" };
+        JCommander jc = Cloudbreak.buildJCommander();
         try {
             jc.parse(argv);
             fail("validation should have failed because no files provided");
         } catch (ParameterException e) {
         }
 
-        String[] argv2 = { "novoalignMatePair",
-                "--HDFSDir", "/user/whelanch/tmp/svpipelinetest",
-                "--fastqFile1", "s_1_1_sequence.txt",
-                "--fastqFile2", "s_1_2_sequence.txt",
+        String[] argv2 = { "alignSingleEnds",
+                "--HDFSDataDir", "/user/whelanch/tmp/svpipelinetest",
+                "--HDFSAlignmentsDir", "s_1_1_sequence.txt",
                 "--reference", "ref",
-                "--repeatReport", "Random",
-                "--targetIsize", "3000",
-                "--targetIsizeSD", "300",
-                "--libraryName", "TC1"};
+                "--threshold", "150" };
         jc.parse(argv2);
 
     }

@@ -83,7 +83,7 @@ public class Cloudbreak extends Configured implements Tool
         CommandSummarizeAlignments commandSummarizeAlignments = new CommandSummarizeAlignments();
         jc.addCommand("summarizeAlignments", commandSummarizeAlignments);
 
-        jc.setProgramName("SVPipeline");
+        jc.setProgramName("Cloudbreak");
         return jc;
     }
 }

@@ -2,9 +2,9 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.NovoalignSingleEndAlignmentsToPairsReducer;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.NovoalignSingleEndMapper;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -45,7 +45,7 @@ public class CommandNovoalignSingleEnds implements CloudbreakCommand {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Single End Alignment");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
         FileInputFormat.addInputPath(conf, new Path(hdfsDataDir));
         Path outputDir = new Path(hdfsAlignmentsDir);
         FileSystem.get(conf).delete(outputDir);

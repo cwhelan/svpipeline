@@ -1,8 +1,8 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -66,11 +66,11 @@ public class CommandExportWigAndBedFilesTest {
 
         command.mergeSortedInputStreams(dfs, writer, faix, true, inputStreams);
 
-        String expectedOutput = "variableStep chrom=chr1 span=" + SVPipeline.DEFAULT_RESOLUTION + "\n" +
+        String expectedOutput = "variableStep chrom=chr1 span=" + Cloudbreak.DEFAULT_RESOLUTION + "\n" +
                 "1000\t-2.0\n" +
                 "2000\t-4.0\n" +
                 "3000\t-1.0\n" +
-                "variableStep chrom=chr2 span=" + SVPipeline.DEFAULT_RESOLUTION + "\n" +
+                "variableStep chrom=chr2 span=" + Cloudbreak.DEFAULT_RESOLUTION + "\n" +
                 "1000\t-3.0\n" +
                 "2000\t-6.0\n" +
                 "3000\t-5.0\n";

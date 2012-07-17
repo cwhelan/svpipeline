@@ -15,7 +15,7 @@ import java.util.List;
  * Date: 5/23/11
  * Time: 10:12 AM
  */
-public class SingleEndAlignmentsToDeletionScoreMapper extends SVPipelineMapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
+public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
@@ -83,13 +83,13 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends SVPipelineMapReduc
         String readPairId = line.substring(0,firstTabIndex);
         String lineValues = line.substring(firstTabIndex + 1);
         
-        String[] readAligments = lineValues.split(SVPipeline.READ_SEPARATOR);
+        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
+        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
+        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
 
         emitDeletionScoresForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);

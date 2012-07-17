@@ -2,7 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
@@ -49,7 +49,7 @@ public class CommandDebugReadPairInfo implements CloudbreakCommand {
     Long endFilter;
 
     @Parameter(names = {"--resolution"})
-    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    final int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     @Parameter(names = {"--excludePairsMappingIn"})
     String exclusionRegionsFileName;
@@ -66,7 +66,7 @@ public class CommandDebugReadPairInfo implements CloudbreakCommand {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Debug Read Pair Info");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
         Path outputDir = new Path(ouptutHDFSDir);
         FileSystem.get(conf).delete(outputDir);

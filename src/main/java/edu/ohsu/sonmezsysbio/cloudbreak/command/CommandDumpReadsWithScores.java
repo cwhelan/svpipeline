@@ -2,7 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToBedSpansMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -51,7 +51,7 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Pileup Deletion Score");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
         Path outputDir = new Path(ouptutHDFSDir);
         FileSystem.get(conf).delete(outputDir);

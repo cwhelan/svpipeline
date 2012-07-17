@@ -24,10 +24,10 @@ import java.util.*;
  * Date: 4/6/12
  * Time: 1:03 PM
  */
-public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduceBase implements Mapper<LongWritable, Text, GenomicLocation, ReadPairInfo> {
+public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase implements Mapper<LongWritable, Text, GenomicLocation, ReadPairInfo> {
 
     private boolean matePairs;
-    private Integer maxInsertSize = SVPipeline.DEFAULT_MAX_INSERT_SIZE;
+    private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
     private PairedAlignmentScorer scorer;
     private String faidxFileName;
     FaidxFileHelper faix;
@@ -119,13 +119,13 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SVPipelineMapReduce
         int firstTabIndex = line.indexOf('\t');
         String lineValues = line.substring(firstTabIndex + 1);
 
-        String[] readAligments = lineValues.split(SVPipeline.READ_SEPARATOR);
+        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
+        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(SVPipeline.ALIGNMENT_SEPARATOR);
+        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
         List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
 
         Set<NovoalignNativeRecord> recordsInExcludedAreas = new HashSet<NovoalignNativeRecord>();

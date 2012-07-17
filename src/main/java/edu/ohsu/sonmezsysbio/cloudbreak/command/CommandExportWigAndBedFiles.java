@@ -2,9 +2,9 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.WigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReaderAndLine;
@@ -50,7 +50,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
     boolean averageOverSlidingWindow = false;
 
     @Parameter(names = {"--resolution"})
-    int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     public String getFaidxFileName() {
         return faidxFileName;
@@ -96,7 +96,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
             BufferedReader inFileReader = new BufferedReader(new FileReader(new File(pileupFileName)));
             BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(averagedFileName)));
             try {
-                WigFileHelper.averageWigOverSlidingWindow(resolution, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
+                WigFileHelper.averageWigOverSlidingWindow(resolution, Cloudbreak.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
             } finally {
                 inFileReader.close();
                 outFileWriter.close();

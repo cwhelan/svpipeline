@@ -2,7 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.WigFileHelper;
 import org.apache.hadoop.conf.Configuration;
 
@@ -24,13 +24,13 @@ public class CommandAverageWigOverSlidingWindow implements CloudbreakCommand {
     String outFile;
 
     @Parameter(names = {"--resolution"})
-    int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     public void run(Configuration conf) throws IOException {
         BufferedReader inFileReader = new BufferedReader(new FileReader(new File(inFile)));
         BufferedWriter outFileWriter = new BufferedWriter(new FileWriter(new File(outFile)));
         try {
-            WigFileHelper.averageWigOverSlidingWindow(resolution, SVPipeline.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
+            WigFileHelper.averageWigOverSlidingWindow(resolution, Cloudbreak.WINDOW_SIZE_IN_LINES, inFileReader, outFileWriter);
         } finally {
             inFileReader.close();
             outFileWriter.close();

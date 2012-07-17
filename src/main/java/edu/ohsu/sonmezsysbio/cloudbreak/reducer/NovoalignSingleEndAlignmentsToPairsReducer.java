@@ -1,6 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -41,7 +41,7 @@ public class NovoalignSingleEndAlignmentsToPairsReducer extends MapReduceBase
         if (read1Alignments.size() > 0 && read2Alignments.size() > 0) {
             StringBuffer valueBuffer = new StringBuffer();
             appendAligmentsToBuffer(read1Alignments, valueBuffer);
-            valueBuffer.append(SVPipeline.READ_SEPARATOR);
+            valueBuffer.append(Cloudbreak.READ_SEPARATOR);
             appendAligmentsToBuffer(read2Alignments, valueBuffer);
             output.collect(key, new Text(valueBuffer.toString()));
         }
@@ -51,7 +51,7 @@ public class NovoalignSingleEndAlignmentsToPairsReducer extends MapReduceBase
         boolean firstAlignment = true;
         for (String alignment : read1Alignments) {
                 if (! firstAlignment) {
-                    valueBuffer.append(SVPipeline.ALIGNMENT_SEPARATOR);
+                    valueBuffer.append(Cloudbreak.ALIGNMENT_SEPARATOR);
                 } else {
                     firstAlignment = false;
                 }

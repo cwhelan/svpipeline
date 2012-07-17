@@ -1,7 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentSummaryMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndAlignmentSummaryReducer;
 import org.apache.hadoop.conf.Configuration;
@@ -33,7 +33,7 @@ public class CommandSummarizeAlignments implements CloudbreakCommand {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Summarize Single End Alignments");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
         Path outputDir = new Path(outputHDFSDir);
         FileSystem.get(conf).delete(outputDir);

@@ -2,7 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToDeletionScoreMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndDeletionScorePileupReducer;
 import org.apache.hadoop.conf.Configuration;
@@ -43,7 +43,7 @@ public class CommandPileupSingleEndDeletionScores implements CloudbreakCommand {
     int maxInsertSize = 500000;
 
     @Parameter(names = {"--resolution"})
-    final int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    final int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     public void run(Configuration conf) throws IOException {
         runHadoopJob(conf);
@@ -53,7 +53,7 @@ public class CommandPileupSingleEndDeletionScores implements CloudbreakCommand {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Pileup Single End Deletion Score");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
         Path outputDir = new Path(outputHDFSDir);
         FileSystem.get(conf).delete(outputDir);

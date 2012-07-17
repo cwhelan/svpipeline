@@ -2,8 +2,8 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocation;
@@ -43,7 +43,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements Cloudbre
     String outputHDFSDir;
 
     @Parameter(names = {"--maxInsertSize"})
-    int maxInsertSize = SVPipeline.DEFAULT_MAX_INSERT_SIZE;
+    int maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
 
     @Parameter(names = {"--faidx"}, required=true)
     String faidxFileName;
@@ -61,7 +61,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements Cloudbre
     String exclusionRegionsFileName;
 
     @Parameter(names = {"--resolution"})
-    int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     @Parameter(names = {"--mapabilityWeighting"})
     String mapabilityWeightingFileName;
@@ -74,7 +74,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements Cloudbre
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Incremental Update Single End Deletion Score");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
 
         ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
         FileSystem dfs = DistributedFileSystem.get(conf);

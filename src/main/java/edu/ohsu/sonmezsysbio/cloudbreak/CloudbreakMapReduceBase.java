@@ -9,10 +9,10 @@ import org.apache.hadoop.mapred.MapReduceBase;
  * Date: 4/23/12
  * Time: 10:05 PM
  */
-public class SVPipelineMapReduceBase extends MapReduceBase {
+public class CloudbreakMapReduceBase extends MapReduceBase {
 
 
-    protected int resolution = SVPipeline.DEFAULT_RESOLUTION;
+    protected int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     public int getResolution() {
         return resolution;

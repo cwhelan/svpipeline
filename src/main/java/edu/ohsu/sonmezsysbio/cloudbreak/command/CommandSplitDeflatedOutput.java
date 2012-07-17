@@ -1,7 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.command;
 
 import com.beust.jcommander.Parameter;
-import edu.ohsu.sonmezsysbio.cloudbreak.SVPipeline;
+import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -30,7 +30,7 @@ public class CommandSplitDeflatedOutput implements CloudbreakCommand {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Split deflated file");
-        conf.setJarByClass(SVPipeline.class);
+        conf.setJarByClass(Cloudbreak.class);
         FileInputFormat.addInputPath(conf, new Path(inputHDFSDir));
         Path outputDir = new Path(ouptutHDFSDir);
         FileSystem.get(conf).delete(outputDir);
