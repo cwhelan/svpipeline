@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-import gzip
+from cStringIO import StringIO
 import random
 import subprocess
 import tempfile
@@ -10,7 +10,9 @@ import sys
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
-        wig_file = gzip.open(wig_filename, "rb")
+        p = subprocess.Popen(["zcat",wig_filename], 
+                             stdout = subprocess.PIPE)
+	wig_file = StringIO(p.communicate()[0])
     else:
         wig_file = open(wig_filename, "r")
     return wig_file

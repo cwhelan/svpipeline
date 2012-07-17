@@ -39,15 +39,15 @@ public class CommandReadPairedEndFilesIntoHDFS implements SVPipelineCommand {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
         try {
-            readFile(writer, readFile1);
-            readFile(writer, readFile2);
+            readFile(writer, readFile1, "/1");
+            readFile(writer, readFile2, "/2");
         } finally {
             writer.close();
         }
 
     }
 
-    private void readFile(BufferedWriter writer, String pathname) throws IOException {
+    private void readFile(BufferedWriter writer, String pathname, String suffix) throws IOException {
         BufferedReader inputReader1 = null;
 
         if (pathname.endsWith("gz")) {
@@ -58,10 +58,10 @@ public class CommandReadPairedEndFilesIntoHDFS implements SVPipelineCommand {
 
         numRecords = 0;
         try {
-            String convertedFastqLine = readFastqEntry(inputReader1);
+            String convertedFastqLine = readFastqEntry(inputReader1, suffix);
             while (convertedFastqLine != null) {
                 writer.write(convertedFastqLine);
-                convertedFastqLine = readFastqEntry(inputReader1);
+                convertedFastqLine = readFastqEntry(inputReader1, suffix);
                 numRecords++;
             }
         } finally {
@@ -69,10 +69,14 @@ public class CommandReadPairedEndFilesIntoHDFS implements SVPipelineCommand {
         }
     }
 
-    private String readFastqEntry(BufferedReader inputReader1) throws IOException {
+    private String readFastqEntry(BufferedReader inputReader1, String suffix) throws IOException {
         String read1 = inputReader1.readLine();
         if (read1 == null) {
             return null;
+        }
+
+        if (! read1.endsWith(suffix)) {
+            read1 = read1 + suffix;
         }
 
         String seq1 = inputReader1.readLine();
@@ -80,7 +84,11 @@ public class CommandReadPairedEndFilesIntoHDFS implements SVPipelineCommand {
         String qual1 = inputReader1.readLine();
 
         StringBuffer lineBuffer = new StringBuffer();
-        lineBuffer.append(read1).append("\t").append(seq1).append("\t").append(sep1).append("\t").append(qual1);
+        lineBuffer.append(read1);
+        if (! read1.endsWith(suffix)) {
+            lineBuffer.append(suffix);
+        }
+        lineBuffer.append("\t").append(seq1).append("\t").append(sep1).append("\t").append(qual1);
         lineBuffer.append("\n");
         return lineBuffer.toString();
     }

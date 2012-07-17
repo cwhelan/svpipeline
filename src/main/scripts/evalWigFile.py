@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-import gzip
 import random
 import subprocess
 import tempfile
@@ -10,6 +9,7 @@ from multiprocessing import Pool
 import sys
 from decimal import *
 import math
+from cStringIO import StringIO
 
 wig_filename = sys.argv[1]
 truth_filename = sys.argv[2]
@@ -19,7 +19,9 @@ lower_threshold = Decimal(sys.argv[5])
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
-        wig_file = gzip.open(wig_filename, "rb")
+        p = subprocess.Popen(["zcat",wig_filename], 
+                             stdout = subprocess.PIPE)
+	wig_file = StringIO(p.communicate()[0])
     else:
         wig_file = open(wig_filename, "r")
     return wig_file
@@ -32,6 +34,7 @@ for line in wig_file:
     val = Decimal(line.split()[1]).quantize(Decimal('.00001'), rounding=ROUND_UP)
     if not math.isnan(val) and val > lower_threshold:
         values_above_threshold.append(val)
+wig_file.close()
 
 #print "values above threshold: " + str(len(values_above_threshold))
 values_above_threshold = list(set(values_above_threshold))
