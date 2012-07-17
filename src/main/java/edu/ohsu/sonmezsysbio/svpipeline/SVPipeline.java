@@ -53,8 +53,6 @@ public class SVPipeline extends Configured implements Tool
 
     protected static JCommander buildJCommander() {
         JCommander jc = new JCommander(new CommanderMain());
-        CommandNovoalignMatePair novoalignMatePair = new CommandNovoalignMatePair();
-        jc.addCommand("novoalignMatePair", novoalignMatePair);
         CommandPileupDeletionScores pileupDeletionScores = new CommandPileupDeletionScores();
         jc.addCommand("pileupDeletionScores", pileupDeletionScores);
 
