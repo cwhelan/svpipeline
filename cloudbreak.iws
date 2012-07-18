@@ -2,7 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dcb68d0a-2860-4575-aca2-4605a32bfe59" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/svpipeline.iml" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandMrFastSingleEnds.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/MrFastSingleEndMapper.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentMapper.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapperHelper.java" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/SingleEndAlignmentsToPairsReducer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cloudbreak.iws" afterPath="$PROJECT_DIR$/cloudbreak.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/Cloudbreak.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/Cloudbreak.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/NovoalignNativeRecord.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/NovoalignNativeRecord.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandIncrementalUpdateSingleEndDeletionScores.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandIncrementalUpdateSingleEndDeletionScores.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandNovoalignSingleEnds.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandNovoalignSingleEnds.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapper.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentSummaryMapper.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentSummaryMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToBedSpansMapper.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToBedSpansMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToDeletionScoreMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapper.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapper.java" />
     </list>
     <ignored path="svpipeline.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -182,6 +196,19 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandMrFastSingleEnds.java" line="2" class="CommandMrFastSingleEnds.java" package="">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
     </line_breakpoints>
     <breakpoint_any>
       <breakpoint>
@@ -240,91 +267,105 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CommandReadPairedEndFilesIntoHDFS.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandReadPairedEndFilesIntoHDFS.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="58" selection-start="588" selection-end="588" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommandPileupSingleEndDeletionScores.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandPileupSingleEndDeletionScores.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="13" selection-start="879" selection-end="879" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CloudbreakTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/cloudbreak/CloudbreakTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="34" selection-start="682" selection-end="682" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="runTest.sh" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scripts/runTest.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="34" selection-start="201" selection-end="201" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="evalWigFileAtThreshold.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scripts/evalWigFileAtThreshold.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="100" selection-start="837" selection-end="837" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="SingleEndAlignmentsToReadPairInfoMapper.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="13" selection-start="897" selection-end="897" vertical-scroll-proportion="0.0">
+            <state line="124" column="91" selection-start="3793" selection-end="3793" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NovoalignSingleEndMapper.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Cloudbreak.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/Cloudbreak.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="10" column="13" selection-start="361" selection-end="361" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NovoalignNativeRecord.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/NovoalignNativeRecord.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="11" column="13" selection-start="195" selection-end="195" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1376#1399#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NovoalignSingleEndMapper.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="147" column="46" selection-start="4759" selection-end="4759" vertical-scroll-proportion="0.62653565">
-              <folding />
+            <state line="92" column="0" selection-start="2858" selection-end="3099" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="18" selection-start="403" selection-end="403" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommandNovoalignSingleEnds.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="CommandNovoalignSingleEnds.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandNovoalignSingleEnds.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="13" selection-start="1056" selection-end="1056" vertical-scroll-proportion="0.0">
+            <state line="59" column="43" selection-start="2069" selection-end="2069" vertical-scroll-proportion="0.50076807">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CloudbreakCommand.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CloudbreakCommand.java">
+      <file leaf-file-name="CommandMrFastSingleEnds.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandMrFastSingleEnds.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="34" selection-start="219" selection-end="219" vertical-scroll-proportion="0.0">
+            <state line="25" column="13" selection-start="844" selection-end="844" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MrFastSingleEndMapper.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/MrFastSingleEndMapper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="76" column="0" selection-start="2454" selection-end="2454" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Runtime.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Library/Java/JavaVirtualMachines/1.6.0_22-b04-307.jdk/Contents/Home/src.jar!/src/java/lang/Runtime.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="464" column="19" selection-start="19026" selection-end="19026" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#0#37018#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SingleEndAlignmentsToPairsReducer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/SingleEndAlignmentsToPairsReducer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="21" column="13" selection-start="525" selection-end="525" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CommandIncrementalUpdateSingleEndDeletionScores.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandIncrementalUpdateSingleEndDeletionScores.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="113" column="43" selection-start="4269" selection-end="4269" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -343,15 +384,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandExportWigAndBedFiles.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/command/CommandReadPairedEndFilesIntoHDFS.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/svpipeline/SVPipeline.java" />
-        <option value="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapperTest.java" />
-        <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/SVPipelineCommand.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CloudbreakCommand.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/SVPipelineMapReduceBase.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/CloudbreakMapReduceBase.java" />
         <option value="$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/cloudbreak/SVPipelineTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/SVPipeline.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/Cloudbreak.java" />
@@ -359,6 +391,15 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/scripts/runTest.sh" />
         <option value="$PROJECT_DIR$/src/main/scripts/evalWigFileAtThreshold.py" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/NovoalignSingleEndAlignmentsToPairsReducer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/SingleEndAlignmentsToPairsReducer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandNovoalignSingleEnds.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandMrFastSingleEnds.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/MrFastSingleEndMapper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandIncrementalUpdateSingleEndDeletionScores.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapperHelper.java" />
       </list>
     </option>
   </component>
@@ -440,9 +481,10 @@
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
   <component name="ProjectFrameBounds">
+    <option name="x" value="43" />
     <option name="y" value="22" />
-    <option name="width" value="1680" />
-    <option name="height" value="1028" />
+    <option name="width" value="1397" />
+    <option name="height" value="878" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -586,7 +628,67 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="reducer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cloudbreak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cloudbreak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="mapper" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cloudbreak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svpipeline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cloudbreak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="command" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -657,12 +759,15 @@
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.command" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline" />
     </key>
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="edu.ohsu.sonmezsysbio.cloudbreak.mapper" />
+    </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord" />
+      <recent name="edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.SVPipeline" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.WigFileHelper" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.SingleEndAlignmentScorer" />
-      <recent name="edu.ohsu.sonmezsysbio.svpipeline.mapper.NovoalignSingleEndMapperHelper" />
-      <recent name="edu.ohsu.sonmezsysbio.svpipeline.SAMRecord" />
     </key>
     <key name="CreateClassDialog.RecentsKey">
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.reducer" />
@@ -671,15 +776,15 @@
       <recent name="edu.ohsu.sonmezsysbio.svpipeline" />
       <recent name="edu.ohsu.sonmezsysbio" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/test/resources/edu/ohsu/sonmezsysbio/svpipeline/file" />
+      <recent name="$PROJECT_DIR$/src/test/resources/edu/ohsu/sonmezsysbio/svpipeline" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.file" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.io" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline" />
       <recent name="edu.ohsu.sonmezsysbio.svpipeline.mapper" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/test/resources/edu/ohsu/sonmezsysbio/svpipeline/file" />
-      <recent name="$PROJECT_DIR$/src/test/resources/edu/ohsu/sonmezsysbio/svpipeline" />
     </key>
   </component>
   <component name="RunManager" selected="JUnit.CloudbreakTest.testBuildJCommander">
@@ -932,14 +1037,14 @@
       <method />
     </configuration>
     <list size="8">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.ReadGroupInfoFileHelperTest.testReadReadGroupsByName" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.ReadGroupInfoFileHelperTest.testReadReadGroupsById" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.IncrementalDelBeliefUpdateReadPairInfoReducerTest.testReduce" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToReadPairInfoMapperTest.testGetInputPath" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.CloudbreakTest.testBuildJCommander" />
-      <item index="5" class="java.lang.String" itemvalue="Application.ExtractRegionsFromBed" />
-      <item index="6" class="java.lang.String" itemvalue="Application.BigWigFileHelper" />
-      <item index="7" class="java.lang.String" itemvalue="Application.trainCRF" />
+      <item index="0" class="java.lang.String" itemvalue="Application.ExtractRegionsFromBed" />
+      <item index="1" class="java.lang.String" itemvalue="Application.BigWigFileHelper" />
+      <item index="2" class="java.lang.String" itemvalue="Application.trainCRF" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.ReadGroupInfoFileHelperTest.testReadReadGroupsByName" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.ReadGroupInfoFileHelperTest.testReadReadGroupsById" />
+      <item index="5" class="java.lang.String" itemvalue="JUnit.IncrementalDelBeliefUpdateReadPairInfoReducerTest.testReduce" />
+      <item index="6" class="java.lang.String" itemvalue="JUnit.SingleEndAlignmentsToReadPairInfoMapperTest.testGetInputPath" />
+      <item index="7" class="java.lang.String" itemvalue="JUnit.CloudbreakTest.testBuildJCommander" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -994,12 +1099,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1680" height="1028" extended-state="6" />
+    <frame x="43" y="22" width="1397" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32524806" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38309115" sideWeight="0.4969419" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34081903" sideWeight="0.4977064" order="7" side_tool="true" content_ui="tabs" />
@@ -1009,11 +1115,10 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3135656" sideWeight="0.19682959" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32690883" sideWeight="0.668428" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31311274" sideWeight="0.673712" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3787991" sideWeight="0.67475194" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.331572" sideWeight="0.4969419" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32628798" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29062086" sideWeight="0.99923545" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -1079,46 +1184,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/SingleEndDeletionScorePileupReducer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="13" selection-start="467" selection-end="467" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapperTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="27" selection-start="7378" selection-end="7378" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="10" selection-start="14" selection-end="24" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandAverageWigOverSlidingWindow.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="0" selection-start="182" selection-end="182" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/Cloudbreak.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="32" selection-start="1628" selection-end="1628" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/CloudbreakMapReduceBase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="23" selection-start="244" selection-end="244" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandReadPairedEndFilesIntoHDFS.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="58" selection-start="588" selection-end="588" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandPileupSingleEndDeletionScores.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="13" selection-start="879" selection-end="879" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/edu/ohsu/sonmezsysbio/cloudbreak/CloudbreakTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="26" column="34" selection-start="682" selection-end="682" vertical-scroll-proportion="0.0" />
@@ -1134,11 +1199,6 @@
         <state line="7" column="18" selection-start="403" selection-end="403" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandNovoalignSingleEnds.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="13" selection-start="1056" selection-end="1056" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CloudbreakCommand.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="10" column="34" selection-start="219" selection-end="219" vertical-scroll-proportion="0.0" />
@@ -1151,16 +1211,93 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapper.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentMapper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="13" selection-start="897" selection-end="897" vertical-scroll-proportion="0.0">
+        <state line="66" column="10" selection-start="1947" selection-end="1947" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/1.6.0_22-b04-307.jdk/Contents/Home/src.jar!/src/java/lang/Runtime.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="464" column="19" selection-start="19026" selection-end="19026" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#37018#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/NovoalignSingleEndMapper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="147" column="46" selection-start="4759" selection-end="4759" vertical-scroll-proportion="0.62653565">
+        <state line="92" column="0" selection-start="2858" selection-end="3099" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/MrFastSingleEndMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="0" selection-start="2454" selection-end="2454" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/reducer/SingleEndAlignmentsToPairsReducer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="13" selection-start="525" selection-end="525" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/NovoalignNativeRecord.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="13" selection-start="195" selection-end="195" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1376#1399#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/mapper/SingleEndAlignmentsToReadPairInfoMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="124" column="91" selection-start="3793" selection-end="3793" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/Cloudbreak.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="13" selection-start="361" selection-end="361" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandIncrementalUpdateSingleEndDeletionScores.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="113" column="43" selection-start="4269" selection-end="4269" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandMrFastSingleEnds.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="13" selection-start="844" selection-end="844" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ohsu/sonmezsysbio/cloudbreak/command/CommandNovoalignSingleEnds.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="43" selection-start="2069" selection-end="2069" vertical-scroll-proportion="0.50076807">
           <folding />
         </state>
       </provider>

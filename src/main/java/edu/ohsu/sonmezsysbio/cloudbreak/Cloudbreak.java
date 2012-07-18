@@ -16,6 +16,7 @@ public class Cloudbreak extends Configured implements Tool
     public static final int DEFAULT_RESOLUTION = 100;
     public static final int WINDOW_SIZE_IN_LINES = 1000;
     public static final int DEFAULT_MAX_INSERT_SIZE = 500000;
+    public static final String ALIGNER_NOVOALIGN = "novoalign";
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new Cloudbreak(), args);

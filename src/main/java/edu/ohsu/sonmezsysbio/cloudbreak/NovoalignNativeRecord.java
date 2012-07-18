@@ -1,5 +1,8 @@
 package edu.ohsu.sonmezsysbio.cloudbreak;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
@@ -36,6 +39,16 @@ public class NovoalignNativeRecord {
 
         return record;
 
+    }
+
+    public static List<NovoalignNativeRecord> parseAlignmentsIntoRecords(String[] alignments) {
+        List<NovoalignNativeRecord> read1AlignmentList = new ArrayList<NovoalignNativeRecord>();
+        for (String alignment : alignments) {
+            String[] fields1 = alignment.split("\t");
+            NovoalignNativeRecord record1 = parseRecord(fields1);
+            read1AlignmentList.add(record1);
+        }
+        return read1AlignmentList;
     }
 
     public boolean isMapped() {

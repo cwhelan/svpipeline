@@ -1,13 +1,11 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.JobConf;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,33 +13,11 @@ import java.util.zip.GZIPOutputStream;
  * Date: 5/21/11
  * Time: 5:36 PM
  */
-public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
 
-    private OutputCollector<Text, Text> output;
-    private String localDir;
-    private Writer s1FileWriter;
-    private File s1File;
     private String reference;
-    private Reporter reporter;
-    private static boolean done = false;
     private String threshold;
     private String baseQualityFormat;
-
-    public OutputCollector<Text, Text> getOutput() {
-        return output;
-    }
-
-    public void setOutput(OutputCollector<Text, Text> output) {
-        this.output = output;
-    }
-
-    public Reporter getReporter() {
-        return reporter;
-    }
-
-    public void setReporter(Reporter reporter) {
-        this.reporter = reporter;
-    }
 
     @Override
     public void configure(JobConf job) {
@@ -49,53 +25,10 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 
         System.err.println("Current dir: " + new File(".").getAbsolutePath());
 
-        this.localDir = job.get("mapred.child.tmp");
-        try {
-            s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
-            s1File.createNewFile();
-            s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+        reference = job.get("novoalign.reference");
+        threshold = job.get("novoalign.threshold");
+        baseQualityFormat = job.get("novoalign.quality.format");
 
-            reference = job.get("novoalign.reference");
-            threshold = job.get("novoalign.threshold");
-            baseQualityFormat = job.get("novoalign.quality.format");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-        if (this.output == null) {
-            this.output = output;
-        }
-        if (this.reporter == null) {
-            this.reporter = reporter;
-        }
-
-        String line = value.toString();
-        String[] fields = line.split("\t");
-
-        s1FileWriter.write(fields[0] + "\n");
-        s1FileWriter.write(fields[1] + "\n");
-        s1FileWriter.write(fields[2] + "\n");
-        s1FileWriter.write(fields[3] + "\n");
-
-        reporter.progress();
-        //System.out.println("Done with map method, real work will happen in close");
-    }
-
-    class ProgressReporter implements Runnable {
-        public void run() {
-            while (! done) {
-                try {
-                    Thread.sleep(10000l);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                reporter.progress();
-            }
-
-        }
     }
 
     @Override
@@ -104,8 +37,6 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 
         s1FileWriter.close();
 
-        //Thread progressThread = new Thread(new ProgressReporter());
-        //progressThread.start();
         if (! s1File.exists()) {
             System.err.println("file does not exist: " + s1File.getPath());
         } else {
@@ -128,8 +59,6 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                          InputStreamReader(p.getInputStream()));
 
         readAlignments(stdInput, p.getErrorStream());
-        done = true;
-
     }
 
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
@@ -152,7 +81,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                 continue;
             }
 
-            output.collect(new Text(readPairId), new Text(outLine));
+            getOutput().collect(new Text(readPairId), new Text(outLine));
 
         }
 
@@ -183,14 +112,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
                 "-F", baseQualityFormat,
                 "-k", "-K", "calfile.txt", "-q", "5",
                 "-r", "Ex", "10", "-t", threshold, "-x", "10"
-                //"-a", "GATCGGAAGAGCGGTTCAGCA", "GATCGGAAGAGCGTCGTGTAGGGA",
         };
-//        String args = String.format("-d %s -c 1 -f %s %s -F ILMFQ -k -K calfile.txt -i MP %s,%s 150,50" +
-//                " -a GATCGGAAGAGCGGTTCAGCA GATCGGAAGAGCGTCGTGTAGGGA " +
-//                " -r %s -oSAM \"@RG\tID:RGID\tPU:ILLUMINA\tLB:%s\tSM:%s\" ",
-//                reference, path1, path2, targetIsize, targetIsizeSD, repeatReport, libraryName, libraryName); // todo: read group ID?
-//
-//        return "/g/whelanch/software/bin/" + "novoalign " + args; //todo: unhardcode path
         return commandArray;
     }
 }

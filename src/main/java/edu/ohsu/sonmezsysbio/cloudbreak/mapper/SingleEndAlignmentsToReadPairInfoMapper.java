@@ -122,11 +122,11 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read1Alignments);
+        List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
         String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
+        List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read2Alignments);
 
         Set<NovoalignNativeRecord> recordsInExcludedAreas = new HashSet<NovoalignNativeRecord>();
         try {

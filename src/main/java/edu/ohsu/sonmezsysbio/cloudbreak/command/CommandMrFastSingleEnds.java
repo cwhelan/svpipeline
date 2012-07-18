@@ -4,12 +4,11 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndAlignmentsToPairsReducer;
-import edu.ohsu.sonmezsysbio.cloudbreak.mapper.NovoalignSingleEndMapper;
+import edu.ohsu.sonmezsysbio.cloudbreak.mapper.MrFastSingleEndMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
@@ -20,11 +19,11 @@ import java.net.URISyntaxException;
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
- * Date: 5/18/11
+ * Date: 6/17/12
  * Time: 2:01 PM
  */
 @Parameters(separators = "=", commandDescription = "Run a novoalign mate pair alignment")
-public class CommandNovoalignSingleEnds implements CloudbreakCommand {
+public class CommandMrFastSingleEnds implements CloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;
@@ -34,12 +33,6 @@ public class CommandNovoalignSingleEnds implements CloudbreakCommand {
 
     @Parameter(names = {"--reference"}, required = true)
     String reference;
-    
-    @Parameter(names = {"--threshold"}, required = true)
-    String threshold;
-
-    @Parameter(names = {"--qualityFormat"})
-    String qualityFormat = "ILMFQ";
 
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
@@ -62,11 +55,9 @@ public class CommandNovoalignSingleEnds implements CloudbreakCommand {
                 conf);
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
-        conf.set("novoalign.reference", referenceBasename);
-        conf.set("novoalign.threshold", threshold);
-        conf.set("novoalign.quality.format", qualityFormat);
+        conf.set("mrfast.reference", referenceBasename);
 
-        conf.setMapperClass(NovoalignSingleEndMapper.class);
+        conf.setMapperClass(MrFastSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
         conf.setMapOutputValueClass(Text.class);
 
