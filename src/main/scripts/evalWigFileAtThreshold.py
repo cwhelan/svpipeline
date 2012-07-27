@@ -12,7 +12,7 @@ def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
         p = subprocess.Popen(["zcat",wig_filename], 
                              stdout = subprocess.PIPE)
-	wig_file = StringIO(p.communicate()[0])
+        wig_file = p.stdout
     else:
         wig_file = open(wig_filename, "r")
     return wig_file

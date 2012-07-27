@@ -83,6 +83,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandSummarizeAlignments commandSummarizeAlignments = new CommandSummarizeAlignments();
         jc.addCommand("summarizeAlignments", commandSummarizeAlignments);
 
+        CommandFindGenomicLocationsOverThreshold commandFindGenomicLocationsOverThreshold = new CommandFindGenomicLocationsOverThreshold();
+        jc.addCommand("findGenomicLocationsOverThreshold", commandFindGenomicLocationsOverThreshold);
+
         jc.setProgramName("Cloudbreak");
         return jc;
     }

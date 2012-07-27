@@ -39,29 +39,26 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
         try {
-            readFile(writer, readFile1, "/1");
-            readFile(writer, readFile2, "/2");
+            readFile(writer, readFile1, readFile2);
         } finally {
             writer.close();
         }
 
     }
 
-    private void readFile(BufferedWriter writer, String pathname, String suffix) throws IOException {
-        BufferedReader inputReader1 = null;
+    private void readFile(BufferedWriter writer, String pathname1, String pathname2) throws IOException {
+        BufferedReader inputReader1;
+        BufferedReader inputReader2 = null;
 
-        if (pathname.endsWith("gz")) {
-            inputReader1 = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(pathname))));
-        } else {
-            inputReader1 = new BufferedReader(new FileReader(new File(pathname)));
-        }
+        inputReader1 = openFile(pathname1);
+        inputReader2 = openFile(pathname2);
 
         numRecords = 0;
         try {
-            String convertedFastqLine = readFastqEntry(inputReader1, suffix);
+            String convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
             while (convertedFastqLine != null) {
                 writer.write(convertedFastqLine);
-                convertedFastqLine = readFastqEntry(inputReader1, suffix);
+                convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
                 numRecords++;
             }
         } finally {
@@ -69,28 +66,58 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         }
     }
 
-    private String readFastqEntry(BufferedReader inputReader1, String suffix) throws IOException {
+    private BufferedReader openFile(String pathname) throws IOException {
+        BufferedReader inputReader1;
+        if (pathname.endsWith("gz")) {
+            inputReader1 = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(pathname))));
+        } else {
+            inputReader1 = new BufferedReader(new FileReader(new File(pathname)));
+        }
+        return inputReader1;
+    }
+
+    private String readFastqEntries(BufferedReader inputReader1, BufferedReader inputReader2) throws IOException {
         String read1 = inputReader1.readLine();
         if (read1 == null) {
             return null;
-        }
-
-        if (! read1.endsWith(suffix)) {
-            read1 = read1 + suffix;
         }
 
         String seq1 = inputReader1.readLine();
         String sep1 = inputReader1.readLine();
         String qual1 = inputReader1.readLine();
 
-        StringBuffer lineBuffer = new StringBuffer();
-        lineBuffer.append(read1);
-        if (! read1.endsWith(suffix)) {
-            lineBuffer.append(suffix);
+        String read2 = inputReader2.readLine();
+        if (read2 == null) {
+            return null;
         }
+
+        String seq2 = inputReader2.readLine();
+        String sep2 = inputReader2.readLine();
+        String qual2 = inputReader2.readLine();
+
+        String readPrefix = greatestCommonPrefix(read1, read2);
+
+        StringBuffer lineBuffer = new StringBuffer();
+
+        lineBuffer.append(readPrefix);
+        lineBuffer.append("/1");
         lineBuffer.append("\t").append(seq1).append("\t").append(sep1).append("\t").append(qual1);
         lineBuffer.append("\n");
+
+        lineBuffer.append(readPrefix);
+        lineBuffer.append("/2");
+        lineBuffer.append("\t").append(seq2).append("\t").append(sep2).append("\t").append(qual2);
+        lineBuffer.append("\n");
+
         return lineBuffer.toString();
+    }
+
+    protected static String greatestCommonPrefix(String read1, String read2) {
+        int i = 0;
+        while (i < Math.max(read1.length(), read2.length()) && read1.charAt(i) == read2.charAt(i)) {
+            i = i + 1;
+        }
+        return read1.substring(0,i);
     }
 
     public void run(Configuration conf) throws Exception {
