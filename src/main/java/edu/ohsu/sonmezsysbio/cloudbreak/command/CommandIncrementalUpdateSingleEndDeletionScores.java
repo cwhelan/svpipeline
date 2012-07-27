@@ -34,7 +34,7 @@ import java.util.Map;
  * Time: 2:53 PM
  */
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome via Incremental Belief Update")
-public class CommandIncrementalUpdateSingleEndDeletionScores implements CloudbreakCommand {
+public class CommandIncrementalUpdateSingleEndDeletionScores extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--inputFileDescriptor"}, required = true)
     String inputFileDescriptor;
@@ -94,15 +94,15 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements Cloudbre
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
-        setupDistributedCacheFile(conf, inputFileDescriptor, "read.group.info.file");
-        setupDistributedCacheFile(conf, faidxFileName, "alignment.faidx");
+        addDistributedCacheFile(conf, inputFileDescriptor, "read.group.info.file");
+        addDistributedCacheFile(conf, faidxFileName, "alignment.faidx");
 
         if (exclusionRegionsFileName != null) {
-            setupDistributedCacheFile(conf, exclusionRegionsFileName, "alignment.exclusionRegions");
+            addDistributedCacheFile(conf, exclusionRegionsFileName, "alignment.exclusionRegions");
         }
 
         if (mapabilityWeightingFileName != null) {
-            setupDistributedCacheFile(conf, mapabilityWeightingFileName, "alignment.mapabilityWeighting");
+            addDistributedCacheFile(conf, mapabilityWeightingFileName, "alignment.mapabilityWeighting");
         }
 
         DistributedCache.createSymlink(conf);
@@ -135,16 +135,5 @@ public class CommandIncrementalUpdateSingleEndDeletionScores implements Cloudbre
 
         JobClient.runJob(conf);
 
-    }
-
-    private void setupDistributedCacheFile(JobConf conf, String fileName, String confPropertyName) throws URISyntaxException {
-        File file = new File(fileName);
-        String fileBasename = file.getName();
-        String fileDir = file.getParent();
-
-        DistributedCache.addCacheFile(new URI(fileDir + "/" + fileBasename + "#" + fileBasename),
-                conf);
-
-        conf.set(confPropertyName, fileBasename);
     }
 }

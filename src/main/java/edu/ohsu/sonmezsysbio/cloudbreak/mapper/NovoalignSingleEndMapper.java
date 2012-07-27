@@ -26,6 +26,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
     private static boolean done = false;
     private String threshold;
     private String baseQualityFormat;
+    private String novoalignExecutable;
 
     public OutputCollector<Text, Text> getOutput() {
         return output;
@@ -58,6 +59,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
             reference = job.get("novoalign.reference");
             threshold = job.get("novoalign.threshold");
             baseQualityFormat = job.get("novoalign.quality.format");
+            novoalignExecutable = job.get("novoalign.executable");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,7 +121,7 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
             System.err.println("index file length: " + indexFile.length());
         }
 
-        String[] commandLine = buildCommandLine(reference, s1File.getPath(), threshold, baseQualityFormat);
+        String[] commandLine = buildCommandLine(novoalignExecutable, reference, s1File.getPath(), threshold, baseQualityFormat);
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         System.err.println("Exec'd");
@@ -174,9 +176,9 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
         return firstErrorLine;
     }
 
-    protected static String[] buildCommandLine(String reference, String path1, String threshold, String baseQualityFormat) {
+    protected static String[] buildCommandLine(String novoalignExecutable, String reference, String path1, String threshold, String baseQualityFormat) {
         String[] commandArray = {
-                "/g/whelanch/software/bin/" + "novoalign",
+                novoalignExecutable,
                 "-d", reference,
                 "-c", "1",
                 "-f", path1,
@@ -190,7 +192,6 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 //                " -r %s -oSAM \"@RG\tID:RGID\tPU:ILLUMINA\tLB:%s\tSM:%s\" ",
 //                reference, path1, path2, targetIsize, targetIsizeSD, repeatReport, libraryName, libraryName); // todo: read group ID?
 //
-//        return "/g/whelanch/software/bin/" + "novoalign " + args; //todo: unhardcode path
         return commandArray;
     }
 }

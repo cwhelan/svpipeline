@@ -24,7 +24,7 @@ import java.net.URISyntaxException;
  * Time: 2:01 PM
  */
 @Parameters(separators = "=", commandDescription = "Run a novoalign mate pair alignment")
-public class CommandNovoalignSingleEnds implements CloudbreakCommand {
+public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;
@@ -41,6 +41,9 @@ public class CommandNovoalignSingleEnds implements CloudbreakCommand {
     @Parameter(names = {"--qualityFormat"})
     String qualityFormat = "ILMFQ";
 
+    @Parameter(names = {"--HDFSPathToNovoalign"}, required = true)
+    String pathToNovoalign;
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -54,15 +57,12 @@ public class CommandNovoalignSingleEnds implements CloudbreakCommand {
 
         conf.setInputFormat(TextInputFormat.class);
 
-        File referenceFile = new File(reference);
-        String referenceBasename = referenceFile.getName();
-        String referenceDir = referenceFile.getParent();
+        addDistributedCacheFile(conf, reference, "novoalign.reference");
 
-        DistributedCache.addCacheFile(new URI(referenceDir + "/" + referenceBasename + "#" + referenceBasename),
-                conf);
+        addDistributedCacheFile(conf, pathToNovoalign, "novoalign.executable");
+
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
-        conf.set("novoalign.reference", referenceBasename);
         conf.set("novoalign.threshold", threshold);
         conf.set("novoalign.quality.format", qualityFormat);
 
