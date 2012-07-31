@@ -4,7 +4,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.ProbabilisticPairedAlignmentScorer;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocation;
+import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;

@@ -7,36 +7,44 @@ import tempfile
 import os
 from multiprocessing import Pool
 import sys
-from decimal import *
 import math
 from cStringIO import StringIO
+import time
 
 wig_filename = sys.argv[1]
 truth_filename = sys.argv[2]
 faidx_filename = sys.argv[3]
 medianFilterWindow = sys.argv[4]
-lower_threshold = Decimal(sys.argv[5])
+lower_threshold = float(sys.argv[5])
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
+        sys.stderr.write("opening with subprocess\n")
         p = subprocess.Popen(["zcat",wig_filename], 
                              stdout = subprocess.PIPE)
-	wig_file = StringIO(p.communicate()[0])
+        wig_file = p.stdout
     else:
         wig_file = open(wig_filename, "r")
     return wig_file
 
 values_above_threshold = []
 wig_file = open_file(wig_filename)
+i = 0
 for line in wig_file:
     if line.startswith("track") or line.startswith("variable"):
         continue
-    val = Decimal(line.split()[1]).quantize(Decimal('.00001'), rounding=ROUND_UP)
+    val = round(float(line.split()[1]),5)
+    # gah this was soooooooo sloooooooow
+    #val = Decimal(line.split()[1]).quantize(Decimal('.00001'), rounding=ROUND_UP)
     if not math.isnan(val) and val > lower_threshold:
         values_above_threshold.append(val)
+    i = i + 1
+    if i % 1000000 == 0:
+        sys.stderr.write("processed 1000000 wig lines + " + str(time.time()) + "\n")
 wig_file.close()
 
-#print "values above threshold: " + str(len(values_above_threshold))
+sys.stderr.write("values above threshold: " + str(len(values_above_threshold)) + "\n")
+
 values_above_threshold = list(set(values_above_threshold))
 values_above_threshold.sort()
 

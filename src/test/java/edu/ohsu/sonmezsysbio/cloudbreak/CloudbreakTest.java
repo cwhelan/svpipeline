@@ -28,7 +28,8 @@ public class CloudbreakTest {
                 "--HDFSDataDir", "/user/whelanch/tmp/svpipelinetest",
                 "--HDFSAlignmentsDir", "s_1_1_sequence.txt",
                 "--reference", "ref",
-                "--threshold", "150" };
+                "--threshold", "150",
+                "--HDFSPathToNovoalign", "/user/whelanch/executables/novoalign"};
         jc.parse(argv2);
 
     }

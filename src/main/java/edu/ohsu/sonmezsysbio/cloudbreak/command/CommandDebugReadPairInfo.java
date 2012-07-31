@@ -3,7 +3,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocation;
+import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
 import org.apache.hadoop.conf.Configuration;
@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
  * Time: 11:12 AM
  */
 @Parameters(separators = "=", commandDescription = "View read pair infos")
-public class CommandDebugReadPairInfo implements CloudbreakCommand {
+public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
@@ -73,38 +73,14 @@ public class CommandDebugReadPairInfo implements CloudbreakCommand {
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
-
-        File faidxFile = new File(faidxFileName);
-        String faidxFileBasename = faidxFile.getName();
-        String faidxFileDir = faidxFile.getParent();
-
-        DistributedCache.addCacheFile(new URI(faidxFileDir + "/" + faidxFileBasename + "#" + faidxFileBasename),
-                conf);
+        addDistributedCacheFile(conf, faidxFileName, "alignment.faidx");
 
         if (exclusionRegionsFileName != null) {
-            File exclusionRegionsFile = new File(exclusionRegionsFileName);
-            String exclusionRegionsFileBasename = exclusionRegionsFile.getName();
-            String exclusionRegionsFileDir = exclusionRegionsFile.getParent();
-
-            URI uri = new URI(exclusionRegionsFileDir + "/" + exclusionRegionsFileBasename + "#" + exclusionRegionsFileBasename);
-            System.err.println("URI: " + uri);
-            DistributedCache.addCacheFile(uri,
-                    conf);
-
-            conf.set("alignment.exclusionRegions", exclusionRegionsFileBasename);
+            addDistributedCacheFile(conf, exclusionRegionsFileName, "alignment.exclusionRegions");
         }
 
         if (mapabilityWeightingFileName != null) {
-            File mapabilityWeightingFile = new File(mapabilityWeightingFileName);
-            String mapabilityWeightingFileBasename = mapabilityWeightingFile.getName();
-            String mapabilityWeightingFileDir = mapabilityWeightingFile.getParent();
-
-            URI uri = new URI(mapabilityWeightingFileDir + "/" + mapabilityWeightingFileBasename + "#" + mapabilityWeightingFileBasename);
-            System.err.println("URI: " + uri);
-            DistributedCache.addCacheFile(uri,
-                    conf);
-
-            conf.set("alignment.mapabilityWeighting", mapabilityWeightingFileBasename);
+            addDistributedCacheFile(conf, mapabilityWeightingFileName, "alignment.mapabilityWeighting");
         }
 
         DistributedCache.createSymlink(conf);
@@ -113,7 +89,6 @@ public class CommandDebugReadPairInfo implements CloudbreakCommand {
 
         conf.set("cloudbreak.resolution", String.valueOf(resolution));
 
-        conf.set("alignment.faidx", faidxFileBasename);
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
         conf.set("alignments.filterchr", chrFilter);
         conf.set("alignments.filterstart", startFilter.toString());

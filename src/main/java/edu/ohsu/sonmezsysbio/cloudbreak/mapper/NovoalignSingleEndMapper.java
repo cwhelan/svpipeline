@@ -3,9 +3,12 @@ package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,9 +18,16 @@ import java.util.Arrays;
  */
 public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
 
+    private OutputCollector<Text, Text> output;
+    private String localDir;
+    private Writer s1FileWriter;
+    private File s1File;
     private String reference;
+    private Reporter reporter;
+    private static boolean done = false;
     private String threshold;
     private String baseQualityFormat;
+    private String novoalignExecutable;
 
     @Override
     public void configure(JobConf job) {
@@ -25,9 +35,19 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
 
         System.err.println("Current dir: " + new File(".").getAbsolutePath());
 
-        reference = job.get("novoalign.reference");
-        threshold = job.get("novoalign.threshold");
-        baseQualityFormat = job.get("novoalign.quality.format");
+        this.localDir = job.get("mapred.child.tmp");
+        try {
+            s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
+            s1File.createNewFile();
+            s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+
+            reference = job.get("novoalign.reference");
+            threshold = job.get("novoalign.threshold");
+            baseQualityFormat = job.get("novoalign.quality.format");
+            novoalignExecutable = job.get("novoalign.executable");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -50,7 +70,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
             System.err.println("index file length: " + indexFile.length());
         }
 
-        String[] commandLine = buildCommandLine(reference, s1File.getPath(), threshold, baseQualityFormat);
+        String[] commandLine = buildCommandLine(novoalignExecutable, reference, s1File.getPath(), threshold, baseQualityFormat);
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         System.err.println("Exec'd");
@@ -103,9 +123,9 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
         return firstErrorLine;
     }
 
-    protected static String[] buildCommandLine(String reference, String path1, String threshold, String baseQualityFormat) {
+    protected static String[] buildCommandLine(String novoalignExecutable, String reference, String path1, String threshold, String baseQualityFormat) {
         String[] commandArray = {
-                "/g/whelanch/software/bin/" + "novoalign",
+                "./" + novoalignExecutable,
                 "-d", reference,
                 "-c", "1",
                 "-f", path1,

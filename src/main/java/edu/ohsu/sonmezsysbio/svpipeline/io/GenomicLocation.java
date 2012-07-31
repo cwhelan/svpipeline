@@ -1,4 +1,4 @@
-package edu.ohsu.sonmezsysbio.cloudbreak.io;
+package edu.ohsu.sonmezsysbio.svpipeline.io;
 
 import org.apache.hadoop.io.WritableComparable;
 
@@ -11,6 +11,8 @@ import java.io.IOException;
  * User: cwhelan
  * Date: 4/6/12
  * Time: 1:05 PM
+ *
+ * todo: this class still in svpipeline for now to support legacy data
  */
 public class GenomicLocation implements WritableComparable<GenomicLocation> {
     public short chromosome;
