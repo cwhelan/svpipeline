@@ -44,6 +44,9 @@ public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
     @Parameter(names = {"--HDFSPathToNovoalign"}, required = true)
     String pathToNovoalign;
 
+    @Parameter(names = {"--HDFSPathToNovoalignLicense"})
+    String pathToNovoalignLicense;
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -60,6 +63,9 @@ public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
         addDistributedCacheFile(conf, reference, "novoalign.reference");
 
         addDistributedCacheFile(conf, pathToNovoalign, "novoalign.executable");
+        if (pathToNovoalignLicense != null) {
+            addDistributedCacheFile(conf, pathToNovoalignLicense, "novoalign.license");
+        }
 
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");

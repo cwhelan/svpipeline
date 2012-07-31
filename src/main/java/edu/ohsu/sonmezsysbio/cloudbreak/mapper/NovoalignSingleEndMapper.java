@@ -178,20 +178,14 @@ public class NovoalignSingleEndMapper extends MapReduceBase implements Mapper<Lo
 
     protected static String[] buildCommandLine(String novoalignExecutable, String reference, String path1, String threshold, String baseQualityFormat) {
         String[] commandArray = {
-                novoalignExecutable,
+                "./" + novoalignExecutable,
                 "-d", reference,
                 "-c", "1",
                 "-f", path1,
                 "-F", baseQualityFormat,
                 "-k", "-K", "calfile.txt", "-q", "5",
                 "-r", "Ex", "10", "-t", threshold, "-x", "10"
-                //"-a", "GATCGGAAGAGCGGTTCAGCA", "GATCGGAAGAGCGTCGTGTAGGGA",
         };
-//        String args = String.format("-d %s -c 1 -f %s %s -F ILMFQ -k -K calfile.txt -i MP %s,%s 150,50" +
-//                " -a GATCGGAAGAGCGGTTCAGCA GATCGGAAGAGCGTCGTGTAGGGA " +
-//                " -r %s -oSAM \"@RG\tID:RGID\tPU:ILLUMINA\tLB:%s\tSM:%s\" ",
-//                reference, path1, path2, targetIsize, targetIsizeSD, repeatReport, libraryName, libraryName); // todo: read group ID?
-//
         return commandArray;
     }
 }
