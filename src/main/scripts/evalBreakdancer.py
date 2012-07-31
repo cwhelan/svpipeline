@@ -60,7 +60,7 @@ for v in unique_score_values:
     # sys.stderr.write("v = " + str(v))
     # sys.stderr.write("long_calls = " + str(long_calls))
     # sys.stderr.write("calls_gte_thresh = " + str(calls_gte_threshold))
-    calls = long_calls + len(calls_gte_threshold) + non_del_calls
+    calls = long_calls + len(calls_gte_threshold)
     tpr = float(matches) / calls
     print "\t".join(map(str, [v, calls, matches, long_calls, non_del_calls, tpr]))
     
