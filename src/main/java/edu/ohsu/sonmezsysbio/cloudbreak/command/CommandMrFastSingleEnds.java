@@ -10,6 +10,7 @@ import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.*;
 
 import java.io.*;
@@ -23,7 +24,7 @@ import java.net.URISyntaxException;
  * Time: 2:01 PM
  */
 @Parameters(separators = "=", commandDescription = "Run a novoalign mate pair alignment")
-public class CommandMrFastSingleEnds implements CloudbreakCommand {
+public class CommandMrFastSingleEnds extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;
@@ -33,6 +34,9 @@ public class CommandMrFastSingleEnds implements CloudbreakCommand {
 
     @Parameter(names = {"--reference"}, required = true)
     String reference;
+
+    @Parameter(names = {"--HDFSPathToMrfast"}, required = true)
+    String pathToMrfast;
 
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
@@ -47,15 +51,12 @@ public class CommandMrFastSingleEnds implements CloudbreakCommand {
 
         conf.setInputFormat(TextInputFormat.class);
 
-        File referenceFile = new File(reference);
-        String referenceBasename = referenceFile.getName();
-        String referenceDir = referenceFile.getParent();
+        addDistributedCacheFile(conf, pathToMrfast, "mrfast.executable");
+        addDistributedCacheFile(conf, reference, "mrfast.reference");
+        addDistributedCacheFile(conf, reference + ".index", "mrfast.index");
 
-        DistributedCache.addCacheFile(new URI(referenceDir + "/" + referenceBasename + "#" + referenceBasename),
-                conf);
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
-        conf.set("mrfast.reference", referenceBasename);
 
         conf.setMapperClass(MrFastSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
@@ -63,6 +64,10 @@ public class CommandMrFastSingleEnds implements CloudbreakCommand {
 
         conf.setOutputKeyClass(Text.class);
         conf.setCompressMapOutput(true);
+
+        conf.setOutputFormat(TextOutputFormat.class);
+        TextOutputFormat.setCompressOutput(conf, true);
+        TextOutputFormat.setOutputCompressorClass(conf, GzipCodec.class);
 
         conf.setReducerClass(SingleEndAlignmentsToPairsReducer.class);
 

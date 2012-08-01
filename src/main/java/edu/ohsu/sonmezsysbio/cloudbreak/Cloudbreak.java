@@ -58,6 +58,10 @@ public class Cloudbreak extends Configured implements Tool
         jc.addCommand("readPairedEndFilesIntoHDFS", readFiles);
         CommandNovoalignSingleEnds singleEnds  = new CommandNovoalignSingleEnds();
         jc.addCommand("alignSingleEnds", singleEnds);
+
+        CommandMrFastSingleEnds mrFastSingleEnds  = new CommandMrFastSingleEnds();
+        jc.addCommand("mrfastSingleEnds", mrFastSingleEnds);
+
         CommandPileupSingleEndDeletionScores pileupSingleEndDeletionScores = new CommandPileupSingleEndDeletionScores();
         jc.addCommand("pileupSingleEndDeletionScores", pileupSingleEndDeletionScores);
 

@@ -16,12 +16,14 @@ import java.util.zip.GZIPInputStream;
 public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
 
     private String reference;
+    private String mrfastExecutable;
 
     @Override
     public void configure(JobConf job) {
         super.configure(job);
         System.err.println("Current dir: " + new File(".").getAbsolutePath());
         reference = job.get("mrfast.reference");
+        mrfastExecutable = job.get("mrfast.executable");
     }
 
     @Override
@@ -43,7 +45,7 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
             System.err.println("index file length: " + indexFile.length());
         }
 
-        String[] commandLine = buildCommandLine(reference, s1File.getPath());
+        String[] commandLine = buildCommandLine(mrfastExecutable, reference, s1File.getPath());
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         System.err.println("Exec'd");
@@ -54,33 +56,61 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        System.err.println("process finished with exit code: " + p.exitValue());
 
         BufferedReader stdInput = new BufferedReader(new
-                InputStreamReader(new GZIPInputStream(new FileInputStream(new File("output")))));
+                InputStreamReader(new GZIPInputStream(new FileInputStream(new File("output.gz")))));
 
         readAlignments(stdInput, p.getErrorStream());
     }
 
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
-        String outLine;
-        while ((outLine = stdInput.readLine()) != null) {
-            String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
-            getOutput().collect(new Text(readPairId), new Text(outLine));
-        }
+
         String errLine;
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
         while ((errLine = errorReader.readLine()) != null) {
             System.err.println("ERROR: " + errLine);
         }
 
+        String outLine;
+        while ((outLine = stdInput.readLine()) != null) {
+            String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
+            String condensedAlignmentLine = condenseAlignmentLine(outLine);
+            getOutput().collect(new Text(readPairId), new Text(condensedAlignmentLine));
+        }
+
     }
 
-    protected static String[] buildCommandLine(String reference, String path1) {
+    /**
+     * MRfast SAM output is very long so only pick out the important fields: alignment location and number
+     * of mismatches
+     * @param outLine
+     * @return
+     */
+    private String condenseAlignmentLine(String outLine) {
+        String[] fields = outLine.split("\t");
+        String readId = fields[0];
+        String orientation = "0".equals(fields[1]) ? "F" : "R";
+        String chrom = fields[2];
+        String position = fields[3];
+        String sequenceLength = String.valueOf(fields[9].length());
+        String nm = "NA";
+        for (int i = 4; i < fields.length; i++) {
+            if (fields[i].startsWith("NM:i:")) {
+                nm = fields[i].substring(5);
+                break;
+            }
+        }
+        return readId + "\t" + orientation + "\t" + chrom + "\t" + position + "\t" + nm + "\t" + sequenceLength;
+    }
+
+    protected static String[] buildCommandLine(String mrfastExecutable, String reference, String path1) {
         String[] commandArray = {
-                "/g/whelanch/software/bin/" + "mrfast",
+                "./" + mrfastExecutable,
                 "--search", reference,
                 "--seq", path1,
-                "--outcomp"
+                "--outcomp",
+                "--seqcomp"
         };
         return commandArray;
     }
