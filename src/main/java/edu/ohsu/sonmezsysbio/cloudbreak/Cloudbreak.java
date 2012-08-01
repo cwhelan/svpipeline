@@ -63,6 +63,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandIncrementalUpdateSingleEndDeletionScores incrementalUpdateSingleEndDeletionScores = new CommandIncrementalUpdateSingleEndDeletionScores();
         jc.addCommand("incrementalUpdateSingleEndDeletionScores", incrementalUpdateSingleEndDeletionScores);
 
+        CommandWeightedAverageSingleEndDeletionScores weightedAverageSingleEndDeletionScores = new CommandWeightedAverageSingleEndDeletionScores();
+        jc.addCommand("weightedAverageSingleEndDeletionScores", weightedAverageSingleEndDeletionScores);
+
         jc.addCommand("splitDeflatedOutput", new CommandSplitDeflatedOutput());
 
         CommandAverageWigOverSlidingWindow averageWigOverSlidingWindow = new CommandAverageWigOverSlidingWindow();
