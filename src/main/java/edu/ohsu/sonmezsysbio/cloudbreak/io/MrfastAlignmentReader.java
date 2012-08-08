@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.io;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.MrfastAlignmentRecord;
+import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,5 +23,9 @@ public class MrfastAlignmentReader extends BaseAlignmentReader {
         record.setSequenceLength(Integer.parseInt(fields[5]));
         return record;
 
+    }
+
+    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
+        return 0;
     }
 }

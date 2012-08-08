@@ -9,7 +9,6 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -119,12 +118,12 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                emitBedSpanForPair(record1, record2, output);
+                emitBedSpanForPair(record1, record2, readPairAlignments, output);
             }
         }
     }
 
-    public void emitBedSpanForPair(AlignmentRecord record1, AlignmentRecord record2, OutputCollector<Text, Text> output) throws IOException {
+    public void emitBedSpanForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
@@ -145,9 +144,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
                leftRead.getPosition() < regionEnd && rightRead.getPosition() > regionStart))
             return;
 
-        double endPosterior1 = ((NovoalignNativeRecord) record1).getPosteriorProb();
-        double endPosterior2 = ((NovoalignNativeRecord) record2).getPosteriorProb();
-
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;
         if (matePairs) {
@@ -161,7 +157,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double pMappingCorrect = scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(endPosterior1), NovoalignNativeRecord.decodePosterior(endPosterior2));
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,
                 isizeMean,

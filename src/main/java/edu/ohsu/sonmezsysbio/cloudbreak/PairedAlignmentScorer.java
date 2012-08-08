@@ -51,11 +51,4 @@ public abstract class PairedAlignmentScorer {
         return matePair;
     }
 
-    public double probabilityMappingIsCorrect(double codedEndPosterior1, double codedEndPosterior2) {
-        double endPosterior1 = Math.log(codedEndPosterior1);
-        double endPosterior2 = Math.log(codedEndPosterior2);
-
-        return endPosterior1 + endPosterior2;
-    }
-
 }

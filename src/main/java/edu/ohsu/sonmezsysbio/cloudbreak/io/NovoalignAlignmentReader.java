@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.io;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord;
+import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +30,18 @@ public class NovoalignAlignmentReader extends BaseAlignmentReader {
         }
 
         return record;
+    }
 
+    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
+        return probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record1).getPosteriorProb()),
+                NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record2).getPosteriorProb()));
+    }
+
+    public static double probabilityMappingIsCorrect(double codedEndPosterior1, double codedEndPosterior2) {
+        double endPosterior1 = Math.log(codedEndPosterior1);
+        double endPosterior2 = Math.log(codedEndPosterior2);
+
+        return endPosterior1 + endPosterior2;
     }
 
 }

@@ -17,7 +17,6 @@ import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -154,12 +153,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
-                emitReadPairInfoForPair(record1, record2, output);
+                emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
             }
         }
     }
 
-    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
@@ -169,9 +168,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         if (getChromosomeFilter() != null) {
             if (! record1.getChromosomeName().equals(getChromosomeFilter())) return;
         }
-
-        double endPosterior1 = ((NovoalignNativeRecord) record1).getPosteriorProb();
-        double endPosterior2 = ((NovoalignNativeRecord) record2).getPosteriorProb();
 
         int insertSize;
         AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
@@ -194,7 +190,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 (resolution - rightRead.getPosition() % resolution);
 
 
-        double pMappingCorrect = scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(endPosterior1), NovoalignNativeRecord.decodePosterior(endPosterior2));
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
         if (mapabilityWeighting != null) {
             if (insertSize > targetIsize + 6 * targetIsizeSD) {

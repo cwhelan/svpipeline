@@ -1,6 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.io;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
+import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
 
 import java.util.List;
 
@@ -14,4 +15,7 @@ public interface AlignmentReader {
     AlignmentRecord parseRecord(String[] fields);
 
     List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments);
+
+    double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments);
+
 }

@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,27 +19,21 @@ public class ProbabilisticPairedAlignmentScorerTest {
     public void testComputeDeletionScore() throws Exception {
         ProbabilisticPairedAlignmentScorer scorer = new ProbabilisticPairedAlignmentScorer();
         // bigger insert size: more likely deletion
-        assertTrue(scorer.computeDeletionScore(5114, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) >
-                scorer.computeDeletionScore(3114, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))));
+        assertTrue(scorer.computeDeletionScore(5114, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) >
+                scorer.computeDeletionScore(3114, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))));
         // higher quality: less likely deletion since insert size close to mean
-        assertTrue(scorer.computeDeletionScore(3114, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) <
-                scorer.computeDeletionScore(3114, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(0))));
+        assertTrue(scorer.computeDeletionScore(3114, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) <
+                scorer.computeDeletionScore(3114, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(0))));
 
         // higher quality: more likely deletion since insert size far from mean
-        assertTrue(scorer.computeDeletionScore(7000, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) >
-                scorer.computeDeletionScore(7000, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(0))));
+        assertTrue(scorer.computeDeletionScore(7000, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) >
+                scorer.computeDeletionScore(7000, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(0))));
 
         // bigger insert size: more likely deletion
-        assertTrue(scorer.computeDeletionScore(5114, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) >
-                scorer.computeDeletionScore(2000, 3000.0, 300.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))));
+        assertTrue(scorer.computeDeletionScore(5114, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) >
+                scorer.computeDeletionScore(2000, 3000.0, 300.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))));
 
-        assertTrue(scorer.computeDeletionScore(5114, 200.0, 30.0, scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) > 0);
+        assertTrue(scorer.computeDeletionScore(5114, 200.0, 30.0, NovoalignAlignmentReader.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117))) > 0);
 
-    }
-
-    @Test
-    public void testProbabilityMappingIsCorrect() {
-        ProbabilisticPairedAlignmentScorer scorer = new ProbabilisticPairedAlignmentScorer();
-        assertTrue(scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(117)) > scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(185), NovoalignNativeRecord.decodePosterior(0)));
     }
 }
