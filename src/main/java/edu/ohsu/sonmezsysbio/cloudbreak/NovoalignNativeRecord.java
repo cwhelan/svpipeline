@@ -1,5 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,38 +20,6 @@ public class NovoalignNativeRecord implements AlignmentRecord {
     boolean forward;
     String readId;
     String sequence;
-
-    public static NovoalignNativeRecord parseRecord(String[] fields) {
-        NovoalignNativeRecord record = new NovoalignNativeRecord();
-        record.setReadId(fields[0]);
-        record.setSequence(fields[2]);
-        record.setMappingStatus(fields[4]);
-        if (record.isMapped()) {
-            String recordReferenceName = fields[7];
-            // cut off the ">" that starts the chromosome name
-            if (recordReferenceName.startsWith(">")) {
-                recordReferenceName = recordReferenceName.substring(1);
-            }
-            record.setChromsomeName(recordReferenceName);
-
-            record.setPosition(Integer.parseInt(fields[8]));
-            record.setPosteriorProb(Double.parseDouble(fields[6]));
-            record.setForward("F".equals(fields[9]));
-        }
-
-        return record;
-
-    }
-
-    public static List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments) {
-        List<AlignmentRecord> read1AlignmentList = new ArrayList<AlignmentRecord>();
-        for (String alignment : alignments) {
-            String[] fields1 = alignment.split("\t");
-            AlignmentRecord record1 = parseRecord(fields1);
-            read1AlignmentList.add(record1);
-        }
-        return read1AlignmentList;
-    }
 
     public boolean isMapped() {
         return "U".equals(getMappingStatus()) || "R".equals(getMappingStatus());

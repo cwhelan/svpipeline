@@ -1,7 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
-import edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -84,6 +84,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
 
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
         String outLine;
+        NovoalignAlignmentReader alignmentReader = new NovoalignAlignmentReader();
         while ((outLine = stdInput.readLine()) != null) {
             // System.err.println("LINE: " + outLine);
             if (outLine.startsWith("#"))  {
@@ -96,7 +97,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
             }
 
             String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
-            AlignmentRecord alignment = NovoalignNativeRecord.parseRecord(outLine.split("\t"));
+            AlignmentRecord alignment = alignmentReader.parseRecord(outLine.split("\t"));
 
             if (! alignment.isMapped()) {
                 continue;
