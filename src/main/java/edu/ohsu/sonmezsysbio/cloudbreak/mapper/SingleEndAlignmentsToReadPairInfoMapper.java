@@ -119,28 +119,18 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
-        int firstTabIndex = line.indexOf('\t');
-        String lineValues = line.substring(firstTabIndex + 1);
-
-        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
-        String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
-
-        String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<AlignmentRecord> read2AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read2Alignments);
+        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
 
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
             if (exclusionRegions != null) {
-                for (AlignmentRecord record : read1AlignmentRecords) {
+                for (AlignmentRecord record : readPairAlignments.getRead1Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         recordsInExcludedAreas.add(record);
                     }
                 }
 
-                for (AlignmentRecord record : read2AlignmentRecords) {
+                for (AlignmentRecord record : readPairAlignments.getRead2Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         recordsInExcludedAreas.add(record);
                     }
@@ -153,16 +143,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
 
         try {
-            emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output, recordsInExcludedAreas);
+            emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void emitReadPairInfoForAllPairs(List<AlignmentRecord> read1AlignmentRecords, List<AlignmentRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
-        for (AlignmentRecord record1 : read1AlignmentRecords) {
-            for (AlignmentRecord record2 : read2AlignmentRecords) {
+    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
+        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
                 emitReadPairInfoForPair(record1, record2, output);
             }
@@ -204,7 +194,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 (resolution - rightRead.getPosition() % resolution);
 
 
-        double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
+        double pMappingCorrect = scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(endPosterior1), NovoalignNativeRecord.decodePosterior(endPosterior2));
 
         if (mapabilityWeighting != null) {
             if (insertSize > targetIsize + 6 * targetIsizeSD) {

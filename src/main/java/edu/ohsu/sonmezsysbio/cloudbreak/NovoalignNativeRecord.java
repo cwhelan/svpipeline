@@ -114,4 +114,9 @@ public class NovoalignNativeRecord implements AlignmentRecord {
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
+
+    public static double decodePosterior(double codedPosterior) {
+        return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
+    }
+
 }

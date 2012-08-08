@@ -52,13 +52,10 @@ public abstract class PairedAlignmentScorer {
     }
 
     public double probabilityMappingIsCorrect(double codedEndPosterior1, double codedEndPosterior2) {
-        double endPosterior1 = Math.log(decodePosterior(codedEndPosterior1));
-        double endPosterior2 = Math.log(decodePosterior(codedEndPosterior2));
+        double endPosterior1 = Math.log(codedEndPosterior1);
+        double endPosterior2 = Math.log(codedEndPosterior2);
 
         return endPosterior1 + endPosterior2;
     }
 
-    double decodePosterior(double codedPosterior) {
-        return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
-    }
 }

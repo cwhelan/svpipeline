@@ -112,26 +112,13 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         String line = value.toString();
         //System.err.println("LINE: " + line);
 
-        int firstTabIndex = line.indexOf('\t');
-        String readPairId = line.substring(0,firstTabIndex);
-        String lineValues = line.substring(firstTabIndex + 1);
-
-        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
-        String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-
-        List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
-
-        String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<AlignmentRecord> read2AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read2Alignments);
-
-        emitDeletionScoresForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
+        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        emitDeletionScoresForAllPairs(readPairAlignments, output);
     }
 
-    private void emitDeletionScoresForAllPairs(List<AlignmentRecord> read1AlignmentRecords, List<AlignmentRecord> read2AlignmentRecords, OutputCollector<Text, Text> output) throws IOException {
-        for (AlignmentRecord record1 : read1AlignmentRecords) {
-            for (AlignmentRecord record2 : read2AlignmentRecords) {
+    private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
+        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 emitBedSpanForPair(record1, record2, output);
             }
         }
@@ -174,7 +161,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
+        double pMappingCorrect = scorer.probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(endPosterior1), NovoalignNativeRecord.decodePosterior(endPosterior2));
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,
                 isizeMean,

@@ -5,6 +5,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
@@ -39,5 +41,21 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
 
     public void setAlignmentReader(AlignmentReader alignmentReader) {
         this.alignmentReader = alignmentReader;
+    }
+
+    protected ReadPairAlignments parsePairAlignmentLine(String line) {
+        int firstTabIndex = line.indexOf('\t');
+        String lineValues = line.substring(firstTabIndex + 1);
+
+        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
+        String read1AlignmentsString = readAligments[0];
+        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
+
+        List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
+
+        String read2AlignmentsString = readAligments[1];
+        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
+        List<AlignmentRecord> read2AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read2Alignments);
+        return new ReadPairAlignments(read1AlignmentRecords, read2AlignmentRecords);
     }
 }
