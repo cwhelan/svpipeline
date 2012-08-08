@@ -86,38 +86,38 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read1Alignments);
+        List<AlignmentRecord> read1AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
         String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read2Alignments);
+        List<AlignmentRecord> read2AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read2Alignments);
 
         emitDeletionScoresForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
     }
 
-    private void emitDeletionScoresForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<Text, DoubleWritable> output) throws IOException {
-        for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
-            for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
+    private void emitDeletionScoresForAllPairs(List<AlignmentRecord> read1AlignmentRecords, List<AlignmentRecord> read2AlignmentRecords, OutputCollector<Text, DoubleWritable> output) throws IOException {
+        for (AlignmentRecord record1 : read1AlignmentRecords) {
+            for (AlignmentRecord record2 : read2AlignmentRecords) {
                 emitDeletionScoresForPair(record1, record2, output);
             }
         }
     }
 
-    private void emitDeletionScoresForPair(NovoalignNativeRecord record1, NovoalignNativeRecord record2, OutputCollector<Text, DoubleWritable> output) throws IOException {
+    private void emitDeletionScoresForPair(AlignmentRecord record1, AlignmentRecord record2, OutputCollector<Text, DoubleWritable> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
 
-        double endPosterior1 = record1.getPosteriorProb();
-        double endPosterior2 = record2.getPosteriorProb();
+        double endPosterior1 = ((NovoalignNativeRecord) record1).getPosteriorProb();
+        double endPosterior2 = ((NovoalignNativeRecord) record2).getPosteriorProb();
 
         int insertSize = -1;
         Double isizeMean;
         Double isizeSD;
 
-        NovoalignNativeRecord leftRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
-        NovoalignNativeRecord rightRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
                 record2 : record1;
 
         // todo: not handling inversions for now

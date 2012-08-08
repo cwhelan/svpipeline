@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
@@ -95,7 +96,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
             }
 
             String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
-            NovoalignNativeRecord alignment = NovoalignNativeRecord.parseRecord(outLine.split("\t"));
+            AlignmentRecord alignment = NovoalignNativeRecord.parseRecord(outLine.split("\t"));
 
             if (! alignment.isMapped()) {
                 continue;

@@ -18,7 +18,7 @@ public abstract class PairedAlignmentScorer {
 
     public abstract double computeDeletionScore(int insertSize, Double targetIsize, Double targetIsizeSD, Double pMappingCorrect);
 
-    public boolean validateMappingOrientations(NovoalignNativeRecord record1, NovoalignNativeRecord record2, boolean matePairs) {
+    public boolean validateMappingOrientations(AlignmentRecord record1, AlignmentRecord record2, boolean matePairs) {
         if (matePairs) {
             if (record1.isForward() && ! record2.isForward()) {
             } else if (!record1.isForward() && record2.isForward()) {
@@ -37,7 +37,7 @@ public abstract class PairedAlignmentScorer {
         return true;
     }
 
-    public boolean isMatePairNotSmallFragment(NovoalignNativeRecord record1, NovoalignNativeRecord record2) {
+    public boolean isMatePairNotSmallFragment(AlignmentRecord record1, AlignmentRecord record2) {
         boolean matePair = false;
         if (record1.isForward() && ! record2.isForward()) {
             if (record1.getPosition() - record2.getPosition() > 0) matePair = true;

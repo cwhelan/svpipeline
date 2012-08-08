@@ -122,22 +122,22 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read1Alignments);
+        List<AlignmentRecord> read1AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
         String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read2Alignments);
+        List<AlignmentRecord> read2AlignmentRecords = NovoalignNativeRecord.parseAlignmentsIntoRecords(read2Alignments);
 
-        Set<NovoalignNativeRecord> recordsInExcludedAreas = new HashSet<NovoalignNativeRecord>();
+        Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
             if (exclusionRegions != null) {
-                for (NovoalignNativeRecord record : read1AlignmentRecords) {
+                for (AlignmentRecord record : read1AlignmentRecords) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
                         recordsInExcludedAreas.add(record);
                     }
                 }
 
-                for (NovoalignNativeRecord record : read2AlignmentRecords) {
+                for (AlignmentRecord record : read2AlignmentRecords) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
                         recordsInExcludedAreas.add(record);
                     }
@@ -157,16 +157,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
     }
 
-    private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<NovoalignNativeRecord> recordsInExcludedAreas) throws Exception {
-        for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
-            for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
+    private void emitReadPairInfoForAllPairs(List<AlignmentRecord> read1AlignmentRecords, List<AlignmentRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
+        for (AlignmentRecord record1 : read1AlignmentRecords) {
+            for (AlignmentRecord record2 : read2AlignmentRecords) {
                 if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
                 emitReadPairInfoForPair(record1, record2, output);
             }
         }
     }
 
-    private void emitReadPairInfoForPair(NovoalignNativeRecord record1, NovoalignNativeRecord record2, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
@@ -177,13 +177,13 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             if (! record1.getChromosomeName().equals(getChromosomeFilter())) return;
         }
 
-        double endPosterior1 = record1.getPosteriorProb();
-        double endPosterior2 = record2.getPosteriorProb();
+        double endPosterior1 = ((NovoalignNativeRecord) record1).getPosteriorProb();
+        double endPosterior2 = ((NovoalignNativeRecord) record2).getPosteriorProb();
 
         int insertSize;
-        NovoalignNativeRecord leftRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
-        NovoalignNativeRecord rightRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
                 record2 : record1;
 
         // todo: not handling inversions for now
