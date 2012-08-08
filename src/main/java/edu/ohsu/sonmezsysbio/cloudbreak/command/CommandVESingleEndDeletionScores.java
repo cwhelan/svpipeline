@@ -9,8 +9,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationPartitioner;
-import edu.ohsu.sonmezsysbio.cloudbreak.reducer.IncrementalDelBeliefUpdateReadPairInfoReducer;
-import edu.ohsu.sonmezsysbio.cloudbreak.reducer.WeightedAverageReadPairInfoReducer;
+import edu.ohsu.sonmezsysbio.cloudbreak.reducer.VirtualEvidenceReadPairInfoReducer;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -33,7 +32,7 @@ import java.util.Map;
  * Time: 2:53 PM
  */
 @Parameters(separators = "=", commandDescription = "Calculate Deletion Scores Across the Genome via Incremental Belief Update")
-public class CommandWeightedAverageSingleEndDeletionScores extends BaseCloudbreakCommand {
+public class CommandVESingleEndDeletionScores extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--inputFileDescriptor"}, required = true)
     String inputFileDescriptor;
@@ -123,7 +122,7 @@ public class CommandWeightedAverageSingleEndDeletionScores extends BaseCloudbrea
         conf.setMapOutputValueClass(ReadPairInfo.class);
         conf.setPartitionerClass(GenomicLocationPartitioner.class);
 
-        conf.setReducerClass(WeightedAverageReadPairInfoReducer.class);
+        conf.setReducerClass(VirtualEvidenceReadPairInfoReducer.class);
 
         conf.setOutputKeyClass(GenomicLocation.class);
         conf.setOutputValueClass(DoubleWritable.class);

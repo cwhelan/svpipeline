@@ -19,7 +19,7 @@ import java.util.Map;
  * Date: 4/6/12
  * Time: 1:35 PM
  */
-public class WeightedAverageReadPairInfoReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, GenomicLocation, DoubleWritable> {
+public class VirtualEvidenceReadPairInfoReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, GenomicLocation, DoubleWritable> {
 
 
     private Map<Short,ReadGroupInfo> readGroupInfos;
@@ -36,14 +36,15 @@ public class WeightedAverageReadPairInfoReducer extends MapReduceBase implements
         System.err.println(key);
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
-        double pDeletion = Math.log(2432.0 / 2700000000.0);
-        double pNoDeletion = Math.log(1 - 2432.0 / 2700000000.0);
+        double deletionPrior = Math.log(2432.0 / 2700000000.0);
+        double noDeletionPrior = Math.log(1 - 2432.0 / 2700000000.0);
 
-        double weightedPDeletionSum = Double.NEGATIVE_INFINITY;
-        double weightedPNoDeletionSum = Double.NEGATIVE_INFINITY;
+        System.err.println("del prior: " + deletionPrior);
+        System.err.println("no del prior: " + noDeletionPrior);
 
-        System.err.println("del prior: " + pDeletion);
-        System.err.println("no del prior: " + pNoDeletion);
+        double pDeletionFactorProduct = deletionPrior;
+        double pNoDeletionFactorProduct = deletionPrior;
+
         while (values.hasNext()) {
             ReadPairInfo readPairInfo = values.next();
             int insertSize = readPairInfo.insertSize;
@@ -67,22 +68,23 @@ public class WeightedAverageReadPairInfoReducer extends MapReduceBase implements
             }
             System.err.println("pISgivenNoDeletion: " + pISgivenNoDeletion);
 
-            double normalization = logAdd(pDeletion + pISgivenDeletion, pNoDeletion + pISgivenNoDeletion);
-            double pDeletionGivenIS = pDeletion + pISgivenDeletion - normalization;
+            double pMappingIncorrect = Math.log(1 - Math.exp(pMappingCorrect));
+
+            double normalization = logAdd(deletionPrior + pISgivenDeletion, noDeletionPrior + pISgivenNoDeletion);
+            double pDeletionGivenIS = deletionPrior + pISgivenDeletion - normalization;
             System.err.println("pDeletionGivenIS: " + pDeletionGivenIS);
-            double pNoDeletionGivenIS = pNoDeletion + pISgivenNoDeletion - normalization;
+
+            double pNoDeletionGivenIS = noDeletionPrior + pISgivenNoDeletion - normalization;
             System.err.println("pNoDeletionGivenIS: " + pNoDeletionGivenIS);
 
-            pMappingCorrect = pMappingCorrect + pMappingCorrect;
-            System.err.println("weightedPDeletionSum: " + weightedPDeletionSum + " logadd (" + pDeletionGivenIS + " + " + pMappingCorrect + ")");
-            weightedPDeletionSum = logAdd(weightedPDeletionSum, pDeletionGivenIS + pMappingCorrect);
-            System.err.println("weightedPDeletionSum: " + weightedPDeletionSum);
+            double pDeletion = logAdd(pDeletionGivenIS + pMappingCorrect, deletionPrior + pMappingIncorrect);
+            double pNoDeletion = logAdd(pNoDeletionGivenIS + pMappingCorrect, noDeletionPrior + pMappingIncorrect);
 
-            System.err.println("weightedPNoDeletionSum: " + weightedPNoDeletionSum + " logadd (" + pNoDeletionGivenIS + " + " + pMappingCorrect + ")");
-            weightedPNoDeletionSum = logAdd(weightedPNoDeletionSum, pNoDeletionGivenIS + pMappingCorrect);
-            System.err.println("weightedPNoDeletionSum: " + weightedPNoDeletionSum);
+            pDeletionFactorProduct = pDeletionFactorProduct + pDeletion;
+            pNoDeletionFactorProduct = pNoDeletionFactorProduct + pNoDeletion;
         }
-        double lr = weightedPDeletionSum - weightedPNoDeletionSum;
+
+        double lr = pDeletionFactorProduct - pNoDeletionFactorProduct;
         System.err.println("lr: " + lr);
         output.collect(key, new DoubleWritable(lr));
     }
