@@ -24,7 +24,7 @@ public class NovoalignNativeRecord implements AlignmentRecord {
         return chromosomeName;
     }
 
-    public void setChromsomeName(String chromosomeName) {
+    public void setChromosomeName(String chromosomeName) {
         this.chromosomeName = chromosomeName;
     }
 
@@ -50,6 +50,10 @@ public class NovoalignNativeRecord implements AlignmentRecord {
 
     public void setPosteriorProb(double posteriorProb) {
         this.posteriorProb = posteriorProb;
+    }
+
+    public int getSequenceLength() {
+        return sequence.length();
     }
 
     @Override

@@ -137,7 +137,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
             }
         }
 
-        insertSize = rightRead.getPosition() + rightRead.getSequence().length() - leftRead.getPosition();
+        insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 

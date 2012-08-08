@@ -135,13 +135,13 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         try {
             if (exclusionRegions != null) {
                 for (AlignmentRecord record : read1AlignmentRecords) {
-                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
+                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         recordsInExcludedAreas.add(record);
                     }
                 }
 
                 for (AlignmentRecord record : read2AlignmentRecords) {
-                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
+                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         recordsInExcludedAreas.add(record);
                     }
                 }
@@ -192,7 +192,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         // todo: not handling inversions for now
         if (!scorer.validateMappingOrientations(record1, record2, matePairs)) return;
 
-        insertSize = rightRead.getPosition() + rightRead.getSequence().length() - leftRead.getPosition();
+        insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
@@ -210,14 +210,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             if (insertSize > targetIsize + 6 * targetIsizeSD) {
                 String chrom = record1.getChromosomeName();
                 int leftReadStart = leftRead.getPosition();
-                int leftReadEnd = leftRead.getPosition() + leftRead.getSequence().length();
+                int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
                 double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
-                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequence().length()) + " = " + leftReadMapability);
+                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequenceLength()) + " = " + leftReadMapability);
 
-                int rightReadStart = rightRead.getPosition() - rightRead.getSequence().length();
+                int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
                 int rightReadEnd = rightRead.getPosition();
                 double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
-                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequence().length()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
+                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
 
                 //System.err.println("old pmc: " + pMappingCorrect);
                 pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);

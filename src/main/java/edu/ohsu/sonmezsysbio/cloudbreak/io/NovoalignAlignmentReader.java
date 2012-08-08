@@ -3,16 +3,13 @@ package edu.ohsu.sonmezsysbio.cloudbreak.io;
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.NovoalignNativeRecord;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
  * Date: 8/8/12
  * Time: 1:56 PM
  */
-public class NovoalignAlignmentReader implements AlignmentReader {
+public class NovoalignAlignmentReader extends BaseAlignmentReader {
     public AlignmentRecord parseRecord(String[] fields) {
         NovoalignNativeRecord record = new NovoalignNativeRecord();
         record.setReadId(fields[0]);
@@ -24,7 +21,7 @@ public class NovoalignAlignmentReader implements AlignmentReader {
             if (recordReferenceName.startsWith(">")) {
                 recordReferenceName = recordReferenceName.substring(1);
             }
-            record.setChromsomeName(recordReferenceName);
+            record.setChromosomeName(recordReferenceName);
 
             record.setPosition(Integer.parseInt(fields[8]));
             record.setPosteriorProb(Double.parseDouble(fields[6]));
@@ -35,13 +32,4 @@ public class NovoalignAlignmentReader implements AlignmentReader {
 
     }
 
-    public List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments) {
-        List<AlignmentRecord> read1AlignmentList = new ArrayList<AlignmentRecord>();
-        for (String alignment : alignments) {
-            String[] fields1 = alignment.split("\t");
-            AlignmentRecord record1 = parseRecord(fields1);
-            read1AlignmentList.add(record1);
-        }
-        return read1AlignmentList;
-    }
 }

@@ -11,15 +11,11 @@ public interface AlignmentRecord {
 
     String getChromosomeName();
 
-    void setChromsomeName(String chromosomeName);
+    void setChromosomeName(String chromosomeName);
 
     int getPosition();
 
     void setPosition(int position);
-
-    String getMappingStatus();
-
-    void setMappingStatus(String mappingStatus);
 
     boolean isForward();
 
@@ -29,7 +25,6 @@ public interface AlignmentRecord {
 
     void setReadId(String readId);
 
-    String getSequence();
+    int getSequenceLength();
 
-    void setSequence(String sequence);
 }
