@@ -2,11 +2,12 @@ package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.AlignmentReader;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
+import edu.ohsu.sonmezsysbio.cloudbreak.CloudbreakMapReduceBase;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
  * Date: 4/16/12
  * Time: 1:44 PM
  */
-public class SingleEndAlignmentSummaryMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+public class SingleEndAlignmentSummaryMapper extends CloudbreakMapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
     Text outKey = new Text("k");
 
@@ -29,7 +30,6 @@ public class SingleEndAlignmentSummaryMapper extends MapReduceBase implements Ma
         String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        AlignmentReader alignmentReader = new NovoalignAlignmentReader();
         List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];

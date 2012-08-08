@@ -1,5 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
+import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -11,9 +13,17 @@ import static junit.framework.Assert.assertEquals;
  * Time: 4:18 PM
  */
 public class SingleEndAlignmentsToBedSpansMapperTest {
+
+    SingleEndAlignmentsToBedSpansMapper mapper;
+
+    @Before
+    public void setup() {
+        mapper = new SingleEndAlignmentsToBedSpansMapper();
+        mapper.setAlignmentReader(new NovoalignAlignmentReader());
+    }
+
     @Test
     public void testParseRegion() {
-        SingleEndAlignmentsToBedSpansMapper mapper = new SingleEndAlignmentsToBedSpansMapper();
         mapper.parseRegion("1:54817520-54915143");
         assertEquals("1", mapper.getChromosome());
         assertEquals(54817520, mapper.getRegionStart());

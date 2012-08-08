@@ -1,12 +1,13 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.*;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.AlignmentReader;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
 import java.util.List;
@@ -76,6 +77,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
+
     }
 
     public void map(LongWritable key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
@@ -88,12 +90,11 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        AlignmentReader alignmentReader = new NovoalignAlignmentReader();
-        List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
+        List<AlignmentRecord> read1AlignmentRecords = getAlignmentReader().parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
         String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<AlignmentRecord> read2AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read2Alignments);
+        List<AlignmentRecord> read2AlignmentRecords = getAlignmentReader().parseAlignmentsIntoRecords(read2Alignments);
 
         emitDeletionScoresForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
     }

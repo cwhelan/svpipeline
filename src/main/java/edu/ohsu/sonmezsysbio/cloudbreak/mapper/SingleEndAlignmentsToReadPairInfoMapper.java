@@ -5,10 +5,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.AlignmentReader;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
-import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
+import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -18,7 +16,10 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -124,7 +125,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        AlignmentReader alignmentReader = new NovoalignAlignmentReader();
         List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
 
         String read2AlignmentsString = readAligments[1];
@@ -283,7 +283,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
         }
         if (! configuredReadGroup) throw new RuntimeException("Unable to configure read group for " + inputFile);
-
 
         scorer = new ProbabilisticPairedAlignmentScorer();
 

@@ -1,10 +1,5 @@
 package edu.ohsu.sonmezsysbio.cloudbreak;
 
-import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan

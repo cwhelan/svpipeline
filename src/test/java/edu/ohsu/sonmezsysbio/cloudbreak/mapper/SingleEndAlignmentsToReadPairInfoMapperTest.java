@@ -4,12 +4,14 @@ import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.ProbabilisticPairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -27,13 +29,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class SingleEndAlignmentsToReadPairInfoMapperTest {
 
-    @Test
-    public void testMapPairedEnd() throws Exception {
+    private SingleEndAlignmentsToReadPairInfoMapper mapper;
 
-        String inputLine = "@ERR000545.10000001 EAS139_44:1:93:532:453\t@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
-
-        SingleEndAlignmentsToReadPairInfoMapper mapper = new SingleEndAlignmentsToReadPairInfoMapper();
-
+    @Before
+    public void setup() {
+        mapper = new SingleEndAlignmentsToReadPairInfoMapper();
+        mapper.setScorer(new ProbabilisticPairedAlignmentScorer());
+        mapper.setAlignmentReader(new NovoalignAlignmentReader());
         mapper.setFaix(new FaidxFileHelper("foo") {
             @Override
             public Short getKeyForChromName(String name) throws IOException {
@@ -41,7 +43,14 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
                 return (short) 9;
             }
         });
-        mapper.setScorer(new ProbabilisticPairedAlignmentScorer());
+
+    }
+
+    @Test
+    public void testMapPairedEnd() throws Exception {
+
+        String inputLine = "@ERR000545.10000001 EAS139_44:1:93:532:453\t@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
+
         mapper.setReadGroupId((short) 3);
 
         MockOutputCollector collector = new MockOutputCollector();
@@ -92,16 +101,6 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
 
         String inputLine = "@ERR000545.10000001 EAS139_44:1:93:532:453\t@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
 
-        SingleEndAlignmentsToReadPairInfoMapper mapper = new SingleEndAlignmentsToReadPairInfoMapper();
-
-        mapper.setFaix(new FaidxFileHelper("foo") {
-            @Override
-            public Short getKeyForChromName(String name) throws IOException {
-                assertEquals("10", name);
-                return (short) 9;
-            }
-        });
-        mapper.setScorer(new ProbabilisticPairedAlignmentScorer());
         mapper.setExclusionRegions(new GFFFileHelper() {
             @Override
             public boolean doesLocationOverlap(String chrom, int start, int end) throws Exception {

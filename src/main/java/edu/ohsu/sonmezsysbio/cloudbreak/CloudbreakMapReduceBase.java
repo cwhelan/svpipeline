@@ -1,5 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.io.AlignmentReader;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 
@@ -11,8 +13,8 @@ import org.apache.hadoop.mapred.MapReduceBase;
  */
 public class CloudbreakMapReduceBase extends MapReduceBase {
 
-
     protected int resolution = Cloudbreak.DEFAULT_RESOLUTION;
+    protected AlignmentReader alignmentReader;
 
     public int getResolution() {
         return resolution;
@@ -28,5 +30,14 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
         if (job.get("cloudbreak.resolution") != null) {
             resolution = Integer.parseInt(job.get("cloudbreak.resolution"));
         }
+        alignmentReader = new NovoalignAlignmentReader();
+    }
+
+    public AlignmentReader getAlignmentReader() {
+        return alignmentReader;
+    }
+
+    public void setAlignmentReader(AlignmentReader alignmentReader) {
+        this.alignmentReader = alignmentReader;
     }
 }
