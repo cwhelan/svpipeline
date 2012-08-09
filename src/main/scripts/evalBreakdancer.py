@@ -35,12 +35,12 @@ for v in unique_score_values:
             continue
         if float(fields[8]) >= v:
 #            print "gte v"
-            if not fields[6] == "DEL":
+            if (not fields[6] == "DEL") or (fields[0] != fields[3]):
                 non_del_calls += 1
                 continue
             sv_len = int(fields[7])
             # sys.stderr.write("len: " + str(sv_len) + "\n")
-            if sv_len > 10000:
+            if sv_len > 25000:
 #                print "too long"
                 long_calls += 1
                 continue
