@@ -56,11 +56,12 @@ for v in unique_score_values:
             #print bed_line.strip()
             calls_gte_threshold.append(bed_line)
     bedtoolsProcess = subprocess.Popen(["intersectBed", "-b", "stdin", "-a", truth_filename, "-u", "-wa"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    bed_lines = ""
     for hline in calls_gte_threshold:        
-        bedtoolsProcess.stdin.write(hline)
-    bedtoolsProcess.stdin.close()
+        bed_lines += hline
+    pout = bedtoolsProcess.communicate(bed_lines)[0]
     matches = 0
-    for line in bedtoolsProcess.stdout:        
+    for line in pout.split("\n"):        
         #print line
         matches += 1
     bedtoolsProcess.stdout.close()

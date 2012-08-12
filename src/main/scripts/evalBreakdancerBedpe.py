@@ -33,7 +33,7 @@ for v in unique_score_values:
                 wrong_type += 1
                 continue
             sv_len = int(fields[5]) - int(fields[1])
-            if sv_len > 100000:
+            if sv_len > 25000:
                 long_calls += 1
                 continue
             calls_gte_threshold.append(line)
