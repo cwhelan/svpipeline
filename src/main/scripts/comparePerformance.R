@@ -10,7 +10,7 @@ plotROC <- function(perfs, perfNames, totalDels, main, sim=TRUE) {
   plot(0, type="n", ylim=c(0, totalDels), xlim=c(0,maxFP), xlab=ifelse(sim, "False Positives", "Novel Predictions"), ylab="True Positives", main=main)
   perfCols <- rainbow(length(perfs))
   mapply(drawPerfLine, perfs, perfCols, MoreArgs=list(maxFP=maxFP))  
-  legend("bottomright", legend=perfNames, col=perfCols, lwd=3, cex=.75)
+  legend("top", legend=perfNames, col=perfCols, lwd=3, cex=.75)
 }
 
 #chr2 gt 125
@@ -25,28 +25,28 @@ plotROC(perfsList, c("SVPipeline", "Hydra", "Breakdancer"), totalDels)
 #chr2 gt 50
 totalDels <- 372
 hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/hydra2_perf_gt50.txt', header=TRUE)
-cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
-breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/breakdancer2_perf_gt50.txt', header=TRUE)
-gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/gasv_perf_gt50.txt', header=TRUE)
-cloudbreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/test_max_insert_25000_sdseqfilter_t180_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr2/test_max_insert_25000_sdseqfilter_t180_f4.perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/breakdancer_35_2_f4.perf.txt', header=TRUE)
+breakdancerSmall <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/breakdancer_35_2_3_f4.perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/gasv_f4.perf.txt', header=TRUE)
 
-perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, mo3=cloudbreak, cbnew=cloudbreak.new)
-pdf('~/Documents/svpipeline/CHR2SIM_ROC_NEW.pdf')
-plotROC(perfsList, c("Hydra", "Breakdancer","GASV", "Cloudbreak", "Cloudbreak (NEW)"), totalDels, "chr2 Simulated (30X)")
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, mo3=cloudbreak, breakdancerSmall=breakdancerSmall)
+pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/CHR2SIM_ROC_NEW.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer","GASV", "Cloudbreak", "BD (SMALL)"), totalDels, "chr2 Simulated (30X)")
 dev.off()
 
 #chr2 gt 50 LOW COVERAGE
 totalDels <- 372
 hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/hydra_perf.txt', header=TRUE)
-cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
-breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_perf.txt', header=TRUE)
-breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
-cloudbreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/test_max_insert_25000_sdseqfilter_t180.perf.txt', header=TRUE)
-gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/gasv_perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr2_lc/maxins_25000_sdseqfilter_f4.perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/breakdancer_35_2_f4.perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/gasv_f4.perf.txt', header=TRUE)
+#breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
+#cloudbreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/test_max_insert_25000_sdseqfilter_t180.perf.txt', header=TRUE)
 
-perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak, cloudbreak.new=cloudbreak.new)
-pdf('~/Documents/svpipeline/CHR2SIMLC_ROC_NEW.pdf')
-plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak", "Cloudbreak (NEW)"), totalDels, "chr2 Simulated (5X)")
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak)
+pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/CHR2SIMLC_ROC_NEW.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "chr2 Simulated (5X)")
 dev.off()
 
 #chr2 gt 50 V. LOW COVERAGE
@@ -79,28 +79,34 @@ dev.off()
 # chr17
 totalDels <- 199
 hydra <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/hydra2_perf_gt50.txt', header=TRUE)
-breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/breakdancer2_perf_gt50.txt', header=TRUE)
-gasv <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/gasv_perf_gt50.txt', header=TRUE)
+breakdancer <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr17/breakdancer_35_2_f4.perf.txt', header=TRUE)
+gasv <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr17/gasv_f4.perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr17/test_max_insert_25000_sdseqfilter_t180_f4.perf.txt', header=TRUE)
 
-cloudBreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
-cloudBreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr17_sim/test_max_insert_25000_sdseqfilter_t180.perf.txt', header=TRUE)
-
-perfsList <- list(hydra, breakdancer, gasv, cloudbreak, cloudbreak.new)
-pdf('~/Documents/svpipeline/CHR17SIM_ROC.pdf')
-plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak", "Cloudbreak (NEW)"), totalDels, "chr17 Simulated (100X)")
+perfsList <- list(hydra, breakdancer, gasv, cloudbreak)
+pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/CHR17SIM_ROC.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "chr17 Simulated (100X)")
 dev.off()
 
 # NA07051
 totalDels <- 2548
 hydra <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/hydra_perf.txt', header=TRUE)
-breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/breakdancer_perf.txt', header=TRUE)
-gasv <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/gasv_perf.txt', header=TRUE)
-cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/b292f1f35e6fc997581e19b773ae4dd33beaf58e_r25_perf.txt', header=TRUE)
-cloudbreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/NA07051/test_max_insert_25000_sdhsd_filter_t120_perf.txt', header=TRUE)
+breakdancer <- read.table('~/Documents/gene_rearrange/sv/1000genomes/NA07051_new/breakdancer_35_2_f4.perf.txt', header=TRUE)
+gasv <- read.table('~/Documents/gene_rearrange/sv/1000genomes/NA07051_new/gasv_f4.perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/sv/NA07051_new/test_max_insert_25000_sdhsd_filter_t120_f4.perf.txt', header=TRUE)
 
-perfsList <- list(hydra, breakdancer, gasv, cloudbreak, cloudbreak.new
-pdf('~/Documents/svpipeline/NA07051_ROC_NEW.pdf')
-plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak", "Cloudbreak (NEW)"), totalDels, "NA07051 (3X)", sim=FALSE)
+perfsList <- list(hydra, breakdancer, gasv, cloudbreak)
+pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/NA07051_ROC_NEW.pdf')
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "NA07051 (4X)", sim=FALSE)
 dev.off()
 
+# NA12156
+totalDels <- 2179
+breakdancer <- read.table('~/Documents/gene_rearrange/sv/1000genomes/NA12156/breakdancer_35_2_f4.perf.txt', header=TRUE)
+gasv <- read.table('~/Documents/gene_rearrange/sv/1000genomes/NA12156/gasv_f4.perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/sv/NA12156/test_max_insert_25000_sdhsd_filter_t135_f4.perf.txt', header=TRUE)
+perfsList <- list(breakdancer, gasv, cloudbreak)
+pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/NA12156_ROC_NEW.pdf')
+plotROC(perfsList, c("Breakdancer", "GASV", "Cloudbreak"), totalDels, "NA12156 (2X)", sim=FALSE)
+dev.off()
 
