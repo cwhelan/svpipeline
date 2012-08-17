@@ -42,7 +42,7 @@ for v in unique_support_values:
                 continue
             calls_gte_threshold.append(line)
 #    print "calls: " + str(len(calls_gte_threshold))
-    bedtoolsProcess = subprocess.Popen(["pairToBed", "-type", "ispan",  "-a", "stdin", "-b", truth_filename], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    bedtoolsProcess = subprocess.Popen(["pairToBed", "-type", "ispan",  "-a", "stdin", "-b", truth_filename, "-f", ".4"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     bedpe_lines = ""
     for hline in calls_gte_threshold:
         bedpe_lines = bedpe_lines + hline + "\n"

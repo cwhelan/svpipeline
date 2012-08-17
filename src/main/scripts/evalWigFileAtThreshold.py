@@ -43,7 +43,7 @@ for line in open_file(temp_file_name):
 #sys.stderr.write("num_predictions = " + str(num_predictions) + "\n")
 #sys.stderr.write("predicted_region = " + str(predicted_region) + "\n")
     
-compare_bed_to_truth_cmd = ['intersectBed', '-b', temp_file_name, '-a', truth_filename, '-wa', '-u', '-f', '.6']
+compare_bed_to_truth_cmd = ['intersectBed', '-b', temp_file_name, '-a', truth_filename, '-wa', '-u', '-f', '.4']
     
 num_matches = sum(1 for _ in subprocess.Popen(compare_bed_to_truth_cmd, stdout=subprocess.PIPE).stdout)
 tpr = float(num_matches) / num_predictions

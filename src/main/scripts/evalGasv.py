@@ -30,7 +30,7 @@ gasv_file.close()
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "Long", "WrongType", "TPR"])
 for v in unique_score_values:
     calls_gte_threshold = []
     gasv_file = open(gasv_filename, "r")
@@ -55,7 +55,7 @@ for v in unique_score_values:
             bed_line = "\t".join([chrom, ostart, oend]) + "\n"
             #print bed_line.strip()
             calls_gte_threshold.append(bed_line)
-    bedtoolsProcess = subprocess.Popen(["intersectBed", "-b", "stdin", "-a", truth_filename, "-u", "-wa", "-f", ".6"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    bedtoolsProcess = subprocess.Popen(["intersectBed", "-b", "stdin", "-a", truth_filename, "-u", "-wa", "-f", ".4"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     bed_lines = ""
     for hline in calls_gte_threshold:        
         bed_lines += hline

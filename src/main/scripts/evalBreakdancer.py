@@ -51,7 +51,7 @@ for v in unique_score_values:
                 continue
             calls_gte_threshold.append(line)
             #    sys.stderr.write(str(calls_gte_threshold))
-    bedtoolsProcess = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-f", ".6"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    bedtoolsProcess = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-f", ".4"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     bed_lines = ""
     for line in calls_gte_threshold:
         fields = line.split("\t")
