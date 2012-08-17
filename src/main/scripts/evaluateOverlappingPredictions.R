@@ -43,3 +43,24 @@ agreements.df <- data.frame(size=true.sizes, size.class=true.size.classes, agree
 
 ggplot(agreements.df, aes(size.class)) + geom_bar() + facet_wrap(~ agreements) 
 
+delly.predictions.file <- '~/Documents/gene_rearrange/sv/jcvi_sim/chr2/delly.del.bed'
+delly.score.threshold <- 6
+
+delly.deletions.df <- read.table(delly.predictions.file)
+names(delly.deletions.df) <- c("Chr","start","end","Size","Score","mq","name")
+
+delly.deletions.df <- delly.deletions.df[which(delly.deletions.df$Size <= 25000),]
+delly.deletions.above.thresh <- delly.deletions.df[which(delly.deletions.df$Score > delly.score.threshold),]
+
+delly.predictions <- GRanges(seqnames=delly.deletions.above.thresh$Chr, 
+                          ranges=IRanges(start=delly.deletions.above.thresh$start, end=delly.deletions.above.thresh$end),
+                          strand="*")
+
+agreements <- sapply(seq(1,length(true.intervals)), function(x) {agreement(true.intervals[x], cb.predictions, delly.predictions, "Cloudbreak", "Delly")})
+agreements.df <- data.frame(size=true.sizes, size.class=true.size.classes, agreements=agreements)
+
+ggplot(agreements.df, aes(size.class)) + geom_bar() + facet_wrap(~ agreements) 
+
+
+
+
