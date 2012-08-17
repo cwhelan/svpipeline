@@ -126,7 +126,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
+        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
 
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,

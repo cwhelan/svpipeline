@@ -32,7 +32,7 @@ public class NovoalignAlignmentReader extends BaseAlignmentReader {
         return record;
     }
 
-    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
+    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2) {
         return probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record1).getPosteriorProb()),
                 NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record2).getPosteriorProb()));
     }
@@ -44,4 +44,6 @@ public class NovoalignAlignmentReader extends BaseAlignmentReader {
         return endPosterior1 + endPosterior2;
     }
 
+    public void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments) {
+    }
 }

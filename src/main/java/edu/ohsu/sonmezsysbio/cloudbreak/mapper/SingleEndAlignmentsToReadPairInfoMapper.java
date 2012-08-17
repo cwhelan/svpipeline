@@ -119,6 +119,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
 
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
@@ -190,7 +191,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 (resolution - rightRead.getPosition() % resolution);
 
 
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
 
         if (mapabilityWeighting != null) {
             if (insertSize > targetIsize + 6 * targetIsizeSD) {

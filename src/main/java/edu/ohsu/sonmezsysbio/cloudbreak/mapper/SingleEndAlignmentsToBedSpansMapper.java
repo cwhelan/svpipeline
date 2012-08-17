@@ -157,7 +157,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,
                 isizeMean,
