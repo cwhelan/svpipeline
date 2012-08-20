@@ -66,6 +66,9 @@ public class CommandIncrementalUpdateSingleEndDeletionScores extends BaseCloudbr
     @Parameter(names = {"--mapabilityWeighting"})
     String mapabilityWeightingFileName;
 
+    @Parameter(names = {"--aligner"})
+    String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
+
     public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
     }
@@ -108,6 +111,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores extends BaseCloudbr
         DistributedCache.createSymlink(conf);
 
         conf.set("cloudbreak.resolution", String.valueOf(resolution));
+        conf.set("cloudbreak.aligner", aligner);
 
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
 

@@ -4,13 +4,13 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndAlignmentsToPairsReducer;
-import edu.ohsu.sonmezsysbio.cloudbreak.mapper.NovoalignSingleEndMapper;
+import edu.ohsu.sonmezsysbio.cloudbreak.mapper.MrFastSingleEndMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.*;
 
 import java.io.*;
@@ -20,11 +20,11 @@ import java.net.URISyntaxException;
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
- * Date: 5/18/11
+ * Date: 6/17/12
  * Time: 2:01 PM
  */
 @Parameters(separators = "=", commandDescription = "Run a novoalign mate pair alignment")
-public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
+public class CommandMrFastSingleEnds extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;
@@ -34,18 +34,9 @@ public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--reference"}, required = true)
     String reference;
-    
-    @Parameter(names = {"--threshold"}, required = true)
-    String threshold;
 
-    @Parameter(names = {"--qualityFormat"})
-    String qualityFormat = "ILMFQ";
-
-    @Parameter(names = {"--HDFSPathToNovoalign"}, required = true)
-    String pathToNovoalign;
-
-    @Parameter(names = {"--HDFSPathToNovoalignLicense"})
-    String pathToNovoalignLicense;
+    @Parameter(names = {"--HDFSPathToMrfast"}, required = true)
+    String pathToMrfast;
 
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
@@ -60,24 +51,23 @@ public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
 
         conf.setInputFormat(TextInputFormat.class);
 
-        addDistributedCacheFile(conf, reference, "novoalign.reference");
-
-        addDistributedCacheFile(conf, pathToNovoalign, "novoalign.executable");
-        if (pathToNovoalignLicense != null) {
-            addDistributedCacheFile(conf, pathToNovoalignLicense, "novoalign.license");
-        }
+        addDistributedCacheFile(conf, pathToMrfast, "mrfast.executable");
+        addDistributedCacheFile(conf, reference, "mrfast.reference");
+        addDistributedCacheFile(conf, reference + ".index", "mrfast.index");
 
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
-        conf.set("novoalign.threshold", threshold);
-        conf.set("novoalign.quality.format", qualityFormat);
 
-        conf.setMapperClass(NovoalignSingleEndMapper.class);
+        conf.setMapperClass(MrFastSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
         conf.setMapOutputValueClass(Text.class);
 
         conf.setOutputKeyClass(Text.class);
         conf.setCompressMapOutput(true);
+
+        conf.setOutputFormat(TextOutputFormat.class);
+        TextOutputFormat.setCompressOutput(conf, true);
+        TextOutputFormat.setOutputCompressorClass(conf, GzipCodec.class);
 
         conf.setReducerClass(SingleEndAlignmentsToPairsReducer.class);
 

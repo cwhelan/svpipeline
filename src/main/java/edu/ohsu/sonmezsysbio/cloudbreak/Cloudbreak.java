@@ -17,6 +17,9 @@ public class Cloudbreak extends Configured implements Tool
     public static final int WINDOW_SIZE_IN_LINES = 1000;
     public static final int DEFAULT_MAX_INSERT_SIZE = 500000;
 
+    public static final String ALIGNER_NOVOALIGN = "novoalign";
+    public static final String ALIGNER_MRFAST = "mrfast";
+
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new Cloudbreak(), args);
 
@@ -57,6 +60,10 @@ public class Cloudbreak extends Configured implements Tool
         jc.addCommand("readPairedEndFilesIntoHDFS", readFiles);
         CommandNovoalignSingleEnds singleEnds  = new CommandNovoalignSingleEnds();
         jc.addCommand("alignSingleEnds", singleEnds);
+
+        CommandMrFastSingleEnds mrFastSingleEnds  = new CommandMrFastSingleEnds();
+        jc.addCommand("mrfastSingleEnds", mrFastSingleEnds);
+
         CommandPileupSingleEndDeletionScores pileupSingleEndDeletionScores = new CommandPileupSingleEndDeletionScores();
         jc.addCommand("pileupSingleEndDeletionScores", pileupSingleEndDeletionScores);
 

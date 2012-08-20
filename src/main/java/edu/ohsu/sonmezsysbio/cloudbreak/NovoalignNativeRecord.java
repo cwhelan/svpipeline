@@ -6,9 +6,9 @@ package edu.ohsu.sonmezsysbio.cloudbreak;
  * Date: 6/5/11
  * Time: 2:26 PM
  */
-public class NovoalignNativeRecord {
+public class NovoalignNativeRecord implements AlignmentRecord {
 
-    String referenceName;
+    String chromosomeName;
     int position;
     String mappingStatus;
     double posteriorProb;
@@ -16,38 +16,16 @@ public class NovoalignNativeRecord {
     String readId;
     String sequence;
 
-    public static NovoalignNativeRecord parseRecord(String[] fields) {
-        NovoalignNativeRecord record = new NovoalignNativeRecord();
-        record.setReadId(fields[0]);
-        record.setSequence(fields[2]);
-        record.setMappingStatus(fields[4]);
-        if (record.isMapped()) {
-            String recordReferenceName = fields[7];
-            // cut off the ">" that starts the chromosome name
-            if (recordReferenceName.startsWith(">")) {
-                recordReferenceName = recordReferenceName.substring(1);
-            }
-            record.setReferenceName(recordReferenceName);
-
-            record.setPosition(Integer.parseInt(fields[8]));
-            record.setPosteriorProb(Double.parseDouble(fields[6]));
-            record.setForward("F".equals(fields[9]));
-        }
-
-        return record;
-
-    }
-
     public boolean isMapped() {
         return "U".equals(getMappingStatus()) || "R".equals(getMappingStatus());
     }
 
     public String getChromosomeName() {
-        return referenceName;
+        return chromosomeName;
     }
 
-    public void setReferenceName(String referenceName) {
-        this.referenceName = referenceName;
+    public void setChromosomeName(String chromosomeName) {
+        this.chromosomeName = chromosomeName;
     }
 
     public int getPosition() {
@@ -74,6 +52,10 @@ public class NovoalignNativeRecord {
         this.posteriorProb = posteriorProb;
     }
 
+    public int getSequenceLength() {
+        return sequence.length();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,7 +69,7 @@ public class NovoalignNativeRecord {
         if (mappingStatus != null ? !mappingStatus.equals(that.mappingStatus) : that.mappingStatus != null)
             return false;
         if (readId != null ? !readId.equals(that.readId) : that.readId != null) return false;
-        if (referenceName != null ? !referenceName.equals(that.referenceName) : that.referenceName != null)
+        if (chromosomeName != null ? !chromosomeName.equals(that.chromosomeName) : that.chromosomeName != null)
             return false;
         if (sequence != null ? !sequence.equals(that.sequence) : that.sequence != null) return false;
 
@@ -98,7 +80,7 @@ public class NovoalignNativeRecord {
     public int hashCode() {
         int result;
         long temp;
-        result = referenceName != null ? referenceName.hashCode() : 0;
+        result = chromosomeName != null ? chromosomeName.hashCode() : 0;
         result = 31 * result + position;
         result = 31 * result + (mappingStatus != null ? mappingStatus.hashCode() : 0);
         temp = posteriorProb != +0.0d ? Double.doubleToLongBits(posteriorProb) : 0L;
@@ -132,4 +114,9 @@ public class NovoalignNativeRecord {
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
+
+    public static double decodePosterior(double codedPosterior) {
+        return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
+    }
+
 }

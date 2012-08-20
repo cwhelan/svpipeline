@@ -5,8 +5,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
-import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
+import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -16,7 +16,9 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -116,29 +118,20 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
-        int firstTabIndex = line.indexOf('\t');
-        String lineValues = line.substring(firstTabIndex + 1);
+        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
 
-        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
-        String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read1Alignments);
-
-        String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
-
-        Set<NovoalignNativeRecord> recordsInExcludedAreas = new HashSet<NovoalignNativeRecord>();
+        Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
             if (exclusionRegions != null) {
-                for (NovoalignNativeRecord record : read1AlignmentRecords) {
-                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
+                for (AlignmentRecord record : readPairAlignments.getRead1Alignments()) {
+                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         recordsInExcludedAreas.add(record);
                     }
                 }
 
-                for (NovoalignNativeRecord record : read2AlignmentRecords) {
-                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequence().length())) {
+                for (AlignmentRecord record : readPairAlignments.getRead2Alignments()) {
+                    if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         recordsInExcludedAreas.add(record);
                     }
                 }
@@ -150,23 +143,23 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
 
         try {
-            emitReadPairInfoForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output, recordsInExcludedAreas);
+            emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void emitReadPairInfoForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<NovoalignNativeRecord> recordsInExcludedAreas) throws Exception {
-        for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
-            for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
+    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
+        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
-                emitReadPairInfoForPair(record1, record2, output);
+                emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
             }
         }
     }
 
-    private void emitReadPairInfoForPair(NovoalignNativeRecord record1, NovoalignNativeRecord record2, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
@@ -177,19 +170,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             if (! record1.getChromosomeName().equals(getChromosomeFilter())) return;
         }
 
-        double endPosterior1 = record1.getPosteriorProb();
-        double endPosterior2 = record2.getPosteriorProb();
-
         int insertSize;
-        NovoalignNativeRecord leftRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
-        NovoalignNativeRecord rightRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
                 record2 : record1;
 
         // todo: not handling inversions for now
         if (!scorer.validateMappingOrientations(record1, record2, matePairs)) return;
 
-        insertSize = rightRead.getPosition() + rightRead.getSequence().length() - leftRead.getPosition();
+        insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
@@ -201,20 +191,20 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 (resolution - rightRead.getPosition() % resolution);
 
 
-        double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
 
         if (mapabilityWeighting != null) {
             if (insertSize > targetIsize + 6 * targetIsizeSD) {
                 String chrom = record1.getChromosomeName();
                 int leftReadStart = leftRead.getPosition();
-                int leftReadEnd = leftRead.getPosition() + leftRead.getSequence().length();
+                int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
                 double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
-                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequence().length()) + " = " + leftReadMapability);
+                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequenceLength()) + " = " + leftReadMapability);
 
-                int rightReadStart = rightRead.getPosition() - rightRead.getSequence().length();
+                int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
                 int rightReadEnd = rightRead.getPosition();
                 double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
-                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequence().length()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
+                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
 
                 //System.err.println("old pmc: " + pMappingCorrect);
                 pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
@@ -280,7 +270,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
         }
         if (! configuredReadGroup) throw new RuntimeException("Unable to configure read group for " + inputFile);
-
 
         scorer = new ProbabilisticPairedAlignmentScorer();
 

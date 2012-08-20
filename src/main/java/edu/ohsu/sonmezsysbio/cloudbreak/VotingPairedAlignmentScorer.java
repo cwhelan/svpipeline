@@ -11,9 +11,7 @@ import org.apache.commons.math3.exception.MathIllegalArgumentException;
  */
 public class VotingPairedAlignmentScorer extends PairedAlignmentScorer {
     public double computeDeletionScore(int insertSize, Double targetIsize, Double targetIsizeSD, Double pMappingCorrect) {
-        //System.err.println("target isize: " + targetIsize + ", sd " + targetIsizeSD);
         NormalDistribution insertSizeDist = new NormalDistribution(targetIsize, targetIsizeSD);
-        // deletion score = codedEndPosterior1 * codedEndPosterior2 * P(X < insertSize - 2 * targetIsizeSD)
 
         double deletionProb;
         try {
@@ -26,12 +24,6 @@ public class VotingPairedAlignmentScorer extends PairedAlignmentScorer {
 
         double vote = deletionProb > 0.5 ? 1 : -1;
 
-
-//        double endPosterior1 = decodePosterior(codedEndPosterior1);
-//        double endPosterior2 = decodePosterior(codedEndPosterior2);
-        //System.err.println("posteriors: " + endPosterior1 + "," + endPosterior2);
-
-        //return deletionProb + endPosterior1 + endPosterior2;
         return vote * Math.exp(pMappingCorrect);
     }
 }

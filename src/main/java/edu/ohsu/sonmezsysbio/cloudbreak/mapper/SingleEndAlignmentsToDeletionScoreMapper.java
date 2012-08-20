@@ -4,10 +4,12 @@ import edu.ohsu.sonmezsysbio.cloudbreak.*;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -74,50 +76,37 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
+
     }
 
     public void map(LongWritable key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
             throws IOException {
         String line = value.toString();
-        int firstTabIndex = line.indexOf('\t');
-        String readPairId = line.substring(0,firstTabIndex);
-        String lineValues = line.substring(firstTabIndex + 1);
-        
-        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
-        String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read1AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read1Alignments);
 
-        String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<NovoalignNativeRecord> read2AlignmentRecords = NovoalignSingleEndMapperHelper.parseAlignmentsIntoRecords(read2Alignments);
-
-        emitDeletionScoresForAllPairs(read1AlignmentRecords, read2AlignmentRecords, output);
+        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        emitDeletionScoresForAllPairs(readPairAlignments, output);
     }
 
-    private void emitDeletionScoresForAllPairs(List<NovoalignNativeRecord> read1AlignmentRecords, List<NovoalignNativeRecord> read2AlignmentRecords, OutputCollector<Text, DoubleWritable> output) throws IOException {
-        for (NovoalignNativeRecord record1 : read1AlignmentRecords) {
-            for (NovoalignNativeRecord record2 : read2AlignmentRecords) {
-                emitDeletionScoresForPair(record1, record2, output);
+    private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, DoubleWritable> output) throws IOException {
+        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
+                emitDeletionScoresForPair(record1, record2, readPairAlignments, output);
             }
         }
     }
 
-    private void emitDeletionScoresForPair(NovoalignNativeRecord record1, NovoalignNativeRecord record2, OutputCollector<Text, DoubleWritable> output) throws IOException {
+    private void emitDeletionScoresForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<Text, DoubleWritable> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) return;
-
-        double endPosterior1 = record1.getPosteriorProb();
-        double endPosterior2 = record2.getPosteriorProb();
 
         int insertSize = -1;
         Double isizeMean;
         Double isizeSD;
 
-        NovoalignNativeRecord leftRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
-        NovoalignNativeRecord rightRead = record1.getPosition() < record2.getPosition() ?
+        AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
                 record2 : record1;
 
         // todo: not handling inversions for now
@@ -133,11 +122,11 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
             }
         }
 
-        insertSize = rightRead.getPosition() + rightRead.getSequence().length() - leftRead.getPosition();
+        insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        Double pMappingCorrect = scorer.probabilityMappingIsCorrect(endPosterior1, endPosterior2);
+        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
 
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,
