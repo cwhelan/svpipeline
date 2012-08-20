@@ -2,6 +2,7 @@
 
 import sys
 import subprocess
+import evalBedFile
 
 # Arguments:
 #
@@ -51,16 +52,13 @@ for v in unique_score_values:
                 continue
             calls_gte_threshold.append(line)
             #    sys.stderr.write(str(calls_gte_threshold))
-    bedtoolsProcess = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-f", ".4"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    bed_lines = ""
+
+    bed_lines = []
     for line in calls_gte_threshold:
         fields = line.split("\t")
-        bed_line = "\t".join([fields[0], fields[1], fields[4]]) + "\n"        
-        bed_lines = bed_lines + bed_line
-    pstdout = bedtoolsProcess.communicate(bed_lines)[0]
-    matches = 0
-    for line in pstdout.split("\n"):        
-        matches += 1
+        bed_line = "\t".join([fields[0], fields[1], fields[4]])
+        bed_lines.append(bed_line)
+    matches = evalBedFile.eval_bed(truth_filename, bed_lines)
     calls = long_calls + len(calls_gte_threshold)
     tpr = float(matches) / calls
     print "\t".join(map(str, [v, calls, matches, long_calls, non_del_calls, tpr]))

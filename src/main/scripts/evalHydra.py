@@ -2,6 +2,7 @@
 
 import sys
 import subprocess
+import evalBedFile
 
 hydra_filename = sys.argv[1]
 truth_filename = sys.argv[2]
@@ -41,21 +42,13 @@ for v in unique_support_values:
                 long_calls += 1
                 continue
             calls_gte_threshold.append(line)
-#    print "calls: " + str(len(calls_gte_threshold))
-    bedtoolsProcess = subprocess.Popen(["pairToBed", "-type", "ispan",  "-a", "stdin", "-b", truth_filename, "-f", ".4"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    bedpe_lines = ""
-    for hline in calls_gte_threshold:
-        bedpe_lines = bedpe_lines + hline + "\n"
-#        bedtoolsProcess.stdin.write(hline)
-#    print "about to close stdin"
-#    bedtoolsProcess.stdin.close()
-    pstdout = bedtoolsProcess.communicate(bedpe_lines)[0]
-    matches = 0    
-    for line in pstdout.split("\n"):        
-        #print line
-        if line.rstrip() != "":
-            matches += 1
-    bedtoolsProcess.stdout.close()
+    bed_lines = []
+    for line in calls_gte_threshold:
+        fields = line.split("\t")
+        bed_line = "\t".join([fields[0], fields[2], fields[4]])
+        bed_lines.append(bed_line)
+
+    matches = evalBedFile.eval_bed(truth_filename, bed_lines)
     print "\t".join(map(str, [v, long_calls + len(calls_gte_threshold), matches, long_calls, float(matches) / (long_calls + len(calls_gte_threshold)), wrong_type]))
     
     
