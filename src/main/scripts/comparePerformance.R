@@ -24,29 +24,30 @@ plotROC(perfsList, c("SVPipeline", "Hydra", "Breakdancer"), totalDels)
 
 #chr2 gt 50
 totalDels <- 372
-hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/hydra2_perf_gt50.txt', header=TRUE)
-cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr2/test_max_insert_25000_sdseqfilter_t180_f4.perf.txt', header=TRUE)
-breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/breakdancer_35_2_f4.perf.txt', header=TRUE)
-breakdancerSmall <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/breakdancer_35_2_3_f4.perf.txt', header=TRUE)
-gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/gasv_f4.perf.txt', header=TRUE)
+hydraPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/hydra.perf.txt', header=TRUE)
+cloudbreakPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/maxins_25000_sdseqfilter_t180.perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/breakdancer.perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/gasv.perf.txt', header=TRUE)
+dellyPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2/delly.perf.txt', header=TRUE)
 
-perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, mo3=cloudbreak, breakdancerSmall=breakdancerSmall)
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreakPerf, delly=dellyPerf)
 pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/CHR2SIM_ROC_NEW.pdf')
-plotROC(perfsList, c("Hydra", "Breakdancer","GASV", "Cloudbreak", "BD (SMALL)"), totalDels, "chr2 Simulated (30X)")
+plotROC(perfsList, c("Hydra", "Breakdancer","GASV", "Cloudbreak", "Delly"), totalDels, "chr2 Simulated (30X)")
 dev.off()
 
 #chr2 gt 50 LOW COVERAGE
 totalDels <- 372
-hydraPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/hydra_perf.txt', header=TRUE)
-cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr2_lc/maxins_25000_sdseqfilter_f4.perf.txt', header=TRUE)
-breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/breakdancer_35_2_f4.perf.txt', header=TRUE)
-gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/gasv_f4.perf.txt', header=TRUE)
+hydraPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/hydra.perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr2_lc/maxins_25000_sdseqfilter.perf.txt', header=TRUE)
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/breakdancer_35_2.perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/gasv.perf.txt', header=TRUE)
+dellyPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/delly.perf.txt', header=TRUE)
 #breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
 #cloudbreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/test_max_insert_25000_sdseqfilter_t180.perf.txt', header=TRUE)
 
-perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak)
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak, delly=dellyPerf)
 pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/CHR2SIMLC_ROC_NEW.pdf')
-plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak"), totalDels, "chr2 Simulated (5X)")
+plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak", "Delly"), totalDels, "chr2 Simulated (5X)")
 dev.off()
 
 #chr2 gt 50 V. LOW COVERAGE
