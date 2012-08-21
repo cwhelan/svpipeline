@@ -4,6 +4,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -110,18 +111,19 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
     }
 
     protected static String[] buildCommandLine(String mrfastExecutable, String reference, String path1, int threshold) {
-        List commandArgs = Arrays.asList(new String[] {
-                "./" + mrfastExecutable,
-                "--search", reference,
-                "--seq", path1,
-                "--outcomp",
-                "--seqcomp"
-        });
+        List<String> commandArgs = new ArrayList<String>();
+        commandArgs.add("./" + mrfastExecutable);
+        commandArgs.add("--search");
+        commandArgs.add(reference);
+        commandArgs.add("--seq");
+        commandArgs.add(path1);
+        commandArgs.add("--outcomp");
+        commandArgs.add("--seqcomp");
         if (threshold != -1) {
             commandArgs.add("-e");
             commandArgs.add(String.valueOf(threshold));
         }
-        return (String[]) commandArgs.toArray();
+        return (String[]) commandArgs.toArray(new String[1]);
     }
 
 }
