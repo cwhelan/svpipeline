@@ -38,6 +38,9 @@ public class CommandMrFastSingleEnds extends BaseCloudbreakCommand {
     @Parameter(names = {"--HDFSPathToMrfast"}, required = true)
     String pathToMrfast;
 
+    @Parameter(names = {"--threshold"})
+    int threshold = -1;
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -57,6 +60,10 @@ public class CommandMrFastSingleEnds extends BaseCloudbreakCommand {
 
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
+
+        if (threshold != -1) {
+            conf.set("mrfast.threshold", String.valueOf(threshold));
+        }
 
         conf.setMapperClass(MrFastSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);

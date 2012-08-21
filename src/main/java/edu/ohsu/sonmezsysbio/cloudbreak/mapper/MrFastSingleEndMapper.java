@@ -5,6 +5,7 @@ import org.apache.hadoop.mapred.JobConf;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -17,6 +18,7 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
 
     private String reference;
     private String mrfastExecutable;
+    private int threshold = -1;
 
     @Override
     public void configure(JobConf job) {
@@ -24,6 +26,9 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
         System.err.println("Current dir: " + new File(".").getAbsolutePath());
         reference = job.get("mrfast.reference");
         mrfastExecutable = job.get("mrfast.executable");
+        if (job.get("mrfast.threshold") != null) {
+            threshold = Integer.parseInt(job.get("mrfast.threshold"));
+        }
     }
 
     @Override
@@ -45,7 +50,7 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
             System.err.println("index file length: " + indexFile.length());
         }
 
-        String[] commandLine = buildCommandLine(mrfastExecutable, reference, s1File.getPath());
+        String[] commandLine = buildCommandLine(mrfastExecutable, reference, s1File.getPath(), threshold);
         System.err.println("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         System.err.println("Exec'd");
@@ -104,15 +109,19 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
         return readId + "\t" + orientation + "\t" + chrom + "\t" + position + "\t" + nm + "\t" + sequenceLength;
     }
 
-    protected static String[] buildCommandLine(String mrfastExecutable, String reference, String path1) {
-        String[] commandArray = {
+    protected static String[] buildCommandLine(String mrfastExecutable, String reference, String path1, int threshold) {
+        List commandArgs = Arrays.asList(new String[] {
                 "./" + mrfastExecutable,
                 "--search", reference,
                 "--seq", path1,
                 "--outcomp",
                 "--seqcomp"
-        };
-        return commandArray;
+        });
+        if (threshold != -1) {
+            commandArgs.add("-e");
+            commandArgs.add(String.valueOf(threshold));
+        }
+        return (String[]) commandArgs.toArray();
     }
 
 }
