@@ -45,7 +45,6 @@ for line in open_file(temp_file_name):
     bed_lines.append(bed_line)
         
 matches = evalBedFile.eval_bed(truth_filename, bed_lines)
-tpr = float(matches) / num_predictions
     
 temp_file.close()
-print "\t".join(map(str, [q, num_predictions, predicted_region, matches, tpr]))
+print "\t".join(map(str, [q, num_predictions, predicted_region, matches]))

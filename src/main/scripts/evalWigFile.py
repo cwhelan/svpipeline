@@ -74,9 +74,13 @@ def process_quantile(q):
     num_predictions = int(result_fields[1])
     predicted_region = int(result_fields[2])
     num_matches = int(result_fields[3])
-    return (q, num_predictions, predicted_region, num_matches, float(num_matches) / num_predictions)
+    if num_predictions == 0:
+        print "Warning: zero predictions in line: " + result
+        return (q, 0, 0, 0, 0)
+    else:
+        return (q, num_predictions, predicted_region, num_matches, float(num_matches) / num_predictions)
     
-p=Pool(100)
+p=Pool(50)
 results = p.map(process_quantile, quantiles)
 
 print "\t".join(["Thresh", "Calls", "Region", "TP", "TPR"])
