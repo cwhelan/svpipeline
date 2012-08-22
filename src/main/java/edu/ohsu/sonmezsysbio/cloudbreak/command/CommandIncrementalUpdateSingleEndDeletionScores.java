@@ -6,11 +6,11 @@ import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.reducer.ReadPairInfoToDeletionScoreReducer;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationPartitioner;
-import edu.ohsu.sonmezsysbio.cloudbreak.reducer.IncrementalDelBeliefUpdateReadPairInfoReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -20,10 +20,8 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapred.*;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
@@ -128,7 +126,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores extends BaseCloudbr
         conf.setMapOutputValueClass(ReadPairInfo.class);
         conf.setPartitionerClass(GenomicLocationPartitioner.class);
 
-        conf.setReducerClass(IncrementalDelBeliefUpdateReadPairInfoReducer.class);
+        conf.setReducerClass(ReadPairInfoToDeletionScoreReducer.class);
         //conf.setReducerClass(IdentityReducer.class);
 
         conf.setOutputKeyClass(GenomicLocation.class);

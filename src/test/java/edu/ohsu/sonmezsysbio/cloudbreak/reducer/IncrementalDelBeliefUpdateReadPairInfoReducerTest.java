@@ -5,6 +5,7 @@ import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,6 +23,24 @@ import static junit.framework.Assert.assertEquals;
  * Time: 9:53 AM
  */
 public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
+
+    private ReadPairInfoToDeletionScoreReducer reducer;
+    private Map<Short,ReadGroupInfo> readGroupInfos;
+
+    @Before
+    public void setup() throws Exception {
+
+        readGroupInfos = new HashMap<Short, ReadGroupInfo>();
+        ReadGroupInfo rg1 = new ReadGroupInfo();
+        rg1.isize = 200;
+        rg1.isizeSD = 30;
+        rg1.matePair = false;
+        readGroupInfos.put((short) 0, rg1);
+
+        reducer = new ReadPairInfoToDeletionScoreReducer();
+        reducer.setReadGroupInfos(readGroupInfos);
+    }
+
     @Test
     public void testReduce() throws Exception {
         GenomicLocation genomicLocation = new GenomicLocation((short) 1,10000);
@@ -29,20 +48,10 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
         ReadPairInfo readPairInfo1 = new ReadPairInfo(3000, -0.69, (short) 0);
         ReadPairInfo readPairInfo2 = new ReadPairInfo(3000, -9.2103, (short) 0);
 
-        MockOutputCollector outputCollector = new MockOutputCollector();
-
-        Map<Short, ReadGroupInfo> readGroupInfos = new HashMap<Short, ReadGroupInfo>();
-        ReadGroupInfo rg1 = new ReadGroupInfo();
-        rg1.isize = 200;
-        rg1.isizeSD = 30;
-        rg1.matePair = false;
-        readGroupInfos.put((short) 0, rg1);
-
-        IncrementalDelBeliefUpdateReadPairInfoReducer reducer = new IncrementalDelBeliefUpdateReadPairInfoReducer();
-        reducer.setReadGroupInfos(readGroupInfos);
-
         List<ReadPairInfo> readPairInfos = new ArrayList<ReadPairInfo>();
         readPairInfos.add(readPairInfo1);
+
+        MockOutputCollector outputCollector = new MockOutputCollector();
 
         reducer.reduce(genomicLocation, readPairInfos.iterator(), outputCollector, null);
 

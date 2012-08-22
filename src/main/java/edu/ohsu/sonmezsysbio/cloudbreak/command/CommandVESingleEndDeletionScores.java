@@ -9,7 +9,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationPartitioner;
-import edu.ohsu.sonmezsysbio.cloudbreak.reducer.VirtualEvidenceReadPairInfoReducer;
+import edu.ohsu.sonmezsysbio.cloudbreak.reducer.ReadPairInfoToDeletionScoreReducer;
+import edu.ohsu.sonmezsysbio.cloudbreak.reducer.VirtualEvidenceReadPairInfoScorer;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -122,7 +123,7 @@ public class CommandVESingleEndDeletionScores extends BaseCloudbreakCommand {
         conf.setMapOutputValueClass(ReadPairInfo.class);
         conf.setPartitionerClass(GenomicLocationPartitioner.class);
 
-        conf.setReducerClass(VirtualEvidenceReadPairInfoReducer.class);
+        conf.setReducerClass(ReadPairInfoToDeletionScoreReducer.class);
 
         conf.setOutputKeyClass(GenomicLocation.class);
         conf.setOutputValueClass(DoubleWritable.class);

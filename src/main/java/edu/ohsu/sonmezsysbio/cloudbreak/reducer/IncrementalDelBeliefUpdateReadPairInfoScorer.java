@@ -1,39 +1,21 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
-import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
-import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.mapred.*;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
- * Date: 4/6/12
- * Time: 1:35 PM
+ * Date: 8/22/12
+ * Time: 11:14 AM
  */
-public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, GenomicLocation, DoubleWritable> {
-
-
-    private Map<Short,ReadGroupInfo> readGroupInfos;
-
-    public Map<Short, ReadGroupInfo> getReadGroupInfos() {
-        return readGroupInfos;
-    }
-
-    public void setReadGroupInfos(Map<Short, ReadGroupInfo> readGroupInfos) {
-        this.readGroupInfos = readGroupInfos;
-    }
-
-    public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
-
+public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInfoScorer {
+    public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
         double pDeletion = Math.log(2432.0 / 2700000000.0);
@@ -70,8 +52,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
             pNoDeletion = logAdd(pNoDeletionGivenIS + pMappingCorrect, pNoDeletion + pMappingIncorrect);
 
         }
-        double lr = pDeletion - pNoDeletion;
-        output.collect(key, new DoubleWritable(lr));
+        return pDeletion - pNoDeletion;
     }
 
     // from https://facwiki.cs.byu.edu/nlp/index.php/Log_Domain_Computations
@@ -97,17 +78,4 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducer extends MapReduceBase
         return logX + java.lang.Math.log(1.0 + java.lang.Math.exp(negDiff));
     }
 
-    @Override
-    public void configure(JobConf job) {
-        super.configure(job);
-
-        String readGroupInfoFile = job.get("read.group.info.file");
-        ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
-        try {
-            readGroupInfos = readGroupInfoFileHelper.readReadGroupsById(readGroupInfoFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 }
