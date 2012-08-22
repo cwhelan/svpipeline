@@ -4,6 +4,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.ProbabilisticPairedAlignmentScorer;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
@@ -126,12 +127,12 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         assertEquals(101, collector.keys.size());
     }
 
-        private static class MockOutputCollector implements OutputCollector<GenomicLocation, ReadPairInfo> {
+        private static class MockOutputCollector implements OutputCollector<GenomicLocationWithQuality, ReadPairInfo> {
 
-        List<GenomicLocation> keys = new ArrayList<GenomicLocation>();
+        List<GenomicLocationWithQuality> keys = new ArrayList<GenomicLocationWithQuality>();
         List<ReadPairInfo> values = new ArrayList<ReadPairInfo>();
 
-        public void collect(GenomicLocation key, ReadPairInfo value) throws IOException {
+        public void collect(GenomicLocationWithQuality key, ReadPairInfo value) throws IOException {
             keys.add(key);
             values.add(value);
         }

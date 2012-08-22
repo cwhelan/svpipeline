@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.io.DoubleWritable;
@@ -17,7 +18,7 @@ import java.util.Map;
  * Date: 4/6/12
  * Time: 1:35 PM
  */
-public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements Reducer<GenomicLocation, ReadPairInfo, GenomicLocation, DoubleWritable> {
+public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements Reducer<GenomicLocationWithQuality, ReadPairInfo, GenomicLocation, DoubleWritable> {
 
     ReadPairInfoScorer readPairInfoScorer = new IncrementalDelBeliefUpdateReadPairInfoScorer();
 
@@ -39,10 +40,11 @@ public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements
         this.readGroupInfos = readGroupInfos;
     }
 
-    public void reduce(GenomicLocation key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
-
+    public void reduce(GenomicLocationWithQuality key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
+        System.err.println("reducing for key: " + key);
         double lr = readPairInfoScorer.reduceReadPairInfos(values, readGroupInfos);
-        output.collect(key, new DoubleWritable(lr));
+        System.err.println("got score: " + lr);
+        output.collect(new GenomicLocation(key.chromosome, key.pos), new DoubleWritable(lr));
     }
 
     @Override
@@ -59,3 +61,4 @@ public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements
 
     }
 }
+
