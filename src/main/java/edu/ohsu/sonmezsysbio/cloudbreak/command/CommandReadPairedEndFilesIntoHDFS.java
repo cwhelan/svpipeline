@@ -28,6 +28,9 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     @Parameter(names = {"--fastqFile2"}, required = true)
     String readFile2;
 
+    @Parameter(names = {"--outFileName"}, required = true)
+    String outFileName = "reads.txt";
+
     private int numRecords;
 
     public void copyReadFilesToHdfs() throws IOException {
@@ -35,7 +38,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
         FileSystem hdfs = FileSystem.get(config);
 
-        FSDataOutputStream outputStream = hdfs.create(new Path(hdfsDataDir + "/" + "novoIn.txt"));
+        FSDataOutputStream outputStream = hdfs.create(new Path(hdfsDataDir + "/" + outFileName));
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
         try {
