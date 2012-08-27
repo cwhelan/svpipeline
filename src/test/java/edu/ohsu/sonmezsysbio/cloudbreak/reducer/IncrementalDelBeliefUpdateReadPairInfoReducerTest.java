@@ -39,6 +39,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
 
         reducer = new ReadPairInfoToDeletionScoreReducer();
         reducer.setReadGroupInfos(readGroupInfos);
+        reducer.setReadPairInfoScorer(new IncrementalDelBeliefUpdateReadPairInfoScorer());
     }
 
     @Test
