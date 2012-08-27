@@ -5,11 +5,10 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,11 +20,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
 
     private OutputCollector<Text, Text> output;
     private String localDir;
-    private Writer s1FileWriter;
-    private File s1File;
     private String reference;
-    private Reporter reporter;
-    private static boolean done = false;
     private String threshold;
     private String baseQualityFormat;
     private String novoalignExecutable;
@@ -37,18 +32,10 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
         System.err.println("Current dir: " + new File(".").getAbsolutePath());
 
         this.localDir = job.get("mapred.child.tmp");
-        try {
-            s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
-            s1File.createNewFile();
-            s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
-
-            reference = job.get("novoalign.reference");
-            threshold = job.get("novoalign.threshold");
-            baseQualityFormat = job.get("novoalign.quality.format");
-            novoalignExecutable = job.get("novoalign.executable");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        reference = job.get("novoalign.reference");
+        threshold = job.get("novoalign.threshold");
+        baseQualityFormat = job.get("novoalign.quality.format");
+        novoalignExecutable = job.get("novoalign.executable");
 
     }
 
