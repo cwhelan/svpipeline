@@ -9,6 +9,7 @@ import org.apache.hadoop.fs.Path;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,6 +32,9 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     @Parameter(names = {"--outFileName"}, required = true)
     String outFileName = "reads.txt";
 
+    @Parameter(names = {"--compress"})
+    String compress = "none";
+
     private int numRecords;
 
     public void copyReadFilesToHdfs() throws IOException {
@@ -39,7 +43,12 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         FileSystem hdfs = FileSystem.get(config);
 
         FSDataOutputStream outputStream = hdfs.create(new Path(hdfsDataDir + "/" + outFileName));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        BufferedWriter writer;
+        if ("gzip".equals(compress)) {
+            writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream)));
+        } else {
+            writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        }
 
         try {
             readFile(writer, readFile1, readFile2);
