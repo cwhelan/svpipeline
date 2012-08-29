@@ -378,7 +378,7 @@
     </library>
     <library name="Maven: org.broad:bigwig:0.1">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/broad/bigwig/0.1/bigwig-0.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/BigWig.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$MAVEN_REPOSITORY$/org/broad/bigwig/0.1/bigwig-0.1-javadoc.jar!/" />

@@ -56,16 +56,6 @@
           <artifactId>jcommander</artifactId>
           <version>1.23</version>
       </dependency>
-      <dependency>
-          <groupId>fi.tkk.ics</groupId>
-          <artifactId>hadoop-bam</artifactId>
-          <version>1.0</version>
-      </dependency>
-      <dependency>
-          <groupId>net.sf.samtools</groupId>
-          <artifactId>sam</artifactId>
-          <version>1.45</version>
-      </dependency>
 
       <dependency>
           <groupId>org.mockito</groupId>
@@ -84,6 +74,8 @@
           <groupId>org.broad</groupId>
           <artifactId>bigwig</artifactId>
           <version>0.1</version>
+          <scope>system</scope>
+          <systemPath>${project.basedir}/lib/BigWig.jar</systemPath>
       </dependency>
 
       <dependency>
