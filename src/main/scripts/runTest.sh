@@ -50,9 +50,9 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --inputFileDescriptor $READ_GROUP_FILE \
     --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $HDFS_FAI \
-    --maxInsertSize $MAX_INSERT_SIZE \
+    --maxInsertSize $MAX_INSERT \
     --mapabilityWeighting $MAPABILITY \
-    --excludePairsMappingIn $EXCLUSIONS \
+    --excludePairsMappingIn $FILTER \
     --resolution $RESOLUTION \
     --aligner $ALIGNER
 
