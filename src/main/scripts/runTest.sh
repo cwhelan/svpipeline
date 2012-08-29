@@ -39,7 +39,7 @@ mvn assembly:assembly
 SHORT_GIT_TAG=`git rev-parse --short HEAD`
 popd
 
-NAME=`basename $READ_GROUP_FILE`_`basename $MAPABILITY`_`basename $FILTER`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${SHORT_GIT_TAG}_${SHORT_NAME}
+NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE`_`basename $MAPABILITY`_`basename $FILTER`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${SHORT_GIT_TAG}
 
 echo Experiment name: $NAME
 
