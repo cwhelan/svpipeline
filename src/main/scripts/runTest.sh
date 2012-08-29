@@ -32,7 +32,7 @@ TRUTH=$8
 THRESHOLD_MIN=$9
 TAG=$10
 
-pushd build_dir
+pushd $BUILD_DIR
 git pull
 mvn clean
 mvn assembly:assembly
