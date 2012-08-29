@@ -85,7 +85,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
         BufferedWriter piledupBedFileWriter = new BufferedWriter(new FileWriter(new File(pileupBedFileName)));
         try {
             medianFilterWindow = 1;
-            WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter, 0, faidx, medianFilterWindow);
+            WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter, 0, faidx, medianFilterWindow);
         } finally {
             pileupWigFileReader.close();
             piledupBedFileWriter.close();
@@ -106,7 +106,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
             BufferedReader averagedWigFileReader = new BufferedReader(new FileReader(new File(averagedFileName)));
             BufferedWriter averageBedFileWriter = new BufferedWriter(new FileWriter(new File(averagedBedFileName)));
             try {
-                WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx, medianFilterWindow);
+                WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, averagedWigFileReader, averageBedFileWriter, 0, faidx, medianFilterWindow);
             } finally {
                 averagedWigFileReader.close();
                 piledupBedFileWriter.close();

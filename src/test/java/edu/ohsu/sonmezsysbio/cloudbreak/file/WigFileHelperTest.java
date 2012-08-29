@@ -41,13 +41,13 @@ public class WigFileHelperTest {
         BufferedWriter bedFileWriter = new BufferedWriter(stringWriter);
         double threshold = 4.5;
 
-        WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 1);
+        WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 1);
         bedFileWriter.close();
 
         String expectedOutput =
                 "track name = \"test peaks over " + threshold + "\"\n" +
-                "chr1\t3000\t3999\t1\t0\n" +
-                "chr2\t1000\t2999\t2\t0\n";
+                "chr1\t3000\t3999\t1\t5.0\n" +
+                "chr2\t1000\t2999\t2\t7.0\n";
         assertEquals(expectedOutput, stringWriter.getBuffer().toString());
     }
 
@@ -74,12 +74,12 @@ public class WigFileHelperTest {
         BufferedWriter bedFileWriter = new BufferedWriter(stringWriter);
         double threshold = 4.5;
 
-        WigFileHelper.exportPositiveRegionsFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 3);
+        WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 3);
         bedFileWriter.close();
 
         String expectedOutput =
                 "track name = \"test peaks over " + threshold + "\"\n" +
-                        "chr1\t2000\t4999\t1\t0\n";
+                        "chr1\t2000\t4999\t1\t5.0\n";
         assertEquals(expectedOutput, stringWriter.getBuffer().toString());
 
     }

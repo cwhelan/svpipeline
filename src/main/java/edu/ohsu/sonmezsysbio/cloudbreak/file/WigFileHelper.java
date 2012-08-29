@@ -97,14 +97,14 @@ public class WigFileHelper {
         return windowTotal;
     }
 
-    public static void exportPositiveRegionsFromWig(String outputPrefix, BufferedReader averagedWigFileReader, BufferedWriter bedFileWriter, double threshold, FaidxFileHelper faidx, int medianFilterWindow) throws IOException {
+    public static void exportRegionsOverThresholdFromWig(String outputPrefix, BufferedReader averagedWigFileReader, BufferedWriter bedFileWriter, double threshold, FaidxFileHelper faidx, int medianFilterWindow) throws IOException {
         String trackName = outputPrefix + " peaks over " + threshold;
         bedFileWriter.write("track name = \"" + trackName + "\"\n");
 
         String line;
         String currentChromosome = "";
 
-        int[] values = null;
+        double[] values = null;
         int resolution = 0;
         int peakNum = 1;
 
@@ -115,13 +115,13 @@ public class WigFileHelper {
             if (line.startsWith("variableStep")) {
 
                 if (values != null) {
-                    int[] filteredVals = medianFilterValues(values, medianFilterWindow);
+                    double[] filteredVals = medianFilterValues(values, medianFilterWindow, threshold);
                     peakNum = writePositiveRegions(filteredVals, bedFileWriter, currentChromosome, faidx, resolution, peakNum);
                 }
                 currentChromosome = line.split(" ")[1].split("=")[1];
                 resolution = Integer.valueOf(line.split(" ")[2].split("=")[1]);
                 int numTiles = (int) Math.ceil(((double) faidx.getLengthForChromName(currentChromosome)) / resolution);
-                values = new int[numTiles];
+                values = new double[numTiles];
 
             } else {
                 String[] fields = line.split("\t");
@@ -129,40 +129,46 @@ public class WigFileHelper {
                 if (pos > faidx.getLengthForChromName(currentChromosome)) continue;
                 double val = Double.valueOf(fields[1]);
                 int tileNum = (int) pos / resolution;
-                values[tileNum] = val > threshold ? 1 : 0;
+                values[tileNum] = val;
             }
         }
-        int[] filteredVals = medianFilterValues(values, medianFilterWindow);
+        double[] filteredVals = medianFilterValues(values, medianFilterWindow, threshold);
         writePositiveRegions(filteredVals, bedFileWriter, currentChromosome, faidx, resolution, peakNum);
 
     }
 
-    private static int[] medianFilterValues(int[] values, int medianFilterWindow) {
-        int[] filteredValues = new int[values.length];
+    private static double[] medianFilterValues(double[] values, int medianFilterWindow, double threshold) {
+        double[] filteredValues = new double[values.length];
         int idx = 0;
         while (idx <= medianFilterWindow / 2) {
-            filteredValues[idx] = values[idx];
+            filteredValues[idx] = values[idx] > threshold ? values[idx] : 0.0;
             idx++;
         }
 
         while (idx < filteredValues.length - medianFilterWindow / 2) {
-            int[] filterWindow = Arrays.copyOfRange(values, idx - medianFilterWindow / 2, idx + medianFilterWindow / 2 + 1);
+            double[] filterWindow = Arrays.copyOfRange(values, idx - medianFilterWindow / 2, idx + medianFilterWindow / 2 + 1);
             Arrays.sort(filterWindow);
-            filteredValues[idx] = filterWindow[medianFilterWindow / 2];
+            double medianValue = filterWindow[medianFilterWindow / 2];
+            if (medianValue > threshold) {
+                filteredValues[idx] = values[idx];
+            } else {
+                filteredValues[idx] = 0;
+            }
             idx++;
         }
 
         while (idx < filteredValues.length) {
-            filteredValues[idx] = values[idx];
+            filteredValues[idx] = values[idx] > threshold ? values[idx] : 0.0;
             idx++;
         }
         return filteredValues;
     }
 
-    private static int writePositiveRegions(int[] filteredVals, BufferedWriter bedFileWriter, String currentChromosome, FaidxFileHelper faidx, int resolution, int peakNum) throws IOException {
+    private static int writePositiveRegions(double[] filteredVals, BufferedWriter bedFileWriter, String currentChromosome, FaidxFileHelper faidx, int resolution, int peakNum) throws IOException {
         boolean inPositivePeak = false;
         long peakStart = 0;
         int idx = 0;
+        double peakMax = 0;
 
         while (idx < filteredVals.length) {
             long pos = idx * resolution;
@@ -172,12 +178,14 @@ public class WigFileHelper {
                     peakStart = pos;
                     inPositivePeak = true;
                 }
+                peakMax = Math.max(peakMax, filteredVals[idx]);
             } else {
                 if (inPositivePeak) {
                     long endPosition = pos - 1;
-                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + 0 + "\n");
+                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax + "\n");
                     peakNum += 1;
                     inPositivePeak = false;
+                    peakMax = 0;
                 }
             }
             idx = idx + 1;
