@@ -48,7 +48,7 @@ pushd $NAME
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores \
     --inputFileDescriptor $READ_GROUP_FILE \
-    --outputHDFSDir $HDFS_DIRNAME/$NAME \
+    --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $HDFS_FAI \
     --maxInsertSize $MAX_INSERT_SIZE \
     --mapabilityWeighting $MAPABILITY \
@@ -57,7 +57,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --aligner $ALIGNER
 
 hadoop jar ../lib/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles \
-    --inputHDFSDir /user/whelanch/svpipeline/$SAMPLE/$NAME \
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $LOCAL_FAI \
     --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
 
