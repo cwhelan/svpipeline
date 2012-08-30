@@ -55,10 +55,11 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorerTest {
 
     @Test
     public void testTwoStrongReadPairs() throws Exception {
-        ReadPairInfo readPairInfo1 = new ReadPairInfo(3000, -10.69, (short) 0);
-        ReadPairInfo readPairInfo2 = new ReadPairInfo(3000, -0.01, (short) 0);
+        ReadPairInfo readPairInfo1 = new ReadPairInfo(3000, -0.01, (short) 0);
+        ReadPairInfo readPairInfo2 = new ReadPairInfo(3000, -0.02, (short) 0);
         ReadPairInfo readPairInfo3 = new ReadPairInfo(3000, -8.32, (short) 0);
-        ReadPairInfo readPairInfo4 = new ReadPairInfo(3000, -0.02, (short) 0);
+        ReadPairInfo readPairInfo4 = new ReadPairInfo(3000, -10.69, (short) 0);
+
 
         List<ReadPairInfo> readPairInfos = new ArrayList<ReadPairInfo>();
         readPairInfos.add(readPairInfo1);

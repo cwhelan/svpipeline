@@ -7,8 +7,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,19 +19,33 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
     private static org.apache.log4j.Logger log = Logger.getLogger(IncrementalDelBeliefUpdateReadPairInfoScorer.class);
 
-    {
-        log.setLevel(Level.DEBUG);
-    }
-
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
         double pDeletion = Math.log(2432.0 / 2700000000.0);
         double pNoDeletion = Math.log(1 - 2432.0 / 2700000000.0);
 
-
+        boolean first = true;
+        double bestQuality = 0;
+        LinkedList<ReadPairInfo> bestRPIs = new LinkedList<ReadPairInfo>();
         while (values.hasNext()) {
             ReadPairInfo readPairInfo = values.next();
+            if (first) {
+                bestQuality=readPairInfo.pMappingCorrect;
+                first=false;
+            }
+            if (bestQuality - readPairInfo.pMappingCorrect > 10) {
+                break;
+            }
+            bestRPIs.add(readPairInfo);
+            if (bestRPIs.size() > 1000) {
+                break;
+            }
+        }
+
+        Iterator<ReadPairInfo> goodPairIterator = bestRPIs.descendingIterator();
+        while (goodPairIterator.hasNext()) {
+            ReadPairInfo readPairInfo = goodPairIterator.next();
             log.debug("Reducing for value: " + readPairInfo);
             int insertSize = readPairInfo.insertSize;
             double pMappingCorrect = readPairInfo.pMappingCorrect;

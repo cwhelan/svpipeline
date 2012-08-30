@@ -42,8 +42,8 @@ public class GenomicLocationWithQualitySortComparator implements RawComparator<G
         if (o1.chromosome > o2.chromosome) return  1;
         if (o1.pos < o2.pos) return -1;
         if (o1.pos > o2.pos) return 1;
-        if (o1.pMappingCorrect < o2.pMappingCorrect) return -1;
-        if (o1.pMappingCorrect > o2.pMappingCorrect) return 1;
+        if (o1.pMappingCorrect > o2.pMappingCorrect) return -1;
+        if (o1.pMappingCorrect < o2.pMappingCorrect) return 1;
         return 0;
     }
 
