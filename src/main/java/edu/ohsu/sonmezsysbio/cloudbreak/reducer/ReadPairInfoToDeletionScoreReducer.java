@@ -7,6 +7,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapred.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -19,6 +21,12 @@ import java.util.Map;
  * Time: 1:35 PM
  */
 public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements Reducer<GenomicLocationWithQuality, ReadPairInfo, GenomicLocation, DoubleWritable> {
+
+    private static org.apache.log4j.Logger log = Logger.getLogger(ReadPairInfoToDeletionScoreReducer.class);
+
+    {
+        log.setLevel(Level.DEBUG);
+    }
 
     ReadPairInfoScorer readPairInfoScorer = new IncrementalDelBeliefUpdateReadPairInfoScorer();
 
@@ -41,9 +49,9 @@ public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements
     }
 
     public void reduce(GenomicLocationWithQuality key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
-        System.err.println("reducing for key: " + key);
+        log.debug("reducing for key: " + key);
         double lr = readPairInfoScorer.reduceReadPairInfos(values, readGroupInfos);
-        System.err.println("got score: " + lr);
+        log.debug("got score: " + lr);
         output.collect(new GenomicLocation(key.chromosome, key.pos), new DoubleWritable(lr));
     }
 
