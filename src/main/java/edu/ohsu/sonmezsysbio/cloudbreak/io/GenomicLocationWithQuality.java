@@ -46,8 +46,8 @@ public class GenomicLocationWithQuality implements WritableComparable<GenomicLoc
         } else {
             if (pos < o.pos) return -1;
             if (pos > o.pos) return 1;
-            if (quality < o.quality) return 1;
-            if (quality > o.quality) return -1;
+            if (quality > o.quality) return 1;
+            if (quality < o.quality) return -1;
         }
         return 0;
     }
