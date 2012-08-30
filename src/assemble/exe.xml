@@ -17,7 +17,6 @@
               <include>com.beust:jcommander</include>
               <include>org.apache.commons:commons-math3</include>
               <include>org.biojava:biojava3-genome</include>
-              <include>org.broad:bigwig</include>
               <include>log4j:log4j</include>
 	      </includes>
 	    </dependencySet>
@@ -27,5 +26,11 @@
 	      <directory>target/classes</directory>
 	      <outputDirectory></outputDirectory>
 	    </fileSet>
+         <fileSet>
+             <directory>lib</directory>
+             <includes>
+                <include>*.jar</include>
+             </includes>
+         </fileSet>
 	  </fileSets>
 	</assembly>
