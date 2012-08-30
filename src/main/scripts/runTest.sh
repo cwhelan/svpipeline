@@ -48,7 +48,7 @@ pushd $NAME
 
 exec > >(tee -a test.log)
 
-echo <<EOF
+cat <<EOF
 Parameters:
 
 EXPERIMENT=$NAME
@@ -73,7 +73,7 @@ SHORT_NAME=$SHORT_NAME
 
 EOF
 
-echo<<EOF
+cat <<EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores 
    --inputFileDescriptor $READ_GROUP_FILE 
@@ -97,7 +97,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --resolution $RESOLUTION \
     --aligner $ALIGNER
 
-echo <<EOF
+cat <<EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles 
    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
@@ -114,7 +114,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFile
 echo gzip *.wig *.bed
 gzip *.wig *.bed
 
-echo <<EOF
+cat <<EOF
 python $BUILD_DIR/src/main/scripts/evalWigFile.py ${NAME}_piledup_deletion_scores.wig.gz \
     $TRUTH \
     $LOCAL_FAI $MEDIAN_FILTER_WINDOW $THRESHOLD_MIN > ${NAME}_perf.txt
