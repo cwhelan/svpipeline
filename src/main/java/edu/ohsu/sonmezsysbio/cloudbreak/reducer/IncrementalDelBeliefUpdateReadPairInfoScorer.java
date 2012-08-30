@@ -19,6 +19,10 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
     private static org.apache.log4j.Logger log = Logger.getLogger(IncrementalDelBeliefUpdateReadPairInfoScorer.class);
 
+    {
+        log.setLevel(Level.DEBUG);
+    }
+
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
@@ -30,11 +34,13 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
         LinkedList<ReadPairInfo> bestRPIs = new LinkedList<ReadPairInfo>();
         while (values.hasNext()) {
             ReadPairInfo readPairInfo = values.next();
+            log.debug("examining value: " + readPairInfo);
             if (first) {
                 bestQuality=readPairInfo.pMappingCorrect;
                 first=false;
             }
             if (bestQuality - readPairInfo.pMappingCorrect > 10) {
+                log.debug("difference is bigger then 10, done adding values");
                 break;
             }
             bestRPIs.add(readPairInfo);
@@ -46,7 +52,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
         Iterator<ReadPairInfo> goodPairIterator = bestRPIs.descendingIterator();
         while (goodPairIterator.hasNext()) {
             ReadPairInfo readPairInfo = goodPairIterator.next();
-            log.debug("Reducing for value: " + readPairInfo);
+            log.debug("operating on value: " + readPairInfo);
             int insertSize = readPairInfo.insertSize;
             double pMappingCorrect = readPairInfo.pMappingCorrect;
             short readGroupId = readPairInfo.readGroupId;
