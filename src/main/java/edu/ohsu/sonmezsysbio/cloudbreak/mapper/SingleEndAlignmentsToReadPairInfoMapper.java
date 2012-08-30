@@ -280,7 +280,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             setChromosomeFilter(job.get("alignments.filterchr"));
             setStartFilter(Long.parseLong(job.get("alignments.filterstart")));
             setEndFilter(Long.parseLong(job.get("alignments.filterend")));
+            System.err.println("Configured filter");
         }
+
 
         if (job.get("alignment.exclusionRegions") != null) {
             String exclusionRegionsFileName = job.get("alignment.exclusionRegions");
@@ -289,7 +291,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.err.println("configured exclusion regions with " + exclusionRegionsFileName);
         }
+
 
         if (job.get("alignment.mapabilityWeighting") != null) {
             String mapabilityWeightingFileName = job.get("alignment.mapabilityWeighting");
@@ -299,11 +303,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.err.println("configured mapability with " + mapabilityWeightingFileName);
         }
 
         if (job.get("pileupDeletionScore.maxInsertSize") != null) {
             maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
+            System.err.println("configured max insert to " + maxInsertSize);
         }
+        System.err.println("done with configuration");
     }
 
     protected static String getInputPath(String mapInputProperty) {

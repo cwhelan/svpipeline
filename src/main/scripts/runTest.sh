@@ -46,6 +46,16 @@ echo Experiment name: $NAME
 mkdir $NAME
 pushd $NAME
 
+echo hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores 
+echo    --inputFileDescriptor $READ_GROUP_FILE 
+echo    --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
+echo    --faidx $HDFS_FAI 
+echo    --maxInsertSize $MAX_INSERT 
+echo    --mapabilityWeighting $MAPABILITY 
+echo    --excludePairsMappingIn $FILTER 
+echo    --resolution $RESOLUTION 
+echo    --aligner $ALIGNER
+
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores \
     --inputFileDescriptor $READ_GROUP_FILE \
     --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
@@ -55,6 +65,11 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --excludePairsMappingIn $FILTER \
     --resolution $RESOLUTION \
     --aligner $ALIGNER
+
+echo hadoop jar ../lib/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles 
+echo    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
+echo    --faidx $LOCAL_FAI 
+echo    --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
 
 hadoop jar ../lib/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
