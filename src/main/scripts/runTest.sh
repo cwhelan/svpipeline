@@ -39,22 +39,53 @@ mvn assembly:assembly
 SHORT_GIT_TAG=`git rev-parse --short HEAD`
 popd
 
-NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE`_`basename $MAPABILITY`_`basename $FILTER`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${SHORT_GIT_TAG}
+NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${SHORT_GIT_TAG}
 
 echo Experiment name: $NAME
 
 mkdir $NAME
 pushd $NAME
 
-echo hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores 
-echo    --inputFileDescriptor $READ_GROUP_FILE 
-echo    --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
-echo    --faidx $HDFS_FAI 
-echo    --maxInsertSize $MAX_INSERT 
-echo    --mapabilityWeighting $MAPABILITY 
-echo    --excludePairsMappingIn $FILTER 
-echo    --resolution $RESOLUTION 
-echo    --aligner $ALIGNER
+exec > >(tee -a test.log) 2>&1
+
+echo <<EOF
+Parameters:
+
+EXPERIMENT=$NAME
+
+SOFTWARE_VERSION=$SHORT_GIT_TAG
+
+SAMPLE_NAME=$SAMPLE_NAME
+HDFS_SAMPLE_DIR=$HDFS_SAMPLE_DIR
+BUILD_DIR=$BUILD_DIR
+LOCAL_FAI=$LOCAL_FAI
+HDFS_FAI=$HDFS_FAI
+READ_GROUP_FILE=$READ_GROUP_FILE
+MAPABILITY=$MAPABILITY
+FILTER=$FILTER
+RESOLUTION=$RESOLUTION
+MEDIAN_FILTER_WINDOW=$MEDIAN_FILTER_WINDOW
+ALIGNER=$ALIGNER
+MAX_INSERT=$MAX_INSERT
+TRUTH=$TRUTH
+THRESHOLD_MIN=$THRESHOLD_MIN
+SHORT_NAME=$SHORT_NAME
+
+EOF
+
+echo<<EOF
+
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores 
+   --inputFileDescriptor $READ_GROUP_FILE 
+   --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
+   --faidx $HDFS_FAI 
+   --maxInsertSize $MAX_INSERT 
+   --mapabilityWeighting $MAPABILITY 
+   --excludePairsMappingIn $FILTER 
+   --resolution $RESOLUTION 
+   --aligner $ALIGNER
+
+EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores \
     --inputFileDescriptor $READ_GROUP_FILE \
@@ -66,18 +97,31 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --resolution $RESOLUTION \
     --aligner $ALIGNER
 
-echo hadoop jar ../lib/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles 
-echo    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
-echo    --faidx $LOCAL_FAI 
-echo    --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
+echo <<EOF
 
-hadoop jar ../lib/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles \
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles 
+   --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
+   --faidx $LOCAL_FAI 
+   --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
+
+EOF
+
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $LOCAL_FAI \
     --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
 
+echo gzip *.wig *.bed
 gzip *.wig *.bed
 
-python ../src/main/scripts/evalWigFile.py ${NAME}_piledup_deletion_scores.wig.gz \
+echo <<EOF
+python $BUILD_DIR/src/main/scripts/evalWigFile.py ${NAME}_piledup_deletion_scores.wig.gz \
     $TRUTH \
     $LOCAL_FAI $MEDIAN_FILTER_WINDOW $THRESHOLD_MIN > ${NAME}_perf.txt
+EOF
+
+python $BUILD_DIR/src/main/scripts/evalWigFile.py ${NAME}_piledup_deletion_scores.wig.gz \
+    $TRUTH \
+    $LOCAL_FAI $MEDIAN_FILTER_WINDOW $THRESHOLD_MIN > ${NAME}_perf.txt
+
+popd
