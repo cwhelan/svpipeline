@@ -46,7 +46,11 @@ echo Experiment name: $NAME
 mkdir $NAME
 pushd $NAME
 
-exec > >(tee -a test.log) 2>&1
+logfile=test.log
+mkfifo ${logfile}.pipe
+tee < ${logfile}.pipe $logfile &
+exec &> ${logfile}.pipe
+rm ${logfile}.pipe
 
 echo <<EOF
 Parameters:
