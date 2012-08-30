@@ -8,6 +8,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQualityGroupingComparator;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQualitySortComparator;
 import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationWithQualityPartitioner;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.ReadPairInfoToDeletionScoreReducer;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
@@ -127,6 +128,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores extends BaseCloudbr
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocationWithQuality.class);
         conf.setMapOutputValueClass(ReadPairInfo.class);
+        conf.setOutputKeyComparatorClass(GenomicLocationWithQualitySortComparator.class);
         conf.setOutputValueGroupingComparator(GenomicLocationWithQualityGroupingComparator.class);
         conf.setPartitionerClass(GenomicLocationWithQualityPartitioner.class);
 
