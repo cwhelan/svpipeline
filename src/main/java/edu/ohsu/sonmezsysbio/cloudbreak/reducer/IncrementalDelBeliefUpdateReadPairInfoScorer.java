@@ -24,6 +24,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
         while (values.hasNext()) {
             ReadPairInfo readPairInfo = values.next();
+            System.err.println("Reducing for value: " + readPairInfo);
             int insertSize = readPairInfo.insertSize;
             double pMappingCorrect = readPairInfo.pMappingCorrect;
             short readGroupId = readPairInfo.readGroupId;

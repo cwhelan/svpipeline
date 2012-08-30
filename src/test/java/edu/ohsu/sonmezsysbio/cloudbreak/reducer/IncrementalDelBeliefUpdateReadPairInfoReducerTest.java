@@ -1,6 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.hadoop.io.DoubleWritable;
@@ -44,7 +45,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
 
     @Test
     public void testReduce() throws Exception {
-        GenomicLocation genomicLocation = new GenomicLocation((short) 1,10000);
+        GenomicLocationWithQuality genomicLocation1 = new GenomicLocationWithQuality((short) 1,10000, -0.69);
 
         ReadPairInfo readPairInfo1 = new ReadPairInfo(3000, -0.69, (short) 0);
         ReadPairInfo readPairInfo2 = new ReadPairInfo(3000, -9.2103, (short) 0);
@@ -54,7 +55,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
 
         MockOutputCollector outputCollector = new MockOutputCollector();
 
-        reducer.reduce(genomicLocation, readPairInfos.iterator(), outputCollector, null);
+        reducer.reduce(genomicLocation1, readPairInfos.iterator(), outputCollector, null);
 
         assertEquals(1, outputCollector.keys.size());
         assertEquals(1, outputCollector.values.size());
@@ -66,7 +67,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoReducerTest {
         readPairInfos.add(readPairInfo2);
         outputCollector.reset();
 
-        reducer.reduce(genomicLocation, readPairInfos.iterator(), outputCollector, null);
+        reducer.reduce(genomicLocation1, readPairInfos.iterator(), outputCollector, null);
 
         assertEquals(1, outputCollector.keys.size());
         assertEquals(1, outputCollector.values.size());

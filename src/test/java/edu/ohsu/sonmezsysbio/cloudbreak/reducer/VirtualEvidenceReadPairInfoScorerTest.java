@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,7 +51,7 @@ public class VirtualEvidenceReadPairInfoScorerTest {
         readPairInfos.add(readPairInfo4);
 
         // should keep this score negative
-        assertEquals(-69.59, scorer.reduceReadPairInfos(readPairInfos.iterator(), readGroupInfos), 0.01);
+        assertTrue("score for only weak evidence should be negative", scorer.reduceReadPairInfos(readPairInfos.iterator(), readGroupInfos) < 0);
     }
 
     @Test

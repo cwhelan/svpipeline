@@ -5,6 +5,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.fs.Path;
@@ -26,7 +27,8 @@ import java.util.Set;
  * Date: 4/6/12
  * Time: 1:03 PM
  */
-public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase implements Mapper<LongWritable, Text, GenomicLocation, ReadPairInfo> {
+public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase
+        implements Mapper<LongWritable, Text, GenomicLocationWithQuality, ReadPairInfo> {
 
     private boolean matePairs;
     private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
@@ -116,7 +118,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         this.readGroupId = readGroupId;
     }
 
-    public void map(LongWritable key, Text value, OutputCollector<GenomicLocation, ReadPairInfo> output, Reporter reporter) throws IOException {
+    public void map(LongWritable key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
@@ -150,7 +152,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
     }
 
-    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocation, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
+    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
@@ -159,7 +161,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
     }
 
-    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocation, ReadPairInfo> output) throws IOException {
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
@@ -230,7 +232,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
 
             //System.err.println("Emitting insert size " + insertSize);
-            GenomicLocation genomicLocation = new GenomicLocation(chromosome, pos);
+            GenomicLocationWithQuality genomicLocation = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
             output.collect(genomicLocation, readPairInfo);
 
         }
