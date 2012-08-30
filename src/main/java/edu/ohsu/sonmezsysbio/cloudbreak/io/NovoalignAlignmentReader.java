@@ -37,9 +37,9 @@ public class NovoalignAlignmentReader extends BaseAlignmentReader {
                 NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record2).getPosteriorProb()));
     }
 
-    public static double probabilityMappingIsCorrect(double codedEndPosterior1, double codedEndPosterior2) {
-        double endPosterior1 = Math.log(codedEndPosterior1);
-        double endPosterior2 = Math.log(codedEndPosterior2);
+    public static double probabilityMappingIsCorrect(double decodedEndPosterior1, double decodedEndPosterior2) {
+        double endPosterior1 = Math.log(decodedEndPosterior1);
+        double endPosterior2 = Math.log(decodedEndPosterior2);
 
         return endPosterior1 + endPosterior2;
     }

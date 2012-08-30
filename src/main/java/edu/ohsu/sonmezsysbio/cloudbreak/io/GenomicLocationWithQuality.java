@@ -15,27 +15,27 @@ import java.io.IOException;
 public class GenomicLocationWithQuality implements WritableComparable<GenomicLocationWithQuality> {
     public short chromosome;
     public int pos;
-    public double quality;
+    public double pMappingCorrect;
 
     public GenomicLocationWithQuality() {
     }
 
-    public GenomicLocationWithQuality(short chromosome, int pos, double quality) {
+    public GenomicLocationWithQuality(short chromosome, int pos, double pMappingCorrect) {
         this.chromosome = chromosome;
         this.pos = pos;
-        this.quality = quality;
+        this.pMappingCorrect = pMappingCorrect;
     }
 
     public void write(DataOutput out) throws IOException {
         out.writeShort(chromosome);
         out.writeInt(pos);
-        out.writeDouble(quality);
+        out.writeDouble(pMappingCorrect);
     }
 
     public void readFields(DataInput in) throws IOException {
         chromosome = in.readShort();
         pos = in.readInt();
-        quality = in.readDouble();
+        pMappingCorrect = in.readDouble();
     }
 
     public int compareTo(GenomicLocationWithQuality o) {
@@ -46,8 +46,8 @@ public class GenomicLocationWithQuality implements WritableComparable<GenomicLoc
         } else {
             if (pos < o.pos) return -1;
             if (pos > o.pos) return 1;
-            if (quality > o.quality) return 1;
-            if (quality < o.quality) return -1;
+            if (pMappingCorrect > o.pMappingCorrect) return 1;
+            if (pMappingCorrect < o.pMappingCorrect) return -1;
         }
         return 0;
     }
@@ -61,7 +61,7 @@ public class GenomicLocationWithQuality implements WritableComparable<GenomicLoc
 
         if (chromosome != that.chromosome) return false;
         if (pos != that.pos) return false;
-        if (quality != that.quality) return false;
+        if (pMappingCorrect != that.pMappingCorrect) return false;
 
         return true;
     }
@@ -72,7 +72,7 @@ public class GenomicLocationWithQuality implements WritableComparable<GenomicLoc
         long temp;
         result = (int) chromosome;
         result = 31 * result + pos;
-        temp = quality != +0.0d ? Double.doubleToLongBits(quality) : 0L;
+        temp = pMappingCorrect != +0.0d ? Double.doubleToLongBits(pMappingCorrect) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -82,7 +82,7 @@ public class GenomicLocationWithQuality implements WritableComparable<GenomicLoc
         return "GenomicLocation{" +
                 "chromosome=" + chromosome +
                 ", pos=" + pos +
-                ", quality=" + quality +
+                ", pMappingCorrect=" + pMappingCorrect +
                 '}';
     }
 }
