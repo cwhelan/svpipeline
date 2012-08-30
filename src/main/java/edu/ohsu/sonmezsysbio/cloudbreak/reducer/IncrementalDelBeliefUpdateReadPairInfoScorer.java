@@ -4,6 +4,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,6 +17,13 @@ import java.util.Map;
  * Time: 11:14 AM
  */
 public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInfoScorer {
+
+    private static org.apache.log4j.Logger log = Logger.getLogger(IncrementalDelBeliefUpdateReadPairInfoScorer.class);
+
+    {
+        log.setLevel(Level.DEBUG);
+    }
+
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
@@ -24,7 +33,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
         while (values.hasNext()) {
             ReadPairInfo readPairInfo = values.next();
-            System.err.println("Reducing for value: " + readPairInfo);
+            log.debug("Reducing for value: " + readPairInfo);
             int insertSize = readPairInfo.insertSize;
             double pMappingCorrect = readPairInfo.pMappingCorrect;
             short readGroupId = readPairInfo.readGroupId;
@@ -51,7 +60,8 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
             pDeletion = logAdd(pDeletionGivenIS + pMappingCorrect, pDeletion + pMappingIncorrect);
             pNoDeletion = logAdd(pNoDeletionGivenIS + pMappingCorrect, pNoDeletion + pMappingIncorrect);
-
+            log.debug("pDeletion: " + pDeletion);
+            log.debug("pNoDeletion: " + pNoDeletion);
         }
         return pDeletion - pNoDeletion;
     }
