@@ -30,11 +30,10 @@ public class WeightedBeliefDeltaScorer implements ReadPairInfoScorer {
         double pDeletionPrior = Math.log(2432.0 / 2700000000.0);
         double pNoDeletionPrior = Math.log(1 - 2432.0 / 2700000000.0);
 
-        // keeping these values outside of the log domain since they are a sum and involve log subtraction
-        double weightedSumOfDeletionSurprises = 2432.0 / 2700000000.0;
-        double weightedSumOfNoDeletionSurprises = 1 - 2432.0 / 2700000000.0;
-        log.debug("weightedSumOfDeletionDeltas: " + weightedSumOfDeletionSurprises);
-        log.debug("weightedSumOfNoDeletionDeltas: " + weightedSumOfNoDeletionSurprises);
+        double weightedSumOfPDeletions = Double.NEGATIVE_INFINITY;
+        double weightedSumOfPNoDeletions = Double.NEGATIVE_INFINITY;
+        log.debug("weightedSumOfPDeletions: " + weightedSumOfPDeletions);
+        log.debug("weightedSumOfPNoDeletions: " + weightedSumOfPNoDeletions);
 
         boolean first = true;
         double bestQuality = 0;
@@ -83,16 +82,21 @@ public class WeightedBeliefDeltaScorer implements ReadPairInfoScorer {
             double pDeletionGivenIS = pDeletionPrior + pISgivenDeletion;
             double pNoDeletionGivenIS = pNoDeletionPrior + pISgivenNoDeletion;
 
-            double pDeletionSurprise = Math.exp(pMappingCorrect) * pDeletionGivenIS;
-            double pNoDeletionSurprise = Math.exp(pMappingCorrect) * pNoDeletionGivenIS;
+            double adjPDeletion = Math.exp(pMappingCorrect) + pDeletionGivenIS;
+            double adjPNoDeletion = Math.exp(pMappingCorrect) + pNoDeletionGivenIS;
 
-            log.debug("pDeletionDelta: " + pDeletionSurprise);
-            log.debug("pNoDeletionDelta: " + pNoDeletionSurprise);
-            weightedSumOfDeletionSurprises += pDeletionSurprise;
-            weightedSumOfNoDeletionSurprises += pNoDeletionSurprise;
+            log.debug("adjPDeletion: " + adjPDeletion);
+            log.debug("adjPNoDeletion: " + adjPNoDeletion);
+            weightedSumOfPDeletions =  logAdd(weightedSumOfPDeletions, adjPDeletion);
+            weightedSumOfPNoDeletions = logAdd(weightedSumOfPNoDeletions, adjPNoDeletion);
+            log.debug("weightedSumOfPDeletions: " + weightedSumOfPDeletions);
+            log.debug("weightedSumOfPNoDeletions: " + weightedSumOfPNoDeletions);
+
         }
-        log.debug("sumdiff: " + (weightedSumOfDeletionSurprises - weightedSumOfNoDeletionSurprises));
-        return weightedSumOfNoDeletionSurprises / weightedSumOfDeletionSurprises;
+
+        double score = weightedSumOfPDeletions - weightedSumOfPNoDeletions;
+        log.debug("score: " + score);
+        return score;
 
     }
 
