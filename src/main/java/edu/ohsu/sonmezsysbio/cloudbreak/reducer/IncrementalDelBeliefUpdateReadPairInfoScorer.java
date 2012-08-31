@@ -54,13 +54,18 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
             log.debug("best rpis: " + bestRPIs.size());
             ReadPairInfo rpi = null;
             log.debug("iterator");
-            for (Iterator<ReadPairInfo> i = bestRPIs.iterator(); i.hasNext(); rpi = i.next()) {
-                log.debug(rpi);
+            Iterator<ReadPairInfo> i = bestRPIs.iterator();
+            while (i.hasNext()) {
+                rpi = i.next();
+                log.debug("ascending read pair info: "+ rpi);
             }
 
+            rpi = null;
             log.debug("descending iterator");
-            for (Iterator<ReadPairInfo> i = bestRPIs.descendingIterator(); i.hasNext(); rpi = i.next()) {
-                log.debug(rpi);
+            i = bestRPIs.descendingIterator();
+            while (i.hasNext()) {
+                rpi = i.next();
+                log.debug("descending read pair info: "+ rpi);
             }
 
         }
