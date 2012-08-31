@@ -24,9 +24,9 @@ public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements
 
     private static org.apache.log4j.Logger log = Logger.getLogger(ReadPairInfoToDeletionScoreReducer.class);
 
-    { log.setLevel(Level.DEBUG); }
+    //{ log.setLevel(Level.DEBUG); }
 
-    ReadPairInfoScorer readPairInfoScorer = new WeightedBeliefDeltaScorer();
+    ReadPairInfoScorer readPairInfoScorer = new IncrementalDelBeliefUpdateReadPairInfoScorer();
 
     public ReadPairInfoScorer getReadPairInfoScorer() {
         return readPairInfoScorer;
