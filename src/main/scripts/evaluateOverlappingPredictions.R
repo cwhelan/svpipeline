@@ -4,7 +4,7 @@ truth.file <- '/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_si
 
 cb.predictions.file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_sim/maxins_25000_sdseqfilt_fdr10.bed'
 bd.predictions.file <- '~/Documents/gene_rearrange/sv/jcvi_sim/chr2/novoalign_tier1_sort_clean_rmdup_35_2_4.bd_out.txt'
-bd.score.threshold <- 56
+bd.score.threshold <- 53
 
 # Returns "N" if neither match, "B" if both match, predictor.1 if only calls.1 matches, or predictor.2 if only calls.2 matches
 agreement <- function(true.region, calls.1, calls.2, predictor.1, predictor.2) {
@@ -44,7 +44,7 @@ agreements.df <- data.frame(size=true.sizes, size.class=true.size.classes, agree
 ggplot(agreements.df, aes(size.class)) + geom_bar() + facet_wrap(~ agreements) 
 
 delly.predictions.file <- '~/Documents/gene_rearrange/sv/jcvi_sim/chr2/delly.del.bed'
-delly.score.threshold <- 6
+delly.score.threshold <- 5
 
 delly.deletions.df <- read.table(delly.predictions.file)
 names(delly.deletions.df) <- c("Chr","start","end","Size","Score","mq","name")
