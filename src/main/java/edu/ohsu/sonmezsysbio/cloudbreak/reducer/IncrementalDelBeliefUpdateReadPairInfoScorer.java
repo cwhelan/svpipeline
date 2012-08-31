@@ -44,7 +44,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
                 break;
             }
             log.debug("adding " + candidateReadPairInfo);
-            bestRPIs.addLast(candidateReadPairInfo);
+            bestRPIs.addLast(new ReadPairInfo(candidateReadPairInfo.insertSize, candidateReadPairInfo.pMappingCorrect, candidateReadPairInfo.readGroupId));
             if (bestRPIs.size() > 1000) {
                 break;
             }
