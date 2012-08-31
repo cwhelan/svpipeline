@@ -22,7 +22,7 @@ public class WeightedBeliefDeltaScorer implements ReadPairInfoScorer {
     private static org.apache.log4j.Logger log = Logger
             .getLogger(WeightedBeliefDeltaScorer.class);
 
-    // { log.setLevel(Level.DEBUG); }
+    { log.setLevel(Level.DEBUG); }
 
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
