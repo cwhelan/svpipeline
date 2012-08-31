@@ -6,6 +6,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
@@ -116,12 +117,12 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
         conf.set("alignments.filterend", endFilter.toString());
 
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
-        conf.setMapOutputKeyClass(GenomicLocation.class);
+        conf.setMapOutputKeyClass(GenomicLocationWithQuality.class);
         conf.setMapOutputValueClass(ReadPairInfo.class);
 
         conf.setReducerClass(IdentityReducer.class);
 
-        conf.setOutputKeyClass(GenomicLocation.class);
+        conf.setOutputKeyClass(GenomicLocationWithQuality.class);
         conf.setOutputValueClass(ReadPairInfo.class);
         conf.setOutputFormat(SequenceFileOutputFormat.class);
 
