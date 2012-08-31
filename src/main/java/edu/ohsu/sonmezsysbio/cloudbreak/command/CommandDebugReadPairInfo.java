@@ -64,6 +64,8 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
     @Parameter(names = {"--mapabilityWeighting"})
     String mapabilityWeightingFileName;
 
+    @Parameter(names = {"--aligner"})
+    String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
 
     public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
@@ -106,6 +108,7 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
         conf.setInputFormat(TextInputFormat.class);
 
         conf.set("cloudbreak.resolution", String.valueOf(resolution));
+        conf.set("cloudbreak.aligner", aligner);
 
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
         conf.set("alignments.filterchr", chrFilter);
