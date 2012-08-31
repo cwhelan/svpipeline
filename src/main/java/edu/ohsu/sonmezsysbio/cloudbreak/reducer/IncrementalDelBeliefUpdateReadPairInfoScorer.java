@@ -19,10 +19,6 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
     private static org.apache.log4j.Logger log = Logger.getLogger(IncrementalDelBeliefUpdateReadPairInfoScorer.class);
 
-    {
-        log.setLevel(Level.DEBUG);
-    }
-
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
@@ -48,27 +44,6 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
             if (bestRPIs.size() > 1000) {
                 break;
             }
-        }
-
-        if (log.isDebugEnabled()) {
-
-            log.debug("best rpis: " + bestRPIs.size());
-            ReadPairInfo rpi = null;
-            log.debug("iterator");
-            Iterator<ReadPairInfo> i = bestRPIs.iterator();
-            while (i.hasNext()) {
-                rpi = i.next();
-                log.debug("ascending read pair info: "+ rpi);
-            }
-
-            rpi = null;
-            log.debug("descending iterator");
-            i = bestRPIs.descendingIterator();
-            while (i.hasNext()) {
-                rpi = i.next();
-                log.debug("descending read pair info: "+ rpi);
-            }
-
         }
 
         Iterator<ReadPairInfo> goodPairIterator = bestRPIs.descendingIterator();
