@@ -33,24 +33,28 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
         double bestQuality = 0;
         LinkedList<ReadPairInfo> bestRPIs = new LinkedList<ReadPairInfo>();
         while (values.hasNext()) {
-            ReadPairInfo readPairInfo = values.next();
-            log.debug("examining value: " + readPairInfo);
+            ReadPairInfo candidateReadPairInfo = values.next();
+            log.debug("examining value: " + candidateReadPairInfo);
             if (first) {
-                bestQuality=readPairInfo.pMappingCorrect;
+                bestQuality=candidateReadPairInfo.pMappingCorrect;
                 first=false;
             }
-            if (bestQuality - readPairInfo.pMappingCorrect > 10) {
+            if (bestQuality - candidateReadPairInfo.pMappingCorrect > 10) {
                 log.debug("difference is bigger then 10, done adding values");
                 break;
             }
-            log.debug("adding " + readPairInfo);
-            bestRPIs.add(readPairInfo);
+            log.debug("adding " + candidateReadPairInfo);
+            bestRPIs.add(candidateReadPairInfo);
             if (bestRPIs.size() > 1000) {
                 break;
             }
         }
 
         if (log.isDebugEnabled()) {
+            for (int i = 0; i < bestRPIs.size(); i++) {
+                log.debug("indexed read pair info: "+ bestRPIs.get(i));
+            }
+
             log.debug("best rpis: " + bestRPIs.size());
             ReadPairInfo rpi = null;
             log.debug("iterator");
