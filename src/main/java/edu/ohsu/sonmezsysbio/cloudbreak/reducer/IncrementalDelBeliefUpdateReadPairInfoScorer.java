@@ -31,7 +31,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
 
         boolean first = true;
         double bestQuality = 0;
-        LinkedList<ReadPairInfo> bestRPIs = new LinkedList<ReadPairInfo>();
+        ArrayDeque<ReadPairInfo> bestRPIs = new ArrayDeque<ReadPairInfo>();
         while (values.hasNext()) {
             ReadPairInfo candidateReadPairInfo = values.next();
             log.debug("examining value: " + candidateReadPairInfo);
@@ -44,16 +44,13 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
                 break;
             }
             log.debug("adding " + candidateReadPairInfo);
-            bestRPIs.add(candidateReadPairInfo);
+            bestRPIs.addLast(candidateReadPairInfo);
             if (bestRPIs.size() > 1000) {
                 break;
             }
         }
 
         if (log.isDebugEnabled()) {
-            for (int i = 0; i < bestRPIs.size(); i++) {
-                log.debug("indexed read pair info: "+ bestRPIs.get(i));
-            }
 
             log.debug("best rpis: " + bestRPIs.size());
             ReadPairInfo rpi = null;
