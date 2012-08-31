@@ -6,6 +6,7 @@ import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -32,8 +33,31 @@ public class WeightedBeliefDeltaScorer implements ReadPairInfoScorer {
         log.debug("weightedSumOfDeletionDeltas: " + weightedSumOfDeletionSurprises);
         log.debug("weightedSumOfNoDeletionDeltas: " + weightedSumOfNoDeletionSurprises);
 
+        boolean first = true;
+        double bestQuality = 0;
+        ArrayDeque<ReadPairInfo> bestRPIs = new ArrayDeque<ReadPairInfo>();
         while (values.hasNext()) {
-            ReadPairInfo readPairInfo = values.next();
+            ReadPairInfo candidateReadPairInfo = values.next();
+            log.debug("examining value: " + candidateReadPairInfo);
+            if (first) {
+                bestQuality=candidateReadPairInfo.pMappingCorrect;
+                first=false;
+            }
+            if (bestQuality - candidateReadPairInfo.pMappingCorrect > 5) {
+                log.debug("difference is bigger then 5, done adding values");
+                break;
+            }
+            log.debug("adding " + candidateReadPairInfo);
+            bestRPIs.addLast(new ReadPairInfo(candidateReadPairInfo.insertSize, candidateReadPairInfo.pMappingCorrect, candidateReadPairInfo.readGroupId));
+            if (bestRPIs.size() > 1000) {
+                break;
+            }
+        }
+
+        Iterator<ReadPairInfo> goodPairIterator = bestRPIs.descendingIterator();
+        while (goodPairIterator.hasNext()) {
+
+            ReadPairInfo readPairInfo = goodPairIterator.next();
             int insertSize = readPairInfo.insertSize;
             double pMappingCorrect = readPairInfo.pMappingCorrect;
             log.debug("processing " + readPairInfo);
