@@ -4,6 +4,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayDeque;
@@ -20,6 +21,8 @@ public class WeightedBeliefDeltaScorer implements ReadPairInfoScorer {
 
     private static org.apache.log4j.Logger log = Logger
             .getLogger(WeightedBeliefDeltaScorer.class);
+
+    { log.setLevel(Level.DEBUG); }
 
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
