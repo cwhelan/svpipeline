@@ -120,7 +120,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
                 "-f", path1,
                 "-F", baseQualityFormat,
                 "-k", "-K", "calfile.txt", "-q", "5",
-                "-r", "Ex", "10", "-t", threshold, "-x", "10"
+                "-r", "Ex", "100", "-t", threshold, "-x", "10"
         };
         return commandArray;
     }
