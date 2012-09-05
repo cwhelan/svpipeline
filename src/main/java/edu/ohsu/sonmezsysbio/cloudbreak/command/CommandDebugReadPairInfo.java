@@ -106,7 +106,7 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
 
         DistributedCache.createSymlink(conf);
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.set("cloudbreak.resolution", String.valueOf(resolution));
         conf.set("cloudbreak.aligner", aligner);

@@ -43,10 +43,7 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
     }
 
     protected ReadPairAlignments parsePairAlignmentLine(String line) {
-        int firstTabIndex = line.indexOf('\t');
-        String lineValues = line.substring(firstTabIndex + 1);
-
-        String[] readAligments = lineValues.split(Cloudbreak.READ_SEPARATOR);
+        String[] readAligments = line.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
 

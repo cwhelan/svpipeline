@@ -58,7 +58,7 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));

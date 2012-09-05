@@ -17,7 +17,7 @@ import java.io.IOException;
  * Date: 5/23/11
  * Time: 10:12 AM
  */
-public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduceBase implements Mapper<LongWritable, Text, Text, DoubleWritable> {
+public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduceBase implements Mapper<Text, Text, Text, DoubleWritable> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
@@ -79,7 +79,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
 
     }
 
-    public void map(LongWritable key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
+    public void map(Text key, Text value, OutputCollector<Text, DoubleWritable> output, Reporter reporter)
             throws IOException {
         String line = value.toString();
 

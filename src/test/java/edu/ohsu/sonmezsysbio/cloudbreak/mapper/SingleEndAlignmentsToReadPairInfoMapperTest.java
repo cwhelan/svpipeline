@@ -50,14 +50,15 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
     @Test
     public void testMapPairedEnd() throws Exception {
 
-        String inputLine = "@ERR000545.10000001 EAS139_44:1:93:532:453\t@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
+        String key = "@ERR000545.10000001 EAS139_44:1:93:532:453";
+        String value = "@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
 
         mapper.setReadGroupId((short) 3);
 
         MockOutputCollector collector = new MockOutputCollector();
         Reporter reporter = Mockito.mock(Reporter.class);
 
-        mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
+        mapper.map(new Text(key), new Text(value), collector, reporter);
 
         int idx = 0;
         for (int i = 43039500; i <= 43049500; i = i + Cloudbreak.DEFAULT_RESOLUTION) {
@@ -100,7 +101,8 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
     @Test
     public void testMapPairedEndWithSegmentalDuplications() throws Exception {
 
-        String inputLine = "@ERR000545.10000001 EAS139_44:1:93:532:453\t@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
+        String key = "@ERR000545.10000001 EAS139_44:1:93:532:453";
+        String value = "@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t43049466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t43039500\tF\t.\t.\t.\t3G>A";
 
         mapper.setExclusionRegions(new GFFFileHelper() {
             @Override
@@ -117,13 +119,14 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         MockOutputCollector collector = new MockOutputCollector();
         Reporter reporter = Mockito.mock(Reporter.class);
 
-        mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
+        mapper.map(new Text(key), new Text(value), collector, reporter);
 
         assertEquals(0, collector.keys.size());
 
-        inputLine = "@ERR000545.10000001 EAS139_44:1:93:532:453\t@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t49466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t39500\tF\t.\t.\t.\t3G>A";
+        key = "@ERR000545.10000001 EAS139_44:1:93:532:453";
+        value = "@ERR000545.10000001 EAS139_44:1:93:532:453/1\tS\tCAAAAACCACTTGTACTCCAAAAGCTATTGAAGTTTAAGTTAAAATAAAAA\t<??>>?;<>=@?=?>8@<<9=98=:@>>>=:>>:6?7>9:?<46:;9;.:9\tR\t114\t0.00000\t>10\t49466\tR\t.\t.\t.\t10A>C 22C>A 46-A\tSVP_READ\t@ERR000545.10000001 EAS139_44:1:93:532:453/2\tS\tTTATTGCACTTACCATGACTGTCTTCTGAAATGCATCTCAACCCTTGAATA\t;<8>>:$>=?@?>>:>=>:9=8<>1;8:<=>>9=:=7><>=;=;=>=72:>\tU\t34\t145.2313\t>10\t39500\tF\t.\t.\t.\t3G>A";
         collector = new MockOutputCollector();
-        mapper.map(new LongWritable(1), new Text(inputLine), collector, reporter);
+        mapper.map(new Text(key), new Text(value), collector, reporter);
         assertEquals(101, collector.keys.size());
     }
 

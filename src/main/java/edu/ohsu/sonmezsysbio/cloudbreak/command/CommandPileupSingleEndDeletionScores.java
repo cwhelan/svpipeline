@@ -60,7 +60,7 @@ public class CommandPileupSingleEndDeletionScores implements CloudbreakCommand {
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.set("cloudbreak.resolution", String.valueOf(resolution));
 

@@ -1,7 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.*;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
@@ -16,7 +15,7 @@ import java.io.IOException;
  * Date: 5/23/11
  * Time: 10:12 AM
  */
-public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase implements Mapper<Text, Text, Text, Text> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
@@ -105,7 +104,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         regionEnd = Integer.parseInt(region.split(":")[1].split("-")[1]);
     }
 
-    public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
+    public void map(Text key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
             throws IOException {
 
         String line = value.toString();

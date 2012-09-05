@@ -9,12 +9,11 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQualityGroupingComparator;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQualitySortComparator;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
+import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationWithQualityPartitioner;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.ReadPairInfoToDeletionScoreReducer;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
-import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
-import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationPartitioner;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -123,7 +122,7 @@ public class CommandIncrementalUpdateSingleEndDeletionScores extends BaseCloudbr
             conf.set("alignments.filterend", endFilter.toString());
         }
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocationWithQuality.class);

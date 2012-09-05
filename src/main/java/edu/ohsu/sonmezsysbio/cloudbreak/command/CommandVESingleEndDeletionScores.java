@@ -116,7 +116,7 @@ public class CommandVESingleEndDeletionScores extends BaseCloudbreakCommand {
             conf.set("alignments.filterend", endFilter.toString());
         }
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocation.class);

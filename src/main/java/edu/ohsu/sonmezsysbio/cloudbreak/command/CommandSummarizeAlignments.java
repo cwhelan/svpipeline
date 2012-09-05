@@ -40,7 +40,7 @@ public class CommandSummarizeAlignments implements CloudbreakCommand {
 
         FileOutputFormat.setOutputPath(conf, outputDir);
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.setMapperClass(SingleEndAlignmentSummaryMapper.class);
         conf.setMapOutputKeyClass(Text.class);

@@ -36,7 +36,7 @@ public class IncrementalDelBeliefUpdateReadPairInfoScorer implements ReadPairInf
                 first=false;
             }
             if (bestQuality - candidateReadPairInfo.pMappingCorrect > 6) {
-                log.debug("difference is bigger then 10, done adding values");
+                log.debug("difference is bigger then 6, done adding values");
                 break;
             }
             log.debug("adding " + candidateReadPairInfo);

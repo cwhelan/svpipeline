@@ -7,9 +7,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
-import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
@@ -28,7 +26,7 @@ import java.util.Set;
  * Time: 1:03 PM
  */
 public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase
-        implements Mapper<LongWritable, Text, GenomicLocationWithQuality, ReadPairInfo> {
+        implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo> {
 
     private boolean matePairs;
     private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
@@ -118,7 +116,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         this.readGroupId = readGroupId;
     }
 
-    public void map(LongWritable key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
+    public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
