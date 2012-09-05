@@ -71,7 +71,11 @@ public class CommandConvertTextAlignmentsToSnappySequence implements CloudbreakC
 
     }
 
-    private class AlignmentLineToKeyValueMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+    public static class AlignmentLineToKeyValueMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+        public AlignmentLineToKeyValueMapper() {
+            super();
+        }
+
         public void map(LongWritable longWritable, Text text, OutputCollector<Text, Text> textTextOutputCollector, Reporter reporter) throws IOException {
             String line = text.toString();
             int firstTabIndex = line.indexOf('\t');
