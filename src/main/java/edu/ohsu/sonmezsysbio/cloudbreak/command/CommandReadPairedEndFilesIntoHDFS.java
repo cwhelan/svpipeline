@@ -6,6 +6,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.SnappyCodec;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -29,7 +33,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     @Parameter(names = {"--fastqFile2"}, required = true)
     String readFile2;
 
-    @Parameter(names = {"--outFileName"}, required = true)
+    @Parameter(names = {"--outFileName"})
     String outFileName = "reads.txt";
 
     @Parameter(names = {"--compress"})
@@ -41,15 +45,21 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         Configuration config = new Configuration();
 
         FileSystem hdfs = FileSystem.get(config);
+        Path p = new Path(hdfsDataDir + "/" + outFileName);
 
-        FSDataOutputStream outputStream = hdfs.create(new Path(hdfsDataDir + "/" + outFileName));
-        BufferedWriter writer;
-        if ("gzip".equals(compress)) {
-            writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream)));
+        HDFSWriter writer = new HDFSWriter();
+        if ("snappy".equals(compress)) {
+            writer.seqFileWriter = SequenceFile.createWriter(hdfs, config, p, IntWritable.class, Text.class, SequenceFile.CompressionType.BLOCK, new SnappyCodec());
         } else {
-            writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            FSDataOutputStream outputStream = hdfs.create(p);
+            BufferedWriter bufferedWriter = null;
+            if ("gzip".equals(compress)) {
+                bufferedWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream)));
+            } else {
+                bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+            }
+            writer.textFileWriter = bufferedWriter;
         }
-
         try {
             readFile(writer, readFile1, readFile2);
         } finally {
@@ -58,7 +68,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
     }
 
-    private void readFile(BufferedWriter writer, String pathname1, String pathname2) throws IOException {
+    private void readFile(HDFSWriter writer, String pathname1, String pathname2) throws IOException {
         BufferedReader inputReader1;
         BufferedReader inputReader2 = null;
 
@@ -69,7 +79,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         try {
             String convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
             while (convertedFastqLine != null) {
-                writer.write(convertedFastqLine);
+                writer.write(numRecords, convertedFastqLine);
                 convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
                 numRecords++;
             }
@@ -136,4 +146,26 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         copyReadFilesToHdfs();
         System.out.println("Loaded " + numRecords + " records.");
     }
+
+    static class HDFSWriter {
+        public BufferedWriter textFileWriter;
+        public SequenceFile.Writer seqFileWriter;
+
+        public void write(int recordNum, String line) throws IOException {
+            if (textFileWriter != null) {
+                textFileWriter.write(line);
+            } else {
+                seqFileWriter.append(new IntWritable(recordNum), new Text(line));
+            }
+        }
+
+        public void close() throws IOException {
+            if (textFileWriter != null) {
+                textFileWriter.close();
+            } else {
+                seqFileWriter.close();
+            }
+        }
+    }
 }
+

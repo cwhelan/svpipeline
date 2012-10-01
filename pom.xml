@@ -36,6 +36,12 @@
       </dependency>
 
       <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-snappy</artifactId>
+          <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
           <groupId>org.biojava</groupId>
           <artifactId>biojava3-core</artifactId>
           <version>3.0.2-SNAPSHOT</version>
