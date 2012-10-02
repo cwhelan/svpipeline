@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -13,7 +14,7 @@ import java.util.zip.GZIPOutputStream;
  * Date: 7/17/12
  * Time: 5:27 PM
  */
-public abstract class SingleEndAlignmentMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+public abstract class SingleEndAlignmentMapper extends MapReduceBase implements Mapper<IntWritable, Text, Text, Text> {
     private String localDir;
     protected Writer s1FileWriter;
     protected File s1File;
@@ -36,7 +37,7 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
 
     }
 
-    public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+    public void map(IntWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
         if (this.output == null) {
             this.output = output;
         }
