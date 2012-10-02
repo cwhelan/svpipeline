@@ -48,6 +48,11 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
         String line = value.toString();
         String[] fields = line.split("\t");
 
+        if (fields[1].length() != fields[3].length()) {
+            System.err.println("Warning; mismatching seq and qual lengths in record " + key.toString() + "!");
+            System.err.println(fields[1]);
+            System.err.println(fields[3]);
+        }
         s1FileWriter.write(fields[0] + "\n");
         s1FileWriter.write(fields[1] + "\n");
         s1FileWriter.write(fields[2] + "\n");
