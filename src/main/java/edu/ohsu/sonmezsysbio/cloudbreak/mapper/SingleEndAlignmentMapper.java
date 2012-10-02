@@ -46,6 +46,15 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
         }
 
         String line = value.toString();
+        String[] reads = line.split("\n");
+        splitRead(key, reads[0]);
+        splitRead(key, reads[1]);
+
+        reporter.progress();
+        //System.out.println("Done with map method, real work will happen in close");
+    }
+
+    private void splitRead(IntWritable key, String line) throws IOException {
         String[] fields = line.split("\t");
 
         if (fields[1].length() != fields[3].length()) {
@@ -60,9 +69,6 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
         s1FileWriter.write(fields[1] + "\n");
         s1FileWriter.write(fields[2] + "\n");
         s1FileWriter.write(fields[3] + "\n");
-
-        reporter.progress();
-        //System.out.println("Done with map method, real work will happen in close");
     }
 
     public OutputCollector<Text, Text> getOutput() {
