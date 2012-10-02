@@ -156,7 +156,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
             if (textFileWriter != null) {
                 textFileWriter.write(line);
             } else {
-                seqFileWriter.append(new IntWritable(recordNum), new Text(line));
+                seqFileWriter.append(new LongWritable(recordNum), new Text(line));
             }
         }
 
