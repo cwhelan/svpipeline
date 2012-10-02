@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.SnappyCodec;
@@ -49,7 +50,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
         HDFSWriter writer = new HDFSWriter();
         if ("snappy".equals(compress)) {
-            writer.seqFileWriter = SequenceFile.createWriter(hdfs, config, p, IntWritable.class, Text.class, SequenceFile.CompressionType.BLOCK, new SnappyCodec());
+            writer.seqFileWriter = SequenceFile.createWriter(hdfs, config, p, LongWritable.class, Text.class, SequenceFile.CompressionType.BLOCK, new SnappyCodec());
         } else {
             FSDataOutputStream outputStream = hdfs.create(p);
             BufferedWriter bufferedWriter = null;

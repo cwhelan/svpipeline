@@ -10,6 +10,7 @@ import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -70,7 +71,7 @@ public class CommandNovoalignSingleEnds extends BaseCloudbreakCommand {
         conf.set("novoalign.threshold", threshold);
         conf.set("novoalign.quality.format", qualityFormat);
 
-        conf.setInputFormat(TextInputFormat.class);
+        conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.setMapperClass(NovoalignSingleEndMapper.class);
         conf.setMapOutputKeyClass(Text.class);
