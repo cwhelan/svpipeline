@@ -39,7 +39,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     @Parameter(names = {"--compress"})
     String compress = "none";
 
-    private int numRecords;
+    private long numRecords;
 
     public void copyReadFilesToHdfs() throws IOException {
         Configuration config = new Configuration();
@@ -151,7 +151,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         public BufferedWriter textFileWriter;
         public SequenceFile.Writer seqFileWriter;
 
-        public void write(int recordNum, String line) throws IOException {
+        public void write(long recordNum, String line) throws IOException {
             if (textFileWriter != null) {
                 textFileWriter.write(line);
             } else {
