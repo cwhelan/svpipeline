@@ -16,7 +16,7 @@ read_group_file = open("readGroups.txt", 'w')
 loaded_groups = set()
 
 job_num = 1
-for line in seqIndex:
+for line in seq_index:
     fields = line.split()
     file_name = fields[1]
     read_group = fields[2]
