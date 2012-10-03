@@ -15,7 +15,7 @@ read_group_file = open("readGroups.txt", 'w')
 
 loaded_groups = set()
 
-int job_num = 1
+job_num = 1
 for line in seqIndex:
     fields = line.split()
     file_name = fields[1]
@@ -31,6 +31,7 @@ for line in seqIndex:
         dag_file.write("VARS {0} file1={1}\n".format(job_num, file_name))
         dag_file.write("VARS {0} file2={1}\n".format(job_num, pair_file_name))
         dag_file.write("VARS {0} threshold={1}\n".format(jon_num, threshold))
+        loaded_groups.add(read_group)
 
 job_desc_file = open("loadAndAlign.desc", 'w')
 job_desc_file.write("Executable = loadAndAlign.sh\n")
