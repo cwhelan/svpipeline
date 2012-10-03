@@ -26,12 +26,12 @@ for line in seq_index:
     if (not (read_group in loaded_groups) and pair_file_name != ""):
         print "processing read group {0}".format(read_group)
         dag_file.write("JOB {0} loadAndAlign.desc\n".format(job_num))
-        dag_file.write("VARS {0} read_group={1}\n".format(job_num, read_group))
-        dag_file.write("VARS {0} data_dir={1}\n".format(job_num, data_dir))
-        dag_file.write("VARS {0} hdfs_dir={1}\n".format(job_num, hdfs_dir))
-        dag_file.write("VARS {0} file1={1}\n".format(job_num, file_name))
-        dag_file.write("VARS {0} file2={1}\n".format(job_num, pair_file_name))
-        dag_file.write("VARS {0} threshold={1}\n".format(job_num, threshold))
+        dag_file.write("VARS {0} read_group=\"{1}\"\n".format(job_num, read_group))
+        dag_file.write("VARS {0} data_dir=\"{1}\"\n".format(job_num, data_dir))
+        dag_file.write("VARS {0} hdfs_dir=\"{1}\"\n".format(job_num, hdfs_dir))
+        dag_file.write("VARS {0} file1=\"{1}\"\n".format(job_num, file_name))
+        dag_file.write("VARS {0} file2=\"{1}\"\n".format(job_num, pair_file_name))
+        dag_file.write("VARS {0} threshold=\"{1}\"\n".format(job_num, threshold))
         loaded_groups.add(read_group)
         job_num = job_num + 1
 
