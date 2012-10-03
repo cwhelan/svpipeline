@@ -22,7 +22,7 @@ for line in seq_index:
     read_group = fields[2]
     insert_size = fields[20]
     pair_file_name = fields[24]
-    if (not loaded_groups.contains(read_group) and pair_file_name != ""):
+    if (not (read_group in loaded_groups) and pair_file_name != ""):
         print "processing read group {}".format(read_group)
         dag_file.write("JOB {0} loadAndAlign.desc\n".format(job_num))
         dag_file.write("VARS {0} read_group={1}\n".format(job_num, read_group))
