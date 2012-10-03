@@ -18,11 +18,11 @@ loaded_groups = set()
 job_num = 1
 for line in seq_index:
     fields = line.split("\t")
-    file_name = fields[1]
+    file_name = fields[0]
     read_group = fields[2]
-    library = fields[20]
-    insert_size = fields[21]
-    pair_file_name = fields[23]
+    library = fields[18]
+    insert_size = fields[19]
+    pair_file_name = fields[21]
     if (not (read_group in loaded_groups) and pair_file_name != ""):
         print "processing read group {0}".format(read_group)
         dag_file.write("JOB {0} loadAndAlign.desc\n".format(job_num))
