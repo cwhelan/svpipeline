@@ -20,9 +20,9 @@ for line in seq_index:
     fields = line.split("\t")
     file_name = fields[0]
     read_group = fields[2]
-    library = fields[18]
-    insert_size = fields[19]
-    pair_file_name = fields[21]
+    library = fields[14]
+    insert_size = fields[17]
+    pair_file_name = fields[19]
     if (not (read_group in loaded_groups) and pair_file_name != ""):
         print "processing read group {0}".format(read_group)
         dag_file.write("JOB {0} loadAndAlign.desc\n".format(job_num))
