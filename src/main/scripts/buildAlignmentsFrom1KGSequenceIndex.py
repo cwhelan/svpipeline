@@ -30,7 +30,7 @@ for line in seq_index:
         dag_file.write("VARS {0} hdfs_dir={1}\n".format(job_num, hdfs_dir))
         dag_file.write("VARS {0} file1={1}\n".format(job_num, file_name))
         dag_file.write("VARS {0} file2={1}\n".format(job_num, pair_file_name))
-        dag_file.write("VARS {0} threshold={1}\n".format(jon_num, threshold))
+        dag_file.write("VARS {0} threshold={1}\n".format(job_num, threshold))
         loaded_groups.add(read_group)
 
 job_desc_file = open("loadAndAlign.desc", 'w')
