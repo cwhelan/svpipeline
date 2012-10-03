@@ -17,7 +17,7 @@ loaded_groups = set()
 
 job_num = 1
 for line in seq_index:
-    fields = line.split()
+    fields = line.split("\t")
     file_name = fields[1]
     read_group = fields[2]
     library = fields[20]
