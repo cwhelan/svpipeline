@@ -35,7 +35,7 @@ for line in seq_index:
         loaded_groups.add(read_group)
         job_num = job_num + 1
 
-        read_group_file.write("\t".join([read_group, library, insert_size, str(int(insert_size) * .15), "false", hdfs_dir + "/alignments/" + read_group]) + "\n")
+        read_group_file.write("\t".join([read_group, library, insert_size, str(int(round(int(insert_size) * .15))), "false", hdfs_dir + "/alignments/" + read_group]) + "\n")
 read_group_file.close()
 
 job_desc_file = open("loadAndAlign.desc", 'w')
