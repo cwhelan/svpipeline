@@ -14,7 +14,7 @@ import java.util.zip.GZIPOutputStream;
  * Date: 7/17/12
  * Time: 5:27 PM
  */
-public abstract class SingleEndAlignmentMapper extends MapReduceBase implements Mapper<IntWritable, Text, Text, Text> {
+public abstract class SingleEndAlignmentMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
     private String localDir;
     protected Writer s1FileWriter;
     protected File s1File;
@@ -37,7 +37,7 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
 
     }
 
-    public void map(IntWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+    public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
         if (this.output == null) {
             this.output = output;
         }
@@ -54,7 +54,7 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
         //System.out.println("Done with map method, real work will happen in close");
     }
 
-    private void splitRead(IntWritable key, String line) throws IOException {
+    private void splitRead(LongWritable key, String line) throws IOException {
         String[] fields = line.split("\t");
 
         if (fields[1].length() != fields[3].length()) {
