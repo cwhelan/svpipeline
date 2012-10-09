@@ -1,6 +1,10 @@
 \documentclass[12pt]{article}
+
 \usepackage{graphics}
 \usepackage{subfigure}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{url}
 
 \begin{document}
 
@@ -22,7 +26,10 @@ This is the paper's abstract \ldots
 \end{abstract}
 
 \section{Introduction}
-Genomic structural variants are important..
+
+Genomic structural variation
+
+
 
 Difficulty of detection.. Lack of concordance of current algorithms...
 
@@ -30,15 +37,83 @@ Typical algorithms use only unambiguous discordant read pair mappings...
 
 Hadoop/MapReduce as framework for processing complete data sets
 
+Use of the Hadoop framework has been demonstrated for sequencing-related bioinformatic tasks including short read mapping, \cite{Schatz:2009p278} querying variant databases, \cite{Oconnor:2010p1835} SNP calling, \cite{Langmead:2009p1225} RNA-seq differential expression analysis, \cite{Langmead:2010p1268} ChIP-seq peak calling, \cite{Feng:2011p1228} and computing genome mappability. \cite{Lee:2012bk}
+
 \section{Methods}\label{Methods}
 
-MapReduce algorithm description
+\subsection{A Hadoop/MapReduce Algorithm for SV Detection}
 
-Local deletion scores
+The MapReduce programming model divides computation for a job accross a cluster into three phases \cite{Dean:2008p277}. In the first phase, \emph{mappers} developed by the application programmer examine small blocks of data and emit $\langle key, value \rangle$ pairs for each block examined. The MapReduce framework then sorts the output of the mappers by key, and aggregates all values that are associated with each key. Finally, the framework executes \emph{reducers}, also created by the application developer, which process all of the values for a particular key and produce one or more outputs that summarize or otherwise aggregate those values. Hadoop is an open source project of the Apache Foundation which provides an implementation of the MapReduce programming framework as well as a distributed file system for storing large data sets across a cluster.
+
+\begin{figure}[p]
+\algrenewcommand\algorithmicprocedure{\textbf{job}}
+  \begin{algorithmic}[1]
+    \Procedure{Alignment}{}
+    \Function{Map}{$\textrm{ReadPairId }rp, \textrm{ReadId }r, \textrm{ReadSequence }s, \textrm{ReadQuality }q$}
+    \ForAll{$ \textrm{Alignments }a \in \textrm{Align}(<s,q>)$}
+    \State $\textsc{Emit}(\textrm{ReadPairId }rid, \textrm{Alignment }a)$
+    \EndFor
+    \EndFunction
+    \Function{Reduce}{$\textrm{ReadPairId }rid, \textrm{Alignments }a_{1,2,\ldots}$}
+    \State $\textsc{Emit}(\textrm{ReadPairId }rp, \textrm{ValidAlignmentPairs}(a_{1,2,\ldots}))$
+    \EndFunction
+    \EndProcedure
+
+    \Procedure{Compute Deletion Scores}{}
+    \Function{Map}{$\textrm{ReadPairId }rp, \textrm{AlignmentPairList }ap$}
+    \ForAll{$ \textrm{AlignmentPairs }<a_1,a_2> \in ap$}
+    \State $ \textrm{SpanningPairInfo }spi \gets <\textrm{InsertSize}(a_1,a_2), \textrm{AlignmentScore}(a_1,a_2)>$
+    \ForAll{$ \textrm{GenomicLocations }g \in \textrm{Span}(a_1,a_2)$}
+    \State $\textsc{Emit}(\textrm{GenomicLocation }g, \textrm{SpanningPairInfo }spi)$
+    \EndFor
+    \EndFor
+    \EndFunction
+    \Function{Reduce}{$\textrm{GenomicLocation }g, \textrm{SpanningPairInfos }spi_{1,2,\ldots}$}
+    \State $\textrm{DeletionScore } d \gets \textrm{DeletionScore}(\textrm{InsertSizes }i_{1,2,\ldots}, \textrm{AlignmentScores }q_{1,2,\ldots})$
+    \State $\textsc{Emit}(\textrm{GenomicLocation }g, \textrm{DeletionScore } d)$
+    \EndFunction
+    \EndProcedure
+  \end{algorithmic}
+  \caption{MapReduce workflow of the Cloudbreak alorithm for deletion detection. Processing is dividied into two MapReduce jobs. In the first job, mappers find all alignments for each read pair end in the data set. Reducers then group the alignments for each pair and filter invalid alignment pairs. In the second job, mappers emit information about all possible read pair alignments that span a genomic location. Reducers compute a deletion score for each genomic location.}
+\label{algo1}
+\end{figure}
+
+Cloudbreak divides its processing into two distinct MapReduce jobs. The first job finds possible alignment locations for pairs of reads in FASTQ format. The second job computes local SV scores for a set of small windows completely covering the target genome. Finally, the SV scores are exported from the Hadoop file system and post-processed to produce a final set of SV calls which span multiple genomic windows. The Cloudbreak MapReduce algorithm is summarized in \ref{algo1}.
+
+The alignment job uses sensitive alignment tools and settings to discover as many mapping locations for each read pair as possible. In the mapping phase, mappers align reads in single-end mode to the reference genome in parallel, outputing each possible mapping location as a value under a key identifying the read pair. In the reduce phase, Cloudbreak combines pairs of mapping locations for the two ends of a read pair to produce all possible combinations of mapping locations found. 
+
+The Cloudbreak algorithm could use any aligner that is capable of reporting multiple alignments for reads. We report results generated with alignments from Novoalign. \cite{novoalign} Novoalign exhibits higher sensitivity for mapping locations than most aligners, even in the presence of indels and errors, at the expense of greater runtime. \cite{Krawitz:2010iq} In addition, Novoalign can report multiple possible mapping locations for a read and has accurate mapping quality scores \cite{Ruffalo:2011p1758}, which are useful in assigning confidence scores to SV calls. The current implementation is also capable of using MrFast \cite{Alkan:2009cr} as an aligner, although MrFast does not provide mapping quality scores, which makes Cloudbreak predictions less accurate.
+
+In the second job, mappers collect information, namely the insert size and the pair mapping quality, about all of the possible alignments of read pairs that span each genomic locus, defined as a small (25bp) window in the genome reference. Reducers then integrate all of the read pair information for reads that span a given location to produce an SV score indicating the likelihood of an SV affecting that locus. Since scores are computed independently at each locus, this procedure is essentially constructing and analyzing a pileup of reads pairs at each location, making it similar to previous bioinformatic MapReduce algorithms for SNP calling implemented in Crossbow \cite{Langmead:2009p1225} and GATK. \cite{McKenna:2010p1051}
+
+\subsection{Computing Local Deletion Scores}
+
+As described in the previous section, reducers in the second Cloudbreak job compute an SV score indicating the presence or absence of a deletion for each genomic location $l$. Locations are defined as contiguous windows of 25bp covering the entire genome. For each location, Cloudbreak examines the set of possible alignments of read pairs that spans that location, meaning that either of the reads or the insert between them overlaps the location. We begin with the prior probabilities of having or not having a deletion that spans the location, $P(D)$ and $P(\bar{D}) = 1 - P(D)$. Based on the results reported by the 1000 Genomes Project pilot data \cite{Mills:2011p1611} we estimate $P(D)$ as approximately $9x10^{-7}$. Each possible spanning alignment indicates an implied insert size $s$ based on the distance between the alignments of the two ends, as well as a mapping quality that indicates $P(m)$, or the probability that the pair alignment is correct. Based on $s$, for each possible pair alignment we compute $P(s|D)$ and $P(s|\bar{D})$, or the probability of observing an aligning pair with insert size $s$ in the presence or absence of a deletion in the current window. $P(s|{\bar{D}})$ can be estimated using a normal distribution with a mean at the expected fragment size of the read group to which the current pair belongs. We estimate $P(s|D)$ using a lognormal distribution fit to the published range of deletion sizes from the 1000 Genomes Project pilot data. Using our estimated prior probabilities we then compute the quantities
+
+\[ 
+P(D|s) = \frac{P(s|D)P(D)} {P(s|D)P(D) + P(s|\bar{D})P(\bar{D})}
+\]
+
+\[ 
+P(\bar{D}|s) = \frac{P(s|\bar{D})P(\bar{D})}{P(s|D)P(D) + P(s|\bar{D})P(\bar{D})} 
+\]
+
+We then incorporate the probability that the mapping is correct into our current belief in the presence or absence of a deletion at $l$, reasoning that if the mapping is correct it provides evidence that should change the estimate of $P(D)$ at $l$, and if it is incorrect the estimate of $P(D)$ at $l$ is unchanged. The new probabilities $P'(D)$ and $P'(\bar{D})$ for $l$ are after examining a single pair alignment are:
+
+\[ P'(D) = P(m)P(D|s) + (1 - P(m))P(D) \]
+\[ P'(\bar{D}) = P(m)P(\bar{D}|s) + (1 - P(m))P(\bar{D}) \]
+
+We then use this procedure to update $P(D)$ and $P(\bar{D})$ for each alignment spanning $l$, and after all alignments have been considered use the log-likelihood ratio of the two values as a score indicating the presence or absence of a deletion that covers $l$.
+
+To increase the specificity of the algorithm, Cloudbreak can exclude alignments from regions of the genome that are particularly difficult to map. For example, in our current results we exclude possible alignments in which one or both of the reads maps to an annotated segmental duplication, or to a region known to have typical sequencing depth in the top 1\% of the distribution of read depths, likely due to mis-assembly of repetitive sequence in the genome reference. \cite{Pickrell:2011du}
 
 \section{Results}\label{results}
 
-Simulated data
+\subsection{Tests with Simulated Data}
+
+There is no available test set of real Illumina sequencing data from a sample that has a complete annotation of structural variations from the reference. Therefore, testing with simulated data is important to fully characterize an algorithm's performance characteristics. On the other hand, it is important that the simulated data contain realistic SVs that follow patterns of SVs observed in real data. To address this, we took one of the most complete lists of SVs from a single sample available, the list of homozygous deletions from the genome of J. Craig Venter \cite{Levy:2007fb} and applied them to the human GRCh36 chromosome 2 and 17 reference sequences. We then simulated paired Illumina reads from this modified sequence using \emph{dwgsim} from the DNAA software package at varying levels of coverage, and compared results from Cloudbreak with the original list of deletions. A similar approach was recently used by \cite{Sindi:2012kk} to evaluate the performance of GASVPro.
+
+We compared the performance of Cloudbreak for detecting deletions to the previously published methods Breakdancer, \cite{Chen:2009p3} Hydra, \cite{Quinlan:2010gf} GASV, \cite{Sindi:2009gu} and DELLY. \cite{Rausch:2012he}
 
 1000 Genomes Data
 
