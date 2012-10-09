@@ -3,18 +3,16 @@ package edu.ohsu.sonmezsysbio.cloudbreak.command;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
-import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndAlignmentsToPairsReducer;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.MrFastSingleEndMapper;
+import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndAlignmentsToPairsReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.*;
 
-import java.io.*;
-import java.net.URI;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 /**
@@ -72,9 +70,9 @@ public class CommandMrFastSingleEnds extends BaseCloudbreakCommand {
         conf.setOutputKeyClass(Text.class);
         conf.setCompressMapOutput(true);
 
-        conf.setOutputFormat(TextOutputFormat.class);
-        TextOutputFormat.setCompressOutput(conf, true);
-        TextOutputFormat.setOutputCompressorClass(conf, GzipCodec.class);
+        conf.setOutputFormat(SequenceFileOutputFormat.class);
+        conf.set("mapred.output.compress", "true");
+        conf.set("mapred.output.compression", "org.apache.hadoop.io.compress.SnappyCodec");
 
         conf.setReducerClass(SingleEndAlignmentsToPairsReducer.class);
 
