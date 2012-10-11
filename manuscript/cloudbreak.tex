@@ -29,15 +29,11 @@ This is the paper's abstract \ldots
 
 Genomic structural variation
 
-
-
 Difficulty of detection.. Lack of concordance of current algorithms...
 
 Typical algorithms use only unambiguous discordant read pair mappings...
 
-Hadoop/MapReduce as framework for processing complete data sets
-
-Use of the Hadoop framework has been demonstrated for sequencing-related bioinformatic tasks including short read mapping, \cite{Schatz:2009p278} querying variant databases, \cite{Oconnor:2010p1835} SNP calling, \cite{Langmead:2009p1225} RNA-seq differential expression analysis, \cite{Langmead:2010p1268} ChIP-seq peak calling, \cite{Feng:2011p1228} and computing genome mappability. \cite{Lee:2012bk}
+Use of the Hadoop framework has been demonstrated for sequencing-related bioinformatic tasks including short read mapping, \cite{Schatz:2009p278} querying variant databases, \cite{Oconnor:2010p1835} single nucleotide polymorphism (SNP) calling, \cite{Langmead:2009p1225} RNA-seq differential expression analysis, \cite{Langmead:2010p1268} ChIP-seq peak calling, \cite{Feng:2011p1228} and computing genome mappability. \cite{Lee:2012bk} The MapReduce programming style lends itself particularly well towards resequencing tasks such as SNP calling, in which a result can be computed independently for various locations along the genome. As mentioned previously, most algorithms for SV calling work by clustering discordant read pairs across the genome, an operation that does not lend itself to easy parallelization. Cloudbreak instead independently computes local scores for small contiguous regions along the genome. The recently published method forestSV \cite{Michaelson:2012fj} showed that SV detection from computation of local scores is a promising approach, since multiple features can be extracted from reads aligning to or near each region, and integrated with features built from genome annotations in machine learning frameworks. This approach also allows the use of a MapReduce programming style and opens the door to cluster computing for SV detection.
 
 \section{Methods}\label{Methods}
 
@@ -111,9 +107,9 @@ To increase the specificity of the algorithm, Cloudbreak can exclude alignments 
 
 \subsection{Tests with Simulated Data}
 
-There is no available test set of real Illumina sequencing data from a sample that has a complete annotation of structural variations from the reference. Therefore, testing with simulated data is important to fully characterize an algorithm's performance characteristics. On the other hand, it is important that the simulated data contain realistic SVs that follow patterns of SVs observed in real data. To address this, we took one of the most complete lists of SVs from a single sample available, the list of homozygous deletions from the genome of J. Craig Venter \cite{Levy:2007fb} and applied them to the human GRCh36 chromosome 2 and 17 reference sequences. We then simulated paired Illumina reads from this modified sequence using \emph{dwgsim} from the DNAA software package at varying levels of coverage, and compared results from Cloudbreak with the original list of deletions. A similar approach was recently used by \cite{Sindi:2012kk} to evaluate the performance of GASVPro.
+There is no available test set of real Illumina sequencing data from a sample that has a complete annotation of structural variations from the reference. Therefore, testing with simulated data is important to fully characterize an algorithm's performance characteristics. On the other hand, it is important that the simulated data contain realistic SVs that follow patterns of SVs observed in real data. To address this, we took one of the most complete lists of SVs from a single sample available, the list of homozygous deletions from the genome of J. Craig Venter \cite{Levy:2007fb} and applied them to the human GRCh36 chromosome 2 and 17 reference sequences. We then simulated 50bp paired Illumina reads with a fragment size of 200bp from this modified sequence using \emph{dwgsim} from the DNAA software package \cite{DNAA} at varying levels of coverage, and compared results from Cloudbreak with the original list of deletions. A similar approach was recently used by \cite{Sindi:2012kk} to evaluate the performance of GASVPro.
 
-We compared the performance of Cloudbreak for detecting deletions to the previously published methods Breakdancer, \cite{Chen:2009p3} Hydra, \cite{Quinlan:2010gf} GASV, \cite{Sindi:2009gu} and DELLY. \cite{Rausch:2012he}
+We compared the performance of Cloudbreak for detecting deletions to the previously published methods Breakdancer, \cite{Chen:2009p3} Hydra, \cite{Quinlan:2010gf} GASV, \cite{Sindi:2009gu} and DELLY. \cite{Rausch:2012he} 
 
 1000 Genomes Data
 
