@@ -26,7 +26,7 @@ public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements
 
     //{ log.setLevel(Level.DEBUG); }
 
-    ReadPairInfoScorer readPairInfoScorer = new IncrementalDelBeliefUpdateReadPairInfoScorer();
+    ReadPairInfoScorer readPairInfoScorer = new GenotypingGMMScorer();
 
     public ReadPairInfoScorer getReadPairInfoScorer() {
         return readPairInfoScorer;
