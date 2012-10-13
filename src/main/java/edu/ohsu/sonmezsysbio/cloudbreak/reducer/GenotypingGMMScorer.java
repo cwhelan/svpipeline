@@ -172,7 +172,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             }
         }
         double[] initialW = new double[]{.5,.5};
-        double[] initialMu = new double[]{0,};
+        double[] initialMu = new double[]{0,1000};
         double[] insertSizeArray = new double[insertSizes.size()];
         for (int i = 0; i < insertSizes.size(); i++) {
             insertSizeArray[i] = insertSizes.get(i);
