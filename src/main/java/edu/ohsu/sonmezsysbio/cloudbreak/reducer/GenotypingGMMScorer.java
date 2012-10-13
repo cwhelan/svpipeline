@@ -171,6 +171,9 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
                 maxSD = readGroupInfo.isizeSD;
             }
         }
+        if (insertSizes.size() >= 100) {
+            return -1;
+        }
         double[] initialW = new double[]{.5,.5};
         double[] initialMu = new double[]{0,1000};
         double[] insertSizeArray = new double[insertSizes.size()];
