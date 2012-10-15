@@ -11,19 +11,11 @@ public interface AlignmentRecord {
 
     String getChromosomeName();
 
-    void setChromosomeName(String chromosomeName);
-
     int getPosition();
-
-    void setPosition(int position);
 
     boolean isForward();
 
-    void setForward(boolean forward);
-
     String getReadId();
-
-    void setReadId(String readId);
 
     int getSequenceLength();
 

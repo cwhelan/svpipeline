@@ -9,7 +9,7 @@ import java.util.Map;
  * Date: 5/23/11
  * Time: 10:44 AM
  */
-public class SAMRecord {
+public class SAMRecord implements AlignmentRecord {
 
     int flag;
     Map<String,String> tags = new HashMap<String, String>();
@@ -17,18 +17,22 @@ public class SAMRecord {
     String pairReferenceName;
     int position;
     int insertSize;
+    String readPairId;
+    String sequence;
 
     public static SAMRecord parseSamRecord(String[] fields) {
         SAMRecord samRecord = new SAMRecord();
-        samRecord.setFlag(Integer.parseInt(fields[1]));
-        samRecord.setReferenceName(fields[2]);
-        samRecord.setPosition(Integer.parseInt(fields[3]));
+        samRecord.readPairId = fields[0];
+        samRecord.flag = Integer.parseInt(fields[1]);
+        samRecord.referenceName = fields[2];
+        samRecord.position = Integer.parseInt(fields[3]);
+        samRecord.sequence = fields[9];
         if (! samRecord.isMapped()) {
             return samRecord;
         }
 
-        samRecord.setPairReferenceName(fields[6]);
-        samRecord.setInsertSize(Integer.parseInt(fields[8]));
+        samRecord.pairReferenceName = fields[6];
+        samRecord.insertSize = Integer.parseInt(fields[8]);
 
         int optionalFieldsStart = 11;
         for (int i = optionalFieldsStart; i < fields.length; i++) {
@@ -38,43 +42,28 @@ public class SAMRecord {
     }
 
     public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
+        // todo: off-by-one error here?
+        if (isForward()) {
+            return position;
+        } else {
+            return position + sequence.length();
+        }
     }
 
     public int getInsertSize() {
         return insertSize;
     }
 
-    public void setInsertSize(int insertSize) {
-        this.insertSize = insertSize;
-    }
-
     public String getReferenceName() {
         return referenceName;
-    }
-
-    public void setReferenceName(String referenceName) {
-        this.referenceName = referenceName;
     }
 
     public String getPairReferenceName() {
         return pairReferenceName;
     }
 
-    public void setPairReferenceName(String pairReferenceName) {
-        this.pairReferenceName = pairReferenceName;
-    }
-
     public int getFlag() {
         return flag;
-    }
-
-    public void setFlag(int flag) {
-        this.flag = flag;
     }
 
     public void addTag(String tag) {
@@ -114,8 +103,31 @@ public class SAMRecord {
         return ((flag & 0x2) == 0x2);
     }
 
-
     public boolean isAlignmentOfFirstRead() {
         return ((flag & 0x40) == 0x40);
+    }
+
+    public String getSequence() {
+        return sequence;
+    }
+
+    public String getChromosomeName() {
+        return getReferenceName();
+    }
+
+    public boolean isForward() {
+        return ! isReverseComplemented();
+    }
+
+    public String getReadId() {
+        return readPairId;
+    }
+
+    public int getSequenceLength() {
+        return getSequence().length();
+    }
+
+    public void setFlag(int i) {
+        flag = i;
     }
 }

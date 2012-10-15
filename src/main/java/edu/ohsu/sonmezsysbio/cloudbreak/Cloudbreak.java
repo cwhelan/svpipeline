@@ -19,6 +19,7 @@ public class Cloudbreak extends Configured implements Tool
 
     public static final String ALIGNER_NOVOALIGN = "novoalign";
     public static final String ALIGNER_MRFAST = "mrfast";
+    public static final String ALIGNER_GENERIC_SAM = "sam";
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new Cloudbreak(), args);
@@ -58,6 +59,10 @@ public class Cloudbreak extends Configured implements Tool
 
         CommandReadPairedEndFilesIntoHDFS readFiles = new CommandReadPairedEndFilesIntoHDFS();
         jc.addCommand("readPairedEndFilesIntoHDFS", readFiles);
+
+        CommandReadSAMFileIntoHDFS readSamFile = new CommandReadSAMFileIntoHDFS();
+        jc.addCommand("readSAMFileIntoHDFS", readSamFile);
+
         CommandNovoalignSingleEnds singleEnds  = new CommandNovoalignSingleEnds();
         jc.addCommand("alignSingleEnds", singleEnds);
 

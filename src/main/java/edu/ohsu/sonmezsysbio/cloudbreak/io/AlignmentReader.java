@@ -25,6 +25,7 @@ public interface AlignmentReader {
         public static AlignmentReader getInstance(String aligner) {
             if (Cloudbreak.ALIGNER_NOVOALIGN.equals(aligner)) return new NovoalignAlignmentReader();
             if (Cloudbreak.ALIGNER_MRFAST.equals(aligner)) return new MrfastAlignmentReader();
+            if (Cloudbreak.ALIGNER_GENERIC_SAM.equals(aligner)) return new SAMAlignmentReader();
             return null;
         }
 

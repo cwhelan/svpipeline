@@ -147,25 +147,5 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         System.out.println("Loaded " + numRecords + " records.");
     }
 
-    static class HDFSWriter {
-        public BufferedWriter textFileWriter;
-        public SequenceFile.Writer seqFileWriter;
-
-        public void write(long recordNum, String line) throws IOException {
-            if (textFileWriter != null) {
-                textFileWriter.write(line);
-            } else {
-                seqFileWriter.append(new LongWritable(recordNum), new Text(line));
-            }
-        }
-
-        public void close() throws IOException {
-            if (textFileWriter != null) {
-                textFileWriter.close();
-            } else {
-                seqFileWriter.close();
-            }
-        }
-    }
 }
 

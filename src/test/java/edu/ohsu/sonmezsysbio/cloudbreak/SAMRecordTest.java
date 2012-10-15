@@ -31,4 +31,6 @@ public class SAMRecordTest {
         samRecord.addTag("PQ:i:340");
         assertEquals(340, samRecord.getPairPosterior());
     }
+
+
 }
