@@ -35,6 +35,14 @@ public class GenotypingGMMScorerTest {
     }
 
     @Test
+    public void testNncleanNotEnoughValues() throws Exception {
+        double[] y = new double[] {260.0736, 1217.8588};
+        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
+        double[] nonnoise = new double[] {};
+        assertArrayEquals(nonnoise, scorer.nnclean(y, 30, 2), 0.000001);
+    }
+
+    @Test
     public void testEstimateW() throws Exception {
         double[] y = new double[] {260.0736, 197.4272,   194.8618,  1217.8588,
                 1228.2190,  1151.7017,  4511.5326, 19719.9700, 19707.2091, 16788.1891,

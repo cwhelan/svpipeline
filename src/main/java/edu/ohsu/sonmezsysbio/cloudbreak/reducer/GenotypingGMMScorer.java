@@ -110,6 +110,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
     }
 
     public double[] nnclean(double[] y, double sigma, int m) {
+        if (m >= y.length) return new double[]{};
         List<Double> ysWithCloseNeighbors = new ArrayList<Double>();
 
         // todo: there's a much better way to do this: sort ys and only calculate distances of neigbors
