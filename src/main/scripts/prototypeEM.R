@@ -20,10 +20,15 @@ sim.hetdel <- function(coverage, del.size, insert.mean=200, insert.sd=30, max.in
   c(nodel.inserts, del.inserts, noise.inserts)
 }
 
+mylognorm <- function(y, mu, sigma) {
+  -1 * log(sigma + sqrt(2 * pi)) + -1 / 2 * ((y - mu) / sigma) ^ 2
+}
+
 likelihood <- function(y, w, mu, sigma) {
-  m1.likelihoods <- dnorm(y, mu[1], sigma, log=TRUE)
-  m2.likelihoods <- dnorm(y, mu[2], sigma, log=TRUE)
-  
+  #m1.likelihoods <- dnorm(y, mu[1], sigma, log=TRUE)
+  #m2.likelihoods <- dnorm(y, mu[2], sigma, log=TRUE)
+  m1.likelihoods <- mylognorm(y, mu[1], sigma)
+  m2.likelihoods <- mylognorm(y, mu[2], sigma)
   weighted.likelihoods <- exp(w[1]) *  m1.likelihoods + exp(w[2]) * m2.likelihoods
   mean(weighted.likelihoods)
 }
@@ -36,16 +41,16 @@ logsumexp <- function(x) {
 
 gamma <- function(y, w, mu, sigma) {
   m1.likelihood <- w[1] + dnorm(y, mu[1], sigma, log=TRUE)
-  print("m1")
-  print(m1.likelihood)
-  print(exp(m1.likelihood))
+  #print("m1")
+  #print(m1.likelihood)
+  #print(exp(m1.likelihood))
   m2.likelihood <- w[2] + dnorm(y, mu[2], sigma, log=TRUE)
-  print("m2")
-  print(m2.likelihood)
-  print(exp(m2.likelihood))
+  #print("m2")
+  #print(m2.likelihood)
+  #print(exp(m2.likelihood))
   total.likelihood <- apply(cbind(m1.likelihood, m2.likelihood), 1, logsumexp)
-  print("total likelihood")
-  print(total.likelihood)
+  #print("total likelihood")
+  #print(total.likelihood)
   gamma1 <- m1.likelihood - total.likelihood
   gamma2 <- m2.likelihood - total.likelihood
   cbind(gamma1,gamma2)
@@ -60,8 +65,9 @@ w.update <- function(n, y) {
   n - log(length(y))
 }
 
-mu2.update <- function(gamma, y) {
-   sum(exp(gamma[,2] + log(y))) / sum(exp(gamma[,2]))
+mu2.update <- function(gamma, y, n) {
+  #print(paste("mu2 update n: ", logsumexp(gamma[,2] + log(y))))
+  exp(logsumexp(gamma[,2] + log(y)) - n[2])
 }
 
 em.step <- function(y, w, mu, sigma) {
@@ -70,11 +76,12 @@ em.step <- function(y, w, mu, sigma) {
   n.m <- n.calc(gamma.m)
   #print(n.m)
   w.1 <- w.update(n.m, y)  
-  mu2.1 <- mu2.update(gamma.m, y)
+  mu2.1 <- mu2.update(gamma.m, y, n.m)
   list(w=w.1, mu2=mu2.1)
 }
 
 em.w <- function(y, w, mu, sigma, max.iter=10) {
+  mu1 <- mu[1]
   #y <- y[NNclean(y, ceiling(length(y)/5))$z == 1]
   #print(y)
   y <- y[mynnclean(y, sigma)]
@@ -83,12 +90,13 @@ em.w <- function(y, w, mu, sigma, max.iter=10) {
     return(log(c(1,0)))
   }
   l <- likelihood(y, w, mu, sigma)
-  #print(paste("l:", l))
+  #print(paste("initial l:", l))
   i <- 1
   repeat {  
     updates <- em.step(y,w,mu,sigma)
+    #print(paste("updates: ", updates))
     w <- updates$w
-    mu <- c(200, updates$mu2)
+    mu <- c(mu1, updates$mu2)
     l.prime <- likelihood(y, w, mu, sigma)  
     #print(paste("l:", l.prime))
     #print(paste("w:", w))
@@ -99,7 +107,7 @@ em.w <- function(y, w, mu, sigma, max.iter=10) {
     }
   l <- l.prime
   }
-  print(mu)
+  #print(mu)
   w
 }
 
@@ -215,7 +223,7 @@ testmclust <- function(samples=300) {
   for (coverage in c(5,8,10,20)) {
     for (noise in c(1,10)) {
       for (dsize in c(75, 100, 200, 500, 1000)) {
-        print(paste("Coverage =", coverage, "Number of noise points =", noise, "Deletion size =", dsize))
+        #print(paste("Coverage =", coverage, "Number of noise points =", noise, "Deletion size =", dsize))
         truth = c(rep(0,(samples/3)), rep(1,(samples/3)), rep(2,(samples/3)))      
         nodelpred = vector(mode="numeric", length=(samples/3))
         for (i in 1:(samples/3)) {     
@@ -233,8 +241,8 @@ testmclust <- function(samples=300) {
           hompred[i] <- call_with_mclust(y)
         }
         preds <- c(nodelpred,hetpred,hompred)
-        print(table(data.frame(truth=truth, pred=preds)))
-        print(paste("accuracy:", sum(ifelse(is.na(preds), -1, preds) == truth) / samples))
+        #print(table(data.frame(truth=truth, pred=preds)))
+        #print(paste("accuracy:", sum(ifelse(is.na(preds), -1, preds) == truth) / samples))
       }
     }
   }

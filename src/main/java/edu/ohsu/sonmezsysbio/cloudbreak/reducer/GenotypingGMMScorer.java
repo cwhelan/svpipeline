@@ -3,11 +3,12 @@ package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 import com.google.common.primitives.Doubles;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+
+import static org.apache.commons.math3.stat.StatUtils.mean;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,21 +20,23 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
 
-    { log.setLevel(Level.DEBUG); }
+    // { log.setLevel(Level.DEBUG); }
 
-    private double[] pointLikelihoods(double[] y, NormalDistribution d) {
+    private double[] pointLikelihoods(double[] y, double mu, double sigma) {
         double[] pointLikelihoods = new double[y.length];
         for (int i = 0; i < y.length; i++) {
-            pointLikelihoods[i] = Math.log(d.density(y[i]));
+            pointLikelihoods[i] = lognormal(y[i], mu, sigma);
         }
         return pointLikelihoods;
     }
 
-    private double likelihood(double[] y, double[] w, double[] mu, double sigma) {
-        NormalDistribution d1 = new NormalDistribution(mu[0], sigma);
-        NormalDistribution d2 = new NormalDistribution(mu[1], sigma);
-        double[] d1PointLikelihoods = pointLikelihoods(y, d1);
-        double[] d2PointLikelihoods = pointLikelihoods(y, d2);
+    private double lognormal(double y, double mu, double sigma) {
+        return -1.0 * Math.log(sigma + Math.sqrt(2.0 * Math.PI)) + -1.0 / 2.0 * Math.pow(((y - mu) / sigma), 2);
+    }
+
+    double likelihood(double[] y, double[] w, double[] mu, double sigma) {
+        double[] d1PointLikelihoods = pointLikelihoods(y, mu[0], sigma);
+        double[] d2PointLikelihoods = pointLikelihoods(y, mu[1], sigma);
         double sumWeightedLikelihoods = 0;
         int i = 0;
         for (i = 0; i < y.length; i++) {
@@ -53,15 +56,16 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
     }
 
     private double[][] gamma(double[] y, double[] w, double[] mu, double sigma) {
-        NormalDistribution d1 = new NormalDistribution(mu[0], sigma);
-        NormalDistribution d2 = new NormalDistribution(mu[1], sigma);
         double[] m1likelihoods = new double[y.length];
         double[] m2likelihoods = new double[y.length];
         double[][] gamma = new double[y.length][2];
         for (int i = 0; i < y.length; i++) {
-            m1likelihoods[i] = w[0] + Math.log(d1.density(y[i]));
-            m2likelihoods[i] = w[1] + Math.log(d2.density(y[i]));
+            m1likelihoods[i] = w[0] + lognormal(y[i], mu[0], sigma);
+            m2likelihoods[i] = w[1] + lognormal(y[i], mu[1], sigma);
+            log.debug("m1likelihoods[" + i +"] " + m1likelihoods[i]);
+            log.debug("m2likelihoods[" + i +"] " + m2likelihoods[i]);
             double total = logsumexp(new double[] {m1likelihoods[i], m2likelihoods[i]});
+            log.debug("total likelihood[" + i + "]: "+ total);
             gamma[i][0] = m1likelihoods[i] - total;
             gamma[i][1] = m2likelihoods[i] - total;
         }
@@ -89,14 +93,15 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         return w;
     }
 
-    double updateMu2(double[][] gamma, double[] y) {
-        double n = 0;
-        double d = 0;
+    double updateMu2(double[][] gamma, double[] y, double[] n) {
+        double numerator = 0;
+        double[] lse = new double[y.length];
         for (int i = 0; i < y.length; i++) {
-            n += Math.exp(gamma[i][1] + Math.log(y[i]));
-            d += Math.exp(gamma[i][1]);
+            lse[i] = gamma[i][1] + Math.log(y[i]);
         }
-        return n / d;
+        numerator = logsumexp(lse);
+        log.debug("update mu2 n " +  numerator);
+        return Math.exp(numerator - n[1]);
     }
 
     private static class EMUpdates {
@@ -114,9 +119,21 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     private EMUpdates emStep(double[] y, double[] w, double[] mu, double sigma) {
         double[][] gamma = gamma(y, w, mu, sigma);
+        if (log.isDebugEnabled()) {
+            for (int i = 0; i < gamma.length; i++) {
+                for (int j = 0; j < gamma[i].length; j++) {
+                    log.debug("gamma[" + i + "][" + j + "] = "  + gamma[i][j]);
+                }
+            }
+        }
         double[] n = cacluateN(gamma);
+        log.debug("n[0] " + n[0]);
+        log.debug("n[1] " + n[1]);
         double[] wprime = updateW(n, y);
-        double mu2prime = updateMu2(gamma, y);
+        log.debug("wprime[0] " + wprime[0]);
+        log.debug("wprime[1] " + wprime[1]);
+        double mu2prime = updateMu2(gamma, y, n);
+        log.debug(mu2prime);
         EMUpdates updates = new EMUpdates();
         updates.w = wprime;
         updates.mu2 = mu2prime;
@@ -149,7 +166,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         return result;
     }
 
-    public double estimateW(double[] y, double[] initialW, double[] initialMu, double sigma) {
+    public double estimateW(double[] y, double[] initialW, double initialMu1, double sigma) {
         int maxIterations = 10;
         if (log.isDebugEnabled()) {
             log.debug("ys:");
@@ -169,6 +186,8 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             log.debug("not enough ycleans, returning 1");
             return 1;
         }
+        double[] initialMu = new double[]{initialMu1,mean(yclean)};
+
         int i = 1;
         double[] w = initialW;
         double[] mu = initialMu;
@@ -189,6 +208,10 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             }
             l = lprime;
         }
+        if (Math.abs(mu[1] - mu[0]) < sigma) {
+            log.debug("means too close, returning " + 0);
+            return 0;
+        }
         log.debug("returning " + w[0]);
         return w[0];
     }
@@ -196,12 +219,17 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         List<Double> insertSizes = new ArrayList<Double>();
         double maxSD = 0;
+        if (readGroupInfos.values().size() > 1) {
+            throw new UnsupportedOperationException("GMM Reducer can't work with more than one read group right now");
+        }
+        int targetIsize = 0;
         while (values.hasNext()) {
             ReadPairInfo rpi = values.next();
             int insertSize = rpi.insertSize;
             short readGroupId = rpi.readGroupId;
             ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupId);
-            insertSizes.add((double) (insertSize - readGroupInfo.isize));
+            targetIsize = readGroupInfo.isize;
+            insertSizes.add((double) (insertSize));
             if (readGroupInfo.isizeSD > maxSD) {
                 maxSD = readGroupInfo.isizeSD;
             }
@@ -209,12 +237,12 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         if (insertSizes.size() >= 100) {
             return -1;
         }
-        double[] initialW = new double[]{.5,.5};
-        double[] initialMu = new double[]{0,1000};
+        double[] initialW = new double[]{Math.log(.5),Math.log(.5)};
         double[] insertSizeArray = new double[insertSizes.size()];
         for (int i = 0; i < insertSizes.size(); i++) {
             insertSizeArray[i] = insertSizes.get(i);
         }
-        return estimateW(insertSizeArray, initialW, initialMu, maxSD);
+
+        return estimateW(insertSizeArray, initialW, targetIsize, maxSD);
     }
 }
