@@ -92,7 +92,7 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
             if (currentReadName.equals("")) {
                 currentReadName = readName;
             }
-
+            System.err.println("trying " + samRecord.getSAMString());
             if (samRecord.getFirstOfPairFlag()) {
                 read1Records.add(samRecord.getSAMString().trim());
             } else {
