@@ -4,6 +4,8 @@ import com.google.common.primitives.Doubles;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -14,6 +16,10 @@ import java.util.*;
  * Time: 9:17 PM
  */
 public class GenotypingGMMScorer implements ReadPairInfoScorer {
+
+    private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
+
+    { log.setLevel(Level.DEBUG); }
 
     private double[] pointLikelihoods(double[] y, NormalDistribution d) {
         double[] pointLikelihoods = new double[y.length];
@@ -96,6 +102,14 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
     private static class EMUpdates {
         double[] w;
         double mu2;
+
+        @Override
+        public String toString() {
+            return "EMUpdates{" +
+                    "w=" + w[0] + ", " + w[1] +
+                    ", mu2=" + mu2 +
+                    '}';
+        }
     }
 
     private EMUpdates emStep(double[] y, double[] w, double[] mu, double sigma) {
@@ -137,25 +151,45 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     public double estimateW(double[] y, double[] initialW, double[] initialMu, double sigma) {
         int maxIterations = 10;
+        if (log.isDebugEnabled()) {
+            log.debug("ys:");
+            for (int i = 0; i < y.length; i++) {
+                log.debug(y[i]);
+            }
+        }
         double[] yclean = nnclean(y, sigma, 2);
+        if (log.isDebugEnabled()) {
+            log.debug("ycleans:");
+            for (int i = 0; i < yclean.length; i++) {
+                log.debug(yclean[i]);
+            }
+        }
+
         if (yclean.length == 0) {
+            log.debug("not enough ycleans, returning 1");
             return 1;
         }
         int i = 1;
         double[] w = initialW;
         double[] mu = initialMu;
         double l = likelihood(yclean, w, mu, sigma);
+        log.debug("initial likelihood: " + l);
         while(true) {
             EMUpdates updates = emStep(yclean, w, mu, sigma);
+            if (log.isDebugEnabled()) {
+                log.debug("updates: " + updates.toString());
+            }
             w = updates.w;
             mu[1] = updates.mu2;
             double lprime = likelihood(yclean, w, mu, sigma);
+            log.debug("new likelihood: " + l);
             i += 1;
             if (Math.abs(l - lprime) < 0.0001 || i > maxIterations) {
                 break;
             }
             l = lprime;
         }
+        log.debug("returning " + w[0]);
         return w[0];
     }
 

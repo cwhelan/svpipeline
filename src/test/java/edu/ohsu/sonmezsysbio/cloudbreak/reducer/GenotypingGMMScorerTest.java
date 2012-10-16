@@ -1,6 +1,14 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
+import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -67,4 +75,60 @@ public class GenotypingGMMScorerTest {
         assertEquals(1, Math.exp(scorer.estimateW(y, initialW, initialMu, sigma)), 0.0001);
     }
 
+    public void testReduce_2_91700() throws Exception {
+        double[] y = new double[] {152,
+                216,
+                194,
+                169,
+                202,
+                237,
+                178,
+                202,
+                208,
+                210,
+                247,
+                227,
+                182,
+                207,
+                191,
+                147,
+                251,
+                236,
+                209,
+                200,
+                204,
+                184,
+                158,
+                152,
+                255,
+                227,
+                185,
+                183,
+                204,
+                226,
+                276,
+                207,
+                223
+        };
+
+        ReadGroupInfo readGroupInfo = new ReadGroupInfo();
+        readGroupInfo.isize = 200;
+        readGroupInfo.isizeSD = 30;
+
+        List<ReadPairInfo> rpis = new ArrayList<ReadPairInfo>();
+        for (int i = 0; i < y.length; i++) {
+            double isize = y[i];
+            ReadPairInfo rpi = new ReadPairInfo();
+            rpi.insertSize = (int) isize;
+            rpi.readGroupId = 0;
+            rpis.add(rpi);
+        }
+
+        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
+
+        Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
+        rgis.put((short) 0, readGroupInfo);
+        double score = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
+        assertEquals(1, score, 0.00001);
+    }
 }
