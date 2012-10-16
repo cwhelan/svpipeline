@@ -74,6 +74,7 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
     }
     private void readFile(HDFSWriter writer, String samFile) throws IOException {
         SAMFileReader samFileReader = new SAMFileReader(new File(samFile));
+        samFileReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
         SAMRecordIterator it = samFileReader.iterator();
         String currentReadName = "";
         List<String> read1Records = new ArrayList<String>();
@@ -92,7 +93,7 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
             if (currentReadName.equals("")) {
                 currentReadName = readName;
             }
-            if (samRecord.getReadPairedFlag()) {
+            if (samRecord.getReadPairedFlag() && ! samRecord.getReadUnmappedFlag()) {
                 if (samRecord.getFirstOfPairFlag()) {
                     read1Records.add(samRecord.getSAMString().trim());
                 } else {
