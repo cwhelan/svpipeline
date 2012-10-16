@@ -11,7 +11,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.SnappyCodec;
@@ -54,7 +53,7 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
 
         HDFSWriter writer = new HDFSWriter();
         if ("snappy".equals(compress)) {
-            writer.seqFileWriter = SequenceFile.createWriter(hdfs, config, p, LongWritable.class, Text.class, SequenceFile.CompressionType.BLOCK, new SnappyCodec());
+            writer.seqFileWriter = SequenceFile.createWriter(hdfs, config, p, Text.class, Text.class, SequenceFile.CompressionType.BLOCK, new SnappyCodec());
         } else {
             FSDataOutputStream outputStream = hdfs.create(p);
             BufferedWriter bufferedWriter = null;
@@ -85,7 +84,7 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
             SAMRecord samRecord = it.next();
             String readName = samRecord.getReadName();
             if (! readName.equals(currentReadName) && ! currentReadName.equals("")) {
-                writeRecords(writer, read1Records, read2Records, readAlignmentJoiner, i);
+                writeRecords(currentReadName, writer, read1Records, read2Records, readAlignmentJoiner, i);
                 currentReadName = readName;
                 i++;
             }
@@ -101,12 +100,12 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
                 }
             }
         }
-        writeRecords(writer, read1Records, read2Records, readAlignmentJoiner, i);
+        writeRecords(currentReadName, writer, read1Records, read2Records, readAlignmentJoiner, i);
     }
 
-    private void writeRecords(HDFSWriter writer, List<String> read1Records, List<String> read2Records, Joiner readAlignmentJoiner, long i) throws IOException {
+    private void writeRecords(String currentReadName, HDFSWriter writer, List<String> read1Records, List<String> read2Records, Joiner readAlignmentJoiner, long i) throws IOException {
         if (read1Records.size() > 0 && read2Records.size() > 0) {
-            writer.write(i, readAlignmentJoiner.join(read1Records) + Cloudbreak.READ_SEPARATOR + readAlignmentJoiner.join(read2Records) + "\n");
+            writer.write(new Text(currentReadName), readAlignmentJoiner.join(read1Records) + Cloudbreak.READ_SEPARATOR + readAlignmentJoiner.join(read2Records) + "\n");
         }
         read1Records.clear();
         read2Records.clear();

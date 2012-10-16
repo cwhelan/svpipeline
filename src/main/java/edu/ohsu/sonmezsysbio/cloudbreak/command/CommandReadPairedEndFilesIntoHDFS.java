@@ -79,7 +79,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         try {
             String convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
             while (convertedFastqLine != null) {
-                writer.write(numRecords, convertedFastqLine);
+                writer.write(new LongWritable(numRecords), convertedFastqLine);
                 convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
                 numRecords++;
             }

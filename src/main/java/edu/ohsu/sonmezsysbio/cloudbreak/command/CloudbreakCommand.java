@@ -21,11 +21,11 @@ public interface CloudbreakCommand {
         public BufferedWriter textFileWriter;
         public SequenceFile.Writer seqFileWriter;
 
-        public void write(long recordNum, String line) throws IOException {
+        public void write(Object key, String line) throws IOException {
             if (textFileWriter != null) {
                 textFileWriter.write(line);
             } else {
-                seqFileWriter.append(new LongWritable(recordNum), new Text(line));
+                seqFileWriter.append(key, new Text(line));
             }
         }
 
