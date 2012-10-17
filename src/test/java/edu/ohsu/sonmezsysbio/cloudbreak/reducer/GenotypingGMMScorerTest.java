@@ -60,7 +60,7 @@ public class GenotypingGMMScorerTest {
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-        assertEquals(.5, Math.exp(scorer.estimateW(y, initialW, 200, sigma)), 0.0001);
+        assertEquals(.5, scorer.estimateW(y, initialW, 200, sigma), 0.0001);
     }
 
     public void testEstimateWNoValues() throws Exception {
@@ -70,7 +70,7 @@ public class GenotypingGMMScorerTest {
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-        assertEquals(1, Math.exp(scorer.estimateW(y, initialW, 200, sigma)), 0.0001);
+        assertEquals(1, scorer.estimateW(y, initialW, 200, sigma), 0.0001);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class GenotypingGMMScorerTest {
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
         double score = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
-        assertEquals(1, Math.exp(score), 0.00001);
+        assertEquals(0, score, 0.00001);
     }
 
     @Test
@@ -186,7 +186,7 @@ public class GenotypingGMMScorerTest {
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
         double score = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
-        assertEquals(0, Math.exp(score), 0.0001);
+        assertEquals(0, score, 0.0001);
     }
 
     @Test
