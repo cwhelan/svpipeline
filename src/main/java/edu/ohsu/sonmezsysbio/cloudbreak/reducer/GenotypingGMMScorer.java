@@ -210,8 +210,8 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             l = lprime;
         }
         if (Math.abs(mu[1] - mu[0]) < 2 * sigma) {
-            log.debug("means too close, returning " + 0);
-            return 0;
+            log.debug("means too close, returning 1");
+            return 1;
         }
         log.debug("returning " + Math.exp(w[0]));
         return Math.exp(w[0]);
@@ -223,16 +223,25 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         if (readGroupInfos.values().size() > 1) {
             throw new UnsupportedOperationException("GMM Reducer can't work with more than one read group right now");
         }
+        boolean first = true;
         int targetIsize = 0;
+        double bestMappingQuality = 0;
         while (values.hasNext()) {
             ReadPairInfo rpi = values.next();
+            if (! first & (bestMappingQuality - rpi.pMappingCorrect > 6)) {
+                break;
+            }
             int insertSize = rpi.insertSize;
             short readGroupId = rpi.readGroupId;
             ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupId);
-            targetIsize = readGroupInfo.isize;
             insertSizes.add((double) (insertSize));
             if (readGroupInfo.isizeSD > maxSD) {
                 maxSD = readGroupInfo.isizeSD;
+            }
+            if (first) {
+                targetIsize = readGroupInfo.isize;
+                bestMappingQuality = rpi.pMappingCorrect;
+                first = false;
             }
         }
         if (insertSizes.size() >= MAX_COVERAGE) {
