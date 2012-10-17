@@ -20,7 +20,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
 
-    { log.setLevel(Level.DEBUG); }
+    //{ log.setLevel(Level.DEBUG); }
 
     private double[] pointLikelihoods(double[] y, double mu, double sigma) {
         double[] pointLikelihoods = new double[y.length];
@@ -184,7 +184,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
         if (yclean.length == 0) {
             log.debug("not enough ycleans, returning 1");
-            return 1;
+            return -1;
         }
         double[] initialMu = new double[]{initialMu1,mean(yclean)};
 
@@ -208,12 +208,12 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             }
             l = lprime;
         }
-        if (Math.abs(mu[1] - mu[0]) < sigma) {
+        if (Math.abs(mu[1] - mu[0]) < 2 * sigma) {
             log.debug("means too close, returning " + 0);
             return 0;
         }
-        log.debug("returning " + w[0]);
-        return w[0];
+        log.debug("returning " + Math.exp(w[0]));
+        return Math.exp(w[0]);
     }
 
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
