@@ -19,6 +19,7 @@ import static org.apache.commons.math3.stat.StatUtils.mean;
 public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
+    public static final int MAX_COVERAGE = 200;
 
     { log.setLevel(Level.INFO); }
 
@@ -234,8 +235,8 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
                 maxSD = readGroupInfo.isizeSD;
             }
         }
-        if (insertSizes.size() >= 100) {
-            return -1;
+        if (insertSizes.size() >= MAX_COVERAGE) {
+            insertSizes = insertSizes.subList(0, MAX_COVERAGE);
         }
         double[] initialW = new double[]{Math.log(.5),Math.log(.5)};
         double[] insertSizeArray = new double[insertSizes.size()];
