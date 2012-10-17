@@ -20,7 +20,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
 
-    // { log.setLevel(Level.DEBUG); }
+    { log.setLevel(Level.DEBUG); }
 
     private double[] pointLikelihoods(double[] y, double mu, double sigma) {
         double[] pointLikelihoods = new double[y.length];
