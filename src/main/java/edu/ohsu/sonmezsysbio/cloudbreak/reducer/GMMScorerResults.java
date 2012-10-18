@@ -13,11 +13,11 @@ import java.io.IOException;
  * Time: 1:05 PM
  */
 public class GMMScorerResults implements Writable {
-    double w0;
-    double mu2;
-    double twoComponentLikelihood;
-    double nodelOneComponentLikelihood;
-    double likelihoodRatio;
+    public double w0;
+    public double mu2;
+    public double twoComponentLikelihood;
+    public double nodelOneComponentLikelihood;
+    public double likelihoodRatio;
 
     @Override
     public String toString() {

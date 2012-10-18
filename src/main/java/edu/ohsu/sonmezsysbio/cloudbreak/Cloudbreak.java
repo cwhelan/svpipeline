@@ -87,6 +87,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandExportWigAndBedFiles exportWigAndBedFiles = new CommandExportWigAndBedFiles();
         jc.addCommand("exportWigAndBedFiles", exportWigAndBedFiles);
 
+        CommandExportGMMResults exportGMMResults = new CommandExportGMMResults();
+        jc.addCommand("exportGMMResults", exportGMMResults);
+
         CommandDumpReadsWithScores dumpReadsWithScores = new CommandDumpReadsWithScores();
         jc.addCommand("dumpReadsWithScores", dumpReadsWithScores);
 

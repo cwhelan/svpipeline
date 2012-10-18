@@ -106,22 +106,10 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFile
 
 EOF
 
-hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles \
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $LOCAL_FAI \
     --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
 
 echo gzip *.wig *.bed
 gzip *.wig *.bed
-
-cat <<EOF
-python $BUILD_DIR/src/main/scripts/evalWigFile.py ${NAME}_piledup_deletion_scores.wig.gz \
-    $TRUTH \
-    $LOCAL_FAI $MEDIAN_FILTER_WINDOW $THRESHOLD_MIN > ${NAME}_perf.txt
-EOF
-
-python $BUILD_DIR/src/main/scripts/evalWigFile.py ${NAME}_piledup_deletion_scores.wig.gz \
-    $TRUTH \
-    $LOCAL_FAI $MEDIAN_FILTER_WINDOW $THRESHOLD_MIN > ${NAME}_perf.txt
-
-popd
