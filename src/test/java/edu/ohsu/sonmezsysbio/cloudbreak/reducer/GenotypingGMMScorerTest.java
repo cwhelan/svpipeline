@@ -60,7 +60,7 @@ public class GenotypingGMMScorerTest {
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-        assertEquals(.5, scorer.estimateW(y, initialW, 200, sigma), 0.0001);
+        assertEquals(.5, scorer.estimateW(y, initialW, 200, sigma).w0, 0.0001);
     }
 
     public void testEstimateWNoValues() throws Exception {
@@ -70,7 +70,7 @@ public class GenotypingGMMScorerTest {
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-        assertEquals(1, scorer.estimateW(y, initialW, 200, sigma), 0.0001);
+        assertEquals(1, scorer.estimateW(y, initialW, 200, sigma).w0, 0.0001);
     }
 
     @Test

@@ -173,7 +173,8 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         return result;
     }
 
-    public double estimateW(double[] y, double[] initialW, double initialMu1, double sigma) {
+    public GMMScorerResults estimateW(double[] y, double[] initialW, double initialMu1, double sigma) {
+        GMMScorerResults results = new GMMScorerResults();
         int maxIterations = 10;
         if (log.isDebugEnabled()) {
             log.debug("ys:");
@@ -191,7 +192,8 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
         if (yclean.length == 0) {
             log.debug("not enough ycleans, returning 1");
-            return -1;
+            results.w0 = -1;
+            return results;
         }
         double[] initialMu = new double[]{initialMu1,mean(yclean)};
 
@@ -217,10 +219,12 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         }
         if (Math.abs(mu[1] - mu[0]) < 2 * sigma) {
             log.debug("means too close, returning 1");
-            return 1;
+            results.w0 = 1;
+            return results;
         }
         log.debug("returning " + Math.exp(w[0]));
-        return Math.exp(w[0]);
+        results.w0 = Math.exp(w[0]);
+        return results;
     }
 
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
@@ -259,6 +263,6 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             insertSizeArray[i] = insertSizes.get(i);
         }
 
-        return estimateW(insertSizeArray, initialW, targetIsize, maxSD);
+        return estimateW(insertSizeArray, initialW, targetIsize, maxSD).w0;
     }
 }
