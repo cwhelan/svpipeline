@@ -20,6 +20,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
     public static final int MAX_COVERAGE = 200;
+    public static final int MAX_LOG_MAPQ_DIFF = 5;
 
     { log.setLevel(Level.INFO); }
 
@@ -233,7 +234,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         double bestMappingQuality = 0;
         while (values.hasNext()) {
             ReadPairInfo rpi = values.next();
-            if (! first & (bestMappingQuality - rpi.pMappingCorrect > 6)) {
+            if (! first & (bestMappingQuality - rpi.pMappingCorrect > MAX_LOG_MAPQ_DIFF)) {
                 break;
             }
             int insertSize = rpi.insertSize;
