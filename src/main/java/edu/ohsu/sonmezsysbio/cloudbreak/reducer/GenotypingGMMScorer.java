@@ -36,12 +36,17 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
     }
 
     double likelihood(double[] y, double[] w, double[] mu, double sigma) {
-        double[] d1PointLikelihoods = pointLikelihoods(y, mu[0], sigma);
-        double[] d2PointLikelihoods = pointLikelihoods(y, mu[1], sigma);
+        double[][] pointLikelihoods = new double[w.length][y.length];
+        for (int i = 0; i < w.length; i++) {
+            pointLikelihoods[i] = pointLikelihoods(y, mu[i], sigma);
+        }
+
         double sumWeightedLikelihoods = 0;
         int i = 0;
         for (i = 0; i < y.length; i++) {
-            sumWeightedLikelihoods += Math.exp(w[0]) * d1PointLikelihoods[i] + Math.exp(w[1]) * d2PointLikelihoods[i];
+            for (int j = 0; j < w.length; j++) {
+                sumWeightedLikelihoods += Math.exp(w[j]) * pointLikelihoods[j][i];
+            }
         }
         return sumWeightedLikelihoods / y.length;
     }

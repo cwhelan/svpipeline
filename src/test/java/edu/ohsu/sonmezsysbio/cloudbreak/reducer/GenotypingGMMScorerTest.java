@@ -192,44 +192,26 @@ public class GenotypingGMMScorerTest {
 
     @Test
     public void testLikelihood() throws Exception {
-        double[] y = new double[] {152,
-                216,
-                194,
-                169,
-                202,
-                237,
-                178,
-                202,
-                208,
-                210,
-                247,
-                227,
-                182,
-                207,
-                191,
-                147,
-                251,
-                236,
-                209,
-                200,
-                204,
-                184,
-                158,
-                152,
-                255,
-                227,
-                185,
-                183,
-                204,
-                226,
-                276,
-                207,
-                223
+        double[] y = new double[] {152, 216, 194, 169, 202, 237, 178, 202, 208, 210,
+                247, 227, 182, 207, 191, 147, 251, 236, 209, 200, 204, 184, 158,
+                152, 255, 227, 185, 183, 204, 226, 276, 207, 223
         };
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double l = scorer.likelihood(y, new double[] { Math.log(.5), Math.log(.5)}, new double[] {100, 1100}, 15);
         assertEquals(-908.0622, l, 0.0001);
+    }
+
+    @Test
+    public void testLikelihoodSingleComponent() throws Exception {
+        double[] y = new double[] {152, 216, 194, 169, 202, 237, 178, 202, 208, 210,
+                247, 227, 182, 207, 191, 147, 251, 236, 209, 200, 204, 184, 158,
+                152, 255, 227, 185, 183, 204, 226, 276, 207, 223
+        };
+
+        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
+        double l = scorer.likelihood(y, new double[] { Math.log(1)}, new double[] {100}, 15);
+        assertEquals(-29.2070, l, 0.0001);
     }
 
     @Test
