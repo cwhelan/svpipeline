@@ -75,6 +75,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandIncrementalUpdateSingleEndDeletionScores incrementalUpdateSingleEndDeletionScores = new CommandIncrementalUpdateSingleEndDeletionScores();
         jc.addCommand("incrementalUpdateSingleEndDeletionScores", incrementalUpdateSingleEndDeletionScores);
 
+        CommandGMMFitSingleEndInsertSizes GMMFitSingleEndInsertSizes = new CommandGMMFitSingleEndInsertSizes();
+        jc.addCommand("GMMFitSingleEndInsertSizes", GMMFitSingleEndInsertSizes);
+
         CommandVESingleEndDeletionScores veSingleEndDeletionScores = new CommandVESingleEndDeletionScores();
         jc.addCommand("veSingleEndDeletionScores", veSingleEndDeletionScores);
 

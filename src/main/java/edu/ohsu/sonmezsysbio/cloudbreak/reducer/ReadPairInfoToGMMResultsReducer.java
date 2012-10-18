@@ -7,7 +7,6 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapred.*;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -20,19 +19,19 @@ import java.util.Map;
  * Date: 4/6/12
  * Time: 1:35 PM
  */
-public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements Reducer<GenomicLocationWithQuality, ReadPairInfo, GenomicLocation, DoubleWritable> {
+public class ReadPairInfoToGMMResultsReducer extends MapReduceBase implements Reducer<GenomicLocationWithQuality, ReadPairInfo, GenomicLocation, GMMScorerResults> {
 
-    private static org.apache.log4j.Logger log = Logger.getLogger(ReadPairInfoToDeletionScoreReducer.class);
+    private static Logger log = Logger.getLogger(ReadPairInfoToGMMResultsReducer.class);
 
     //{ log.setLevel(Level.DEBUG); }
 
-    ReadPairInfoScorer readPairInfoScorer = new IncrementalDelBeliefUpdateReadPairInfoScorer();
+    GenotypingGMMScorer readPairInfoScorer = new GenotypingGMMScorer();
 
-    public ReadPairInfoScorer getReadPairInfoScorer() {
+    public GenotypingGMMScorer getReadPairInfoScorer() {
         return readPairInfoScorer;
     }
 
-    public void setReadPairInfoScorer(ReadPairInfoScorer readPairInfoScorer) {
+    public void GenotypingGMMScorer(GenotypingGMMScorer readPairInfoScorer) {
         this.readPairInfoScorer = readPairInfoScorer;
     }
 
@@ -46,11 +45,11 @@ public class ReadPairInfoToDeletionScoreReducer extends MapReduceBase implements
         this.readGroupInfos = readGroupInfos;
     }
 
-    public void reduce(GenomicLocationWithQuality key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, DoubleWritable> output, Reporter reporter) throws IOException {
+    public void reduce(GenomicLocationWithQuality key, Iterator<ReadPairInfo> values, OutputCollector<GenomicLocation, GMMScorerResults> output, Reporter reporter) throws IOException {
         log.debug("reducing for key: " + key);
-        double lr = readPairInfoScorer.reduceReadPairInfos(values, readGroupInfos);
-        log.debug("got score: " + lr);
-        output.collect(new GenomicLocation(key.chromosome, key.pos), new DoubleWritable(lr));
+        GMMScorerResults results = readPairInfoScorer.reduceReadPairInfos(values, readGroupInfos);
+        log.debug("got results: " + results);
+        output.collect(new GenomicLocation(key.chromosome, key.pos), results);
     }
 
     @Override

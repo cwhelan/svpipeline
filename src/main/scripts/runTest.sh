@@ -75,7 +75,7 @@ EOF
 
 cat <<EOF
 
-hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores 
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 GMMFitSingleEndInsertSizes
    --inputFileDescriptor $READ_GROUP_FILE 
    --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
    --faidx $HDFS_FAI 
@@ -87,7 +87,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
 
 EOF
 
-hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 incrementalUpdateSingleEndDeletionScores \
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 GMMFitSingleEndInsertSizes \
     --inputFileDescriptor $READ_GROUP_FILE \
     --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $HDFS_FAI \

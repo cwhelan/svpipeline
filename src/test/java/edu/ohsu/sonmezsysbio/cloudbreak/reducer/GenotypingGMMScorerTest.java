@@ -128,8 +128,8 @@ public class GenotypingGMMScorerTest {
 
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
-        double score = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
-        assertEquals(1, score, 0.00001);
+        GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
+        assertEquals(1, results.w0, 0.00001);
     }
 
     @Test
@@ -186,8 +186,8 @@ public class GenotypingGMMScorerTest {
 
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
-        double score = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
-        assertEquals(0, score, 0.0001);
+        GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
+        assertEquals(0, results.w0, 0.0001);
     }
 
     @Test
@@ -259,8 +259,8 @@ public class GenotypingGMMScorerTest {
 
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
-        double score = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
-        assertEquals(0, score, 0.0001);
+        GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
+        assertEquals(0, results.w0, 0.0001);
     }
 
 }

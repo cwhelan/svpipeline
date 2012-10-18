@@ -4,7 +4,6 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.util.*;

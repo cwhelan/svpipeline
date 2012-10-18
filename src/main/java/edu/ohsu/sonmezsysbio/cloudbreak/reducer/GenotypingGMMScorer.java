@@ -16,7 +16,7 @@ import static org.apache.commons.math3.stat.StatUtils.mean;
  * Date: 10/10/12
  * Time: 9:17 PM
  */
-public class GenotypingGMMScorer implements ReadPairInfoScorer {
+public class GenotypingGMMScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
     public static final int MAX_COVERAGE = 200;
@@ -195,6 +195,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             results.w0 = -1;
             return results;
         }
+        results.nodelOneComponentLikelihood = likelihood(yclean, new double[]{Math.log(1)}, new double[]{initialMu1}, sigma);
         double[] initialMu = new double[]{initialMu1,mean(yclean)};
 
         int i = 1;
@@ -217,6 +218,9 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             }
             l = lprime;
         }
+        results.twoComponentLikelihood = l;
+        results.likelihoodRatio = l - results.nodelOneComponentLikelihood;
+        results.mu2 = mu[1];
         if (Math.abs(mu[1] - mu[0]) < 2 * sigma) {
             log.debug("means too close, returning 1");
             results.w0 = 1;
@@ -227,7 +231,7 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
         return results;
     }
 
-    public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
+    public GMMScorerResults reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         List<Double> insertSizes = new ArrayList<Double>();
         double maxSD = 0;
         if (readGroupInfos.values().size() > 1) {
@@ -263,6 +267,6 @@ public class GenotypingGMMScorer implements ReadPairInfoScorer {
             insertSizeArray[i] = insertSizes.get(i);
         }
 
-        return estimateW(insertSizeArray, initialW, targetIsize, maxSD).w0;
+        return estimateW(insertSizeArray, initialW, targetIsize, maxSD);
     }
 }
