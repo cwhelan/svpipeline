@@ -12,7 +12,7 @@ import java.io.IOException;
  * Date: 10/18/12
  * Time: 2:15 PM
  */
-public class GMMResultsReaderAndLine {
+public class GMMResultsReaderAndLine implements Comparable<GMMResultsReaderAndLine> {
     private SequenceFile.Reader reader;
     private GenomicLocation gl;
     private GMMScorerResults results;
@@ -51,4 +51,7 @@ public class GMMResultsReaderAndLine {
         reader.close();
     }
 
+    public int compareTo(GMMResultsReaderAndLine o) {
+        return this.gl.compareTo(o.getGenomicLocation());
+    }
 }
