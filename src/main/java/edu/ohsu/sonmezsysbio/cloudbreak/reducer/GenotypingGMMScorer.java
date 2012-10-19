@@ -63,68 +63,67 @@ public class GenotypingGMMScorer {
     }
 
     private double[][] gamma(double[] y, double[] w, double[] mu, double sigma) {
-        double[] m1likelihoods = new double[y.length];
-        double[] m2likelihoods = new double[y.length];
-        double[][] gamma = new double[y.length][2];
+        double[][] gamma = new double[y.length][w.length];
+        double[][] likelihoods = new double[y.length][w.length];
         for (int i = 0; i < y.length; i++) {
-            m1likelihoods[i] = w[0] + lognormal(y[i], mu[0], sigma);
-            m2likelihoods[i] = w[1] + lognormal(y[i], mu[1], sigma);
-            log.debug("m1likelihoods[" + i +"] " + m1likelihoods[i]);
-            log.debug("m2likelihoods[" + i +"] " + m2likelihoods[i]);
-            double total = logsumexp(new double[] {m1likelihoods[i], m2likelihoods[i]});
+            for (int j = 0; j < w.length; j++) {
+                likelihoods[i][j] = w[j] + lognormal(y[i], mu[j], sigma);
+                log.debug("likelihoods[" + i +"][" + j + "] " + likelihoods[i][j]);
+            }
+            double total = logsumexp(likelihoods[i]);
             log.debug("total likelihood[" + i + "]: "+ total);
-            gamma[i][0] = m1likelihoods[i] - total;
-            gamma[i][1] = m2likelihoods[i] - total;
+            for (int j = 0; j < w.length; j++) {
+                gamma[i][j] = likelihoods[i][j] - total;
+            }
         }
         return gamma;
     }
 
     private double[] cacluateN(double[][] gamma) {
-        double[] ns = new double[2];
-        double[] temp = new double[gamma.length];
-        for (int i = 0; i < gamma.length; i++) {
-            temp[i] = gamma[i][0];
+        double[] ns = new double[gamma[0].length];
+        for (int j = 0; j < gamma[0].length; j++) {
+            double[] temp = new double[gamma.length];
+            for (int i = 0; i < gamma.length; i++) {
+                temp[i] = gamma[i][j];
+            }
+            ns[j] = logsumexp(temp);
         }
-        ns[0] = logsumexp(temp);
-        for (int i = 0; i < gamma.length; i++) {
-            temp[i] = gamma[i][1];
-        }
-        ns[1] = logsumexp(temp);
         return ns;
     }
 
     private double[] updateW(double[] ns, double[] y) {
-        double[] w = new double[2];
-        w[0] = ns[0] - Math.log(y.length);
-        w[1] = ns[1] - Math.log(y.length);
+        double[] w = new double[ns.length];
+        for (int j = 0; j < ns.length; j++) {
+            w[j] = ns[j] - Math.log(y.length);
+        }
         return w;
     }
 
-    double updateMu2(double[][] gamma, double[] y, double[] n) {
+    double updateMuForComponent(double[][] gamma, double[] y, double[] n, int component) {
         double numerator = 0;
         double[] lse = new double[y.length];
         for (int i = 0; i < y.length; i++) {
-            lse[i] = gamma[i][1] + Math.log(y[i]);
+            lse[i] = gamma[i][component] + Math.log(y[i]);
         }
         numerator = logsumexp(lse);
-        log.debug("update mu2 n " +  numerator);
-        return Math.exp(numerator - n[1]);
+        log.debug("update mu[" + component + "] n " +  numerator);
+        return Math.exp(numerator - n[component]);
     }
 
     private static class EMUpdates {
         double[] w;
-        double mu2;
+        double[] mu;
 
         @Override
         public String toString() {
             return "EMUpdates{" +
-                    "w=" + w[0] + ", " + w[1] +
-                    ", mu2=" + mu2 +
+                    "w=" + w +
+                    ", mu=" + mu +
                     '}';
         }
     }
 
-    private EMUpdates emStep(double[] y, double[] w, double[] mu, double sigma) {
+    private EMUpdates emStep(double[] y, double[] w, double[] mu, double sigma, int[] freeMus) {
         double[][] gamma = gamma(y, w, mu, sigma);
         if (log.isDebugEnabled()) {
             for (int i = 0; i < gamma.length; i++) {
@@ -136,14 +135,22 @@ public class GenotypingGMMScorer {
         double[] n = cacluateN(gamma);
         log.debug("n[0] " + n[0]);
         log.debug("n[1] " + n[1]);
-        double[] wprime = updateW(n, y);
-        log.debug("wprime[0] " + wprime[0]);
-        log.debug("wprime[1] " + wprime[1]);
-        double mu2prime = updateMu2(gamma, y, n);
-        log.debug(mu2prime);
         EMUpdates updates = new EMUpdates();
+        updates.mu = Arrays.copyOf(mu, mu.length);
+
+        double[] wprime = updateW(n, y);
         updates.w = wprime;
-        updates.mu2 = mu2prime;
+        for (int j = 0; j < wprime.length; j++) {
+            log.debug("wprime[" + j + "] " + wprime[j]);
+        }
+
+        for (int k = 0; k < freeMus.length; k++) {
+            int j = freeMus[k];
+            double mujprime = updateMuForComponent(gamma, y, n, j);
+            log.debug("mu[" + j + "] prime: " + mujprime);
+            updates.mu[j] = mujprime;
+        }
+
         return updates;
     }
 
@@ -204,12 +211,12 @@ public class GenotypingGMMScorer {
         double l = likelihood(yclean, w, mu, sigma);
         log.debug("initial likelihood: " + l);
         while(true) {
-            EMUpdates updates = emStep(yclean, w, mu, sigma);
+            EMUpdates updates = emStep(yclean, w, mu, sigma, new int[] {1});
             if (log.isDebugEnabled()) {
                 log.debug("updates: " + updates.toString());
             }
             w = updates.w;
-            mu[1] = updates.mu2;
+            mu[1] = updates.mu[1];
             double lprime = likelihood(yclean, w, mu, sigma);
             log.debug("new likelihood: " + l);
             i += 1;
