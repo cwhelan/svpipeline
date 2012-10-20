@@ -17,6 +17,7 @@ public class GMMScorerResults implements Writable {
     public double mu2;
     public double twoComponentLikelihood;
     public double nodelOneComponentLikelihood;
+    public double oneFreeComponenLikelihood = Double.NEGATIVE_INFINITY;
     public double likelihoodRatio;
 
     @Override
@@ -26,6 +27,7 @@ public class GMMScorerResults implements Writable {
                 ", mu2=" + mu2 +
                 ", twoComponentLikelihood=" + twoComponentLikelihood +
                 ", nodelOneComponentLikelihood=" + nodelOneComponentLikelihood +
+                ", oneFreeComponentLikelihood=" + oneFreeComponenLikelihood +
                 ", likelihoodRatio=" + likelihoodRatio +
                 '}';
     }
@@ -35,6 +37,7 @@ public class GMMScorerResults implements Writable {
         dataOutput.writeDouble(mu2);
         dataOutput.writeDouble(twoComponentLikelihood);
         dataOutput.writeDouble(nodelOneComponentLikelihood);
+        dataOutput.writeDouble(oneFreeComponenLikelihood);
         dataOutput.writeDouble(likelihoodRatio);
     }
 
@@ -43,6 +46,7 @@ public class GMMScorerResults implements Writable {
         mu2 = dataInput.readDouble();
         twoComponentLikelihood = dataInput.readDouble();
         nodelOneComponentLikelihood = dataInput.readDouble();
+        oneFreeComponenLikelihood = dataInput.readDouble();
         likelihoodRatio = dataInput.readDouble();
     }
 }

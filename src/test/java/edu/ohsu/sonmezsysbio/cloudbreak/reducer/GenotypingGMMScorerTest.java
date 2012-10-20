@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,6 +23,20 @@ import static org.junit.Assert.assertEquals;
  */
 public class GenotypingGMMScorerTest {
 
+    public static final double[] NODEL_ISIZES = new double[]{152, 216, 194, 169, 202, 237, 178, 202, 208, 210,
+            247, 227, 182, 207, 191, 147, 251, 236, 209, 200, 204, 184, 158,
+            152, 255, 227, 185, 183, 204, 226, 276, 207, 223
+    };
+
+    public static final double[] HET_DEL_5X_5N = new double[]{260.0736, 197.4272, 194.8618, 1217.8588,
+            1228.2190, 1151.7017, 4511.5326, 19719.9700, 19707.2091, 16788.1891,
+            22556.1203, 9909.8687, 13709.7259, 9219.4829, 13076.1122, 8140.4713};
+
+    public static final double[] HOM_DEL_1000_20X_0N = new double[] {
+            1227.113, 1183.168, 1176.475, 1165.822, 1216.683, 1177.825, 1193.821, 1199.589, 1240.887,
+            1229.633, 1184.879, 1230.889, 1169.125, 1200.363, 1262.897, 1155.817, 1164.294
+    };
+
     @Test
     public void testLogsumexp() throws Exception {
         double[] x = new double[] {-7.018195, -309.17497};
@@ -33,9 +46,7 @@ public class GenotypingGMMScorerTest {
 
     @Test
     public void testNnclean() throws Exception {
-        double[] y = new double[] {260.0736, 197.4272,   194.8618,  1217.8588,
-                1228.2190,  1151.7017,  4511.5326, 19719.9700, 19707.2091, 16788.1891,
-                22556.1203,  9909.8687, 13709.7259,  9219.4829, 13076.1122,  8140.4713};
+        double[] y = HET_DEL_5X_5N;
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double[] nonnoise = new double[] {260.0736, 197.4272,   194.8618,  1217.8588,
                 1228.2190,  1151.7017};
@@ -52,15 +63,13 @@ public class GenotypingGMMScorerTest {
 
     @Test
     public void testEstimateW() throws Exception {
-        double[] y = new double[] {260.0736, 197.4272,   194.8618,  1217.8588,
-                1228.2190,  1151.7017,  4511.5326, 19719.9700, 19707.2091, 16788.1891,
-                22556.1203,  9909.8687, 13709.7259,  9219.4829, 13076.1122,  8140.4713};
+        double[] y = HET_DEL_5X_5N;
 
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-        assertEquals(.5, scorer.estimateW(y, initialW, 200, sigma).w0, 0.0001);
+        assertEquals(.5, scorer.estimate(y, initialW, 200, sigma).w0, 0.0001);
     }
 
     public void testEstimateWNoValues() throws Exception {
@@ -70,104 +79,13 @@ public class GenotypingGMMScorerTest {
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-        assertEquals(1, scorer.estimateW(y, initialW, 200, sigma).w0, 0.0001);
+        assertEquals(1, scorer.estimate(y, initialW, 200, sigma).w0, 0.0001);
     }
 
-    @Test
-    public void testReduce_2_91700() throws Exception {
-        double[] y = new double[] {152,
-                216,
-                194,
-                169,
-                202,
-                237,
-                178,
-                202,
-                208,
-                210,
-                247,
-                227,
-                182,
-                207,
-                191,
-                147,
-                251,
-                236,
-                209,
-                200,
-                204,
-                184,
-                158,
-                152,
-                255,
-                227,
-                185,
-                183,
-                204,
-                226,
-                276,
-                207,
-                223
-        };
-
-        ReadGroupInfo readGroupInfo = new ReadGroupInfo();
-        readGroupInfo.isize = 200;
-        readGroupInfo.isizeSD = 30;
-
-        List<ReadPairInfo> rpis = new ArrayList<ReadPairInfo>();
-        for (int i = 0; i < y.length; i++) {
-            double isize = y[i];
-            ReadPairInfo rpi = new ReadPairInfo();
-            rpi.insertSize = (int) isize;
-            rpi.readGroupId = 0;
-            rpi.pMappingCorrect = 0;
-            rpis.add(rpi);
-        }
-
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-
-        Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
-        rgis.put((short) 0, readGroupInfo);
-        GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
-        assertEquals(1, results.w0, 0.00001);
-    }
 
     @Test
     public void testReduce_homdel_100() throws Exception {
-        double[] y = new double[] {152,
-                216,
-                194,
-                169,
-                202,
-                237,
-                178,
-                202,
-                208,
-                210,
-                247,
-                227,
-                182,
-                207,
-                191,
-                147,
-                251,
-                236,
-                209,
-                200,
-                204,
-                184,
-                158,
-                152,
-                255,
-                227,
-                185,
-                183,
-                204,
-                226,
-                276,
-                207,
-                223
-        };
+        double[] y = NODEL_ISIZES;
 
         ReadGroupInfo readGroupInfo = new ReadGroupInfo();
         readGroupInfo.isize = 100;
@@ -192,22 +110,17 @@ public class GenotypingGMMScorerTest {
 
     @Test
     public void testLikelihood() throws Exception {
-        double[] y = new double[] {152, 216, 194, 169, 202, 237, 178, 202, 208, 210,
-                247, 227, 182, 207, 191, 147, 251, 236, 209, 200, 204, 184, 158,
-                152, 255, 227, 185, 183, 204, 226, 276, 207, 223
-        };
+        double[] y = NODEL_ISIZES;
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double l = scorer.likelihood(y, new double[] { Math.log(.5), Math.log(.5)}, new double[] {100, 1100}, 15);
         assertEquals(-29.90017, l, 0.0001);
+
     }
 
     @Test
     public void testLikelihoodSingleComponent() throws Exception {
-        double[] y = new double[] {152, 216, 194, 169, 202, 237, 178, 202, 208, 210,
-                247, 227, 182, 207, 191, 147, 251, 236, 209, 200, 204, 184, 158,
-                152, 255, 227, 185, 183, 204, 226, 276, 207, 223
-        };
+        double[] y = NODEL_ISIZES;
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double l = scorer.likelihood(y, new double[] { Math.log(1)}, new double[] {100}, 15);
@@ -261,6 +174,23 @@ public class GenotypingGMMScorerTest {
         rgis.put((short) 0, readGroupInfo);
         GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
         assertEquals(0, results.w0, 0.0001);
+    }
+
+    @Test
+    public void testHomDel1v2Components() throws Exception{
+        double[] y = HOM_DEL_1000_20X_0N;
+
+        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
+
+        double sigma = 30;
+        double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
+
+        GMMScorerResults estimates = scorer.estimate(y, initialW, 200, sigma);
+        assertTrue(estimates.twoComponentLikelihood > estimates.nodelOneComponentLikelihood);
+        assertTrue(estimates.oneFreeComponenLikelihood >  estimates.nodelOneComponentLikelihood);
+
+        // by only a tiny bit:
+        assertTrue(estimates.twoComponentLikelihood >  estimates.oneFreeComponenLikelihood);
     }
 
 }

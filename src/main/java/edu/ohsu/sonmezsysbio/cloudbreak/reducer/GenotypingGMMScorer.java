@@ -136,8 +136,10 @@ public class GenotypingGMMScorer {
             }
         }
         double[] n = cacluateN(gamma);
-        log.debug("n[0] " + n[0]);
-        log.debug("n[1] " + n[1]);
+        for (int j = 0; j < w.length; j++) {
+            log.debug("n[" + j + "] " + n[j]);
+        }
+
         EMUpdates updates = new EMUpdates();
         updates.mu = Arrays.copyOf(mu, mu.length);
 
@@ -183,7 +185,7 @@ public class GenotypingGMMScorer {
         return result;
     }
 
-    public GMMScorerResults estimateW(double[] y, double[] initialW, double initialMu1, double sigma) {
+    public GMMScorerResults estimate(double[] y, double[] initialW, double initialMu1, double sigma) {
         GMMScorerResults results = new GMMScorerResults();
         int maxIterations = 10;
         if (log.isDebugEnabled()) {
@@ -206,8 +208,9 @@ public class GenotypingGMMScorer {
             return results;
         }
         results.nodelOneComponentLikelihood = likelihood(yclean, new double[]{Math.log(1)}, new double[]{initialMu1}, sigma);
-        double[] initialMu = new double[]{initialMu1,mean(yclean)};
 
+        log.debug("estimating with two components, one fixed");
+        double[] initialMu = new double[]{initialMu1,mean(yclean)};
         int i = 1;
         double[] w = initialW;
         double[] mu = initialMu;
@@ -219,7 +222,7 @@ public class GenotypingGMMScorer {
                 log.debug("updates: " + updates.toString());
             }
             w = updates.w;
-            mu[1] = updates.mu[1];
+            mu = updates.mu;
             double lprime = likelihood(yclean, w, mu, sigma);
             log.debug("new likelihood: " + l);
             i += 1;
@@ -231,13 +234,33 @@ public class GenotypingGMMScorer {
         results.twoComponentLikelihood = l;
         results.likelihoodRatio = l - results.nodelOneComponentLikelihood;
         results.mu2 = mu[1];
-        if (Math.abs(mu[1] - mu[0]) < 2 * sigma) {
-            log.debug("means too close, returning 1");
-            results.w0 = 1;
-            return results;
-        }
-        log.debug("returning " + Math.exp(w[0]));
         results.w0 = Math.exp(w[0]);
+
+        log.debug("estimating with one free component");
+        initialMu = new double[]{mean(yclean)};
+        i = 1;
+        w = new double[] { 0 };
+        mu = initialMu;
+        l = likelihood(yclean, w, mu, sigma);
+        log.debug("initial likelihood: " + l);
+
+        while(true) {
+            EMUpdates updates = emStep(yclean, w, mu, sigma, new int[] {0});
+            if (log.isDebugEnabled()) {
+                log.debug("updates: " + updates.toString());
+            }
+            w = updates.w;
+            mu = updates.mu;
+            double lprime = likelihood(yclean, w, mu, sigma);
+            log.debug("new likelihood: " + l);
+            i += 1;
+            if (Math.abs(l - lprime) < 0.0001 || i > maxIterations) {
+                break;
+            }
+            l = lprime;
+        }
+        results.oneFreeComponenLikelihood = l;
+
         return results;
     }
 
@@ -277,6 +300,6 @@ public class GenotypingGMMScorer {
             insertSizeArray[i] = insertSizes.get(i);
         }
 
-        return estimateW(insertSizeArray, initialW, targetIsize, maxSD);
+        return estimate(insertSizeArray, initialW, targetIsize, maxSD);
     }
 }
