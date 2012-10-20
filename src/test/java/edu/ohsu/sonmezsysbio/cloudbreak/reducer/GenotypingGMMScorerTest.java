@@ -199,7 +199,7 @@ public class GenotypingGMMScorerTest {
 
         GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double l = scorer.likelihood(y, new double[] { Math.log(.5), Math.log(.5)}, new double[] {100, 1100}, 15);
-        assertEquals(-908.0622, l, 0.0001);
+        assertEquals(-29.90017, l, 0.0001);
     }
 
     @Test

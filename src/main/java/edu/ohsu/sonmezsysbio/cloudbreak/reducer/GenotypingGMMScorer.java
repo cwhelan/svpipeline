@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import java.util.*;
 
 import static org.apache.commons.math3.stat.StatUtils.mean;
+import static org.apache.commons.math3.stat.StatUtils.sum;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,9 +46,11 @@ public class GenotypingGMMScorer {
         double sumWeightedLikelihoods = 0;
         int i = 0;
         for (i = 0; i < y.length; i++) {
+            double[] weightedPointLikelihoods = new double[w.length];
             for (int j = 0; j < w.length; j++) {
-                sumWeightedLikelihoods += Math.exp(w[j]) * pointLikelihoods[j][i];
+                weightedPointLikelihoods[j] = w[j] + pointLikelihoods[j][i];
             }
+            sumWeightedLikelihoods += logsumexp(weightedPointLikelihoods);
         }
         return sumWeightedLikelihoods / y.length;
     }

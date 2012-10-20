@@ -29,7 +29,7 @@ likelihood <- function(y, w, mu, sigma) {
   #m2.likelihoods <- dnorm(y, mu[2], sigma, log=TRUE)
   m1.likelihoods <- mylognorm(y, mu[1], sigma)
   m2.likelihoods <- mylognorm(y, mu[2], sigma)
-  weighted.likelihoods <- exp(w[1]) *  m1.likelihoods + exp(w[2]) * m2.likelihoods
+  weighted.likelihoods <- logsumexp(c(w[1] +  m1.likelihoods, w[2] + m2.likelihoods))
   mean(weighted.likelihoods)
 }
 
