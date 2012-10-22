@@ -92,7 +92,7 @@ public class SAMRecord implements AlignmentRecord {
     }
 
     public boolean isReverseComplemented() {
-        return ! ((flag & 0x10) == 0x10);
+        return ((flag & 0x10) == 0x10);
     }
 
     public boolean isInterChromosomal() {

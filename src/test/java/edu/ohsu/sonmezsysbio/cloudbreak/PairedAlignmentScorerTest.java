@@ -14,13 +14,13 @@ public class PairedAlignmentScorerTest {
     @Test
     public void testValidateMappingOrientations() throws Exception {
         SAMRecord r1 = new SAMRecord();
-        r1.flag = 0x99;
+        r1.flag = 99;
         r1.referenceName = "2";
         r1.position = 41;
         r1.sequence = "..................................................";
 
         SAMRecord r2 = new SAMRecord();
-        r2.flag = 0x147;
+        r2.flag = 147;
         r2.referenceName = "2";
         r2.position = 212;
         r2.sequence = "..................................................";

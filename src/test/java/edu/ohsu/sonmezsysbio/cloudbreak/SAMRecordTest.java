@@ -19,10 +19,10 @@ public class SAMRecordTest {
         assertTrue(samRecord.isMateMapped());
         assertTrue(samRecord.isPairMapped());
 
-        assertTrue(! samRecord.isReverseComplemented());
+        assertTrue(samRecord.isReverseComplemented());
 
         samRecord.setFlag(355);
-        assertTrue(samRecord.isReverseComplemented());
+        assertTrue(! samRecord.isReverseComplemented());
     }
 
     @Test
@@ -35,10 +35,10 @@ public class SAMRecordTest {
     @Test
     public void testOrientationFlags() throws Exception {
         SAMRecord r1 = new SAMRecord();
-        r1.setFlag(0x99);
+        r1.setFlag(99);
 
         SAMRecord r2 = new SAMRecord();
-        r2.setFlag(0x147);
+        r2.setFlag(147);
 
         assertTrue(r1.isForward());
         assertTrue(! r2.isForward());

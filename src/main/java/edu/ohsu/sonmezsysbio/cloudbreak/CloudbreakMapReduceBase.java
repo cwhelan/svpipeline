@@ -42,7 +42,7 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
         this.alignmentReader = alignmentReader;
     }
 
-    protected ReadPairAlignments parsePairAlignmentLine(String line) {
+    public ReadPairAlignments parsePairAlignmentLine(String line) {
         String[] readAligments = line.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = readAligments[0];
         String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
