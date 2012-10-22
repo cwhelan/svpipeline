@@ -130,4 +130,18 @@ public class SAMRecord implements AlignmentRecord {
     public void setFlag(int i) {
         flag = i;
     }
+
+    @Override
+    public String toString() {
+        return "SAMRecord{" +
+                "flag=" + flag +
+                ", tags=" + tags +
+                ", referenceName='" + referenceName + '\'' +
+                ", pairReferenceName='" + pairReferenceName + '\'' +
+                ", position=" + position +
+                ", insertSize=" + insertSize +
+                ", readPairId='" + readPairId + '\'' +
+                ", sequence='" + sequence + '\'' +
+                '}';
+    }
 }

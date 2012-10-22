@@ -14,6 +14,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.SnappyCodec;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,6 +32,8 @@ import java.util.zip.GZIPOutputStream;
  */
 @Parameters(separators = "=", commandDescription = "Load paired fastq files into HDFS")
 public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
+
+    private static org.apache.log4j.Logger logger = Logger.getLogger(CommandReadSAMFileIntoHDFS.class);
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;
@@ -84,6 +87,7 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
             SAMRecord samRecord = it.next();
             String readName = samRecord.getReadName();
             if (! readName.equals(currentReadName) && ! currentReadName.equals("")) {
+                logger.debug("writing " + readName);
                 writeRecords(currentReadName, writer, read1Records, read2Records, readAlignmentJoiner, i);
                 currentReadName = readName;
                 i++;
@@ -104,6 +108,8 @@ public class CommandReadSAMFileIntoHDFS implements CloudbreakCommand {
     }
 
     private void writeRecords(String currentReadName, HDFSWriter writer, List<String> read1Records, List<String> read2Records, Joiner readAlignmentJoiner, long i) throws IOException {
+        logger.debug("r1 records: " + read1Records.size());
+        logger.debug("r2 records: " + read1Records.size());
         if (read1Records.size() > 0 && read2Records.size() > 0) {
             writer.write(new Text(currentReadName), readAlignmentJoiner.join(read1Records) + Cloudbreak.READ_SEPARATOR + readAlignmentJoiner.join(read2Records) + "\n");
         }

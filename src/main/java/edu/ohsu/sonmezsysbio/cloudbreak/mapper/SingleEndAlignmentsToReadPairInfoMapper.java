@@ -13,6 +13,8 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -27,6 +29,10 @@ import java.util.Set;
  */
 public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase
         implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo> {
+
+    private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentsToReadPairInfoMapper.class);
+
+    { logger.setLevel(Level.DEBUG); }
 
     private boolean matePairs;
     private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
@@ -126,12 +132,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             if (exclusionRegions != null) {
                 for (AlignmentRecord record : readPairAlignments.getRead1Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
+                        logger.debug("excluding record " + record);
                         recordsInExcludedAreas.add(record);
                     }
                 }
 
                 for (AlignmentRecord record : readPairAlignments.getRead2Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
+                        logger.debug("excluding record " + record);
                         recordsInExcludedAreas.add(record);
                     }
                 }
@@ -163,6 +171,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("translocation: r1 = " + record1 + "; r2 = " + record2);
+            }
             return;
         }
 
@@ -177,7 +188,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 record2 : record1;
 
         // todo: not handling inversions for now
-        if (!scorer.validateMappingOrientations(record1, record2, matePairs)) return;
+        if (!scorer.validateMappingOrientations(record1, record2, matePairs)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2);
+            }
+            return;
+        }
 
         insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
@@ -199,16 +215,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 int leftReadStart = leftRead.getPosition();
                 int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
                 double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
-                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequenceLength()) + " = " + leftReadMapability);
+                logger.debug("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequenceLength()) + " = " + leftReadMapability);
 
                 int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
                 int rightReadEnd = rightRead.getPosition();
                 double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
-                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
+                logger.debug("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
 
-                //System.err.println("old pmc: " + pMappingCorrect);
+                logger.debug("old pmc: " + pMappingCorrect);
                 pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
-                //System.err.println("new pmc: " + pMappingCorrect);
+                logger.debug("new pmc: " + pMappingCorrect);
             }
         }
 
@@ -229,7 +245,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 }
             }
 
-            //System.err.println("Emitting insert size " + insertSize);
+            logger.debug("Emitting insert size " + insertSize);
             GenomicLocationWithQuality genomicLocation = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
             output.collect(genomicLocation, readPairInfo);
 
@@ -254,12 +270,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             e.printStackTrace();
         }
 
-        System.err.println("Looking up the read group for input file: " + inputFile);
+        logger.debug("Looking up the read group for input file: " + inputFile);
         boolean configuredReadGroup = false;
         for (Short readGroupInfoId : readGroupInfos.keySet()) {
-            System.err.println("comparing to: " + readGroupInfos.get(readGroupInfoId).hdfsPath);
+            logger.debug("comparing to: " + readGroupInfos.get(readGroupInfoId).hdfsPath);
             if (inputFile.startsWith(readGroupInfos.get(readGroupInfoId).hdfsPath)) {
-                System.err.println("got it!");
+                logger.debug("got it!");
                 this.readGroupId = readGroupInfoId;
                 ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupInfoId);
                 matePairs = readGroupInfo.matePair;
@@ -280,7 +296,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             setChromosomeFilter(job.get("alignments.filterchr"));
             setStartFilter(Long.parseLong(job.get("alignments.filterstart")));
             setEndFilter(Long.parseLong(job.get("alignments.filterend")));
-            System.err.println("Configured filter");
+            logger.debug("Configured filter");
         }
 
 
@@ -291,7 +307,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.err.println("configured exclusion regions with " + exclusionRegionsFileName);
+            logger.debug("configured exclusion regions with " + exclusionRegionsFileName);
         }
 
 
@@ -303,14 +319,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.err.println("configured mapability with " + mapabilityWeightingFileName);
+            logger.debug("configured mapability with " + mapabilityWeightingFileName);
         }
 
         if (job.get("pileupDeletionScore.maxInsertSize") != null) {
             maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
-            System.err.println("configured max insert to " + maxInsertSize);
+            logger.debug("configured max insert to " + maxInsertSize);
         }
-        System.err.println("done with configuration");
+        logger.debug("done with configuration");
     }
 
     protected static String getInputPath(String mapInputProperty) {
