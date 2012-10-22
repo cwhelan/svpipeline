@@ -43,6 +43,9 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
     @Parameter(names = {"--maxInsertSize"})
     int maxInsertSize = 500000;
 
+    @Parameter(names = {"--aligner"})
+    String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
+
     public void run(Configuration configuration) throws IOException {
         runHadoopJob(configuration);
     }
@@ -60,6 +63,7 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
 
         conf.setInputFormat(SequenceFileInputFormat.class);
 
+        conf.set("cloudbreak.aligner", aligner);
         conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
         conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
