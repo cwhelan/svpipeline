@@ -190,7 +190,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         // todo: not handling inversions for now
         if (!scorer.validateMappingOrientations(record1, record2, matePairs)) {
             if (logger.isDebugEnabled()) {
-                logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2);
+                logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + matePairs);
             }
             return;
         }

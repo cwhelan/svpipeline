@@ -32,5 +32,16 @@ public class SAMRecordTest {
         assertEquals(340, samRecord.getPairPosterior());
     }
 
+    @Test
+    public void testOrientationFlags() throws Exception {
+        SAMRecord r1 = new SAMRecord();
+        r1.setFlag(0x99);
+
+        SAMRecord r2 = new SAMRecord();
+        r2.setFlag(0x147);
+
+        assertTrue(r1.isForward());
+        assertTrue(! r2.isForward());
+    }
 
 }
