@@ -70,7 +70,7 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
 //
 //        System.out.println("pDeletionNew:\t" + pDeletionNew);
 //        System.out.println("pNoDeletionNew:\t" + pNoDeletionNew);
-//        System.out.println("likelihoodRatio:\t" + likelihoodRatio);
+//        System.out.println("lrHeterozygous:\t" + lrHeterozygous);
 //        System.out.println("-----");
 
         return likelihoodRatio;

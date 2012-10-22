@@ -15,10 +15,11 @@ import java.io.IOException;
 public class GMMScorerResults implements Writable {
     public double w0;
     public double mu2;
-    public double twoComponentLikelihood;
     public double nodelOneComponentLikelihood;
-    public double oneFreeComponenLikelihood = Double.NEGATIVE_INFINITY;
-    public double likelihoodRatio;
+    public double twoComponentLikelihood;
+    public double oneFreeComponentLikelihood = Double.NEGATIVE_INFINITY;
+    public double lrHeterozygous;
+    public double lrHomozygous;
 
     @Override
     public String toString() {
@@ -27,26 +28,29 @@ public class GMMScorerResults implements Writable {
                 ", mu2=" + mu2 +
                 ", twoComponentLikelihood=" + twoComponentLikelihood +
                 ", nodelOneComponentLikelihood=" + nodelOneComponentLikelihood +
-                ", oneFreeComponentLikelihood=" + oneFreeComponenLikelihood +
-                ", likelihoodRatio=" + likelihoodRatio +
+                ", oneFreeComponentLikelihood=" + oneFreeComponentLikelihood +
+                ", lrHeterozygous=" + lrHeterozygous +
+                ", lrHomozygous=" + lrHomozygous +
                 '}';
     }
 
     public void write(DataOutput dataOutput) throws IOException {
         dataOutput.writeDouble(w0);
         dataOutput.writeDouble(mu2);
-        dataOutput.writeDouble(twoComponentLikelihood);
         dataOutput.writeDouble(nodelOneComponentLikelihood);
-        dataOutput.writeDouble(oneFreeComponenLikelihood);
-        dataOutput.writeDouble(likelihoodRatio);
+        dataOutput.writeDouble(twoComponentLikelihood);
+        dataOutput.writeDouble(oneFreeComponentLikelihood);
+        dataOutput.writeDouble(lrHeterozygous);
+        dataOutput.writeDouble(lrHomozygous);
     }
 
     public void readFields(DataInput dataInput) throws IOException {
         w0 = dataInput.readDouble();
         mu2 = dataInput.readDouble();
-        twoComponentLikelihood = dataInput.readDouble();
         nodelOneComponentLikelihood = dataInput.readDouble();
-        oneFreeComponenLikelihood = dataInput.readDouble();
-        likelihoodRatio = dataInput.readDouble();
+        twoComponentLikelihood = dataInput.readDouble();
+        oneFreeComponentLikelihood = dataInput.readDouble();
+        lrHeterozygous = dataInput.readDouble();
+        lrHomozygous = dataInput.readDouble();
     }
 }

@@ -232,7 +232,7 @@ public class GenotypingGMMScorer {
             l = lprime;
         }
         results.twoComponentLikelihood = l;
-        results.likelihoodRatio = l - results.nodelOneComponentLikelihood;
+        results.lrHeterozygous = l - results.nodelOneComponentLikelihood;
         results.mu2 = mu[1];
         results.w0 = Math.exp(w[0]);
 
@@ -259,7 +259,8 @@ public class GenotypingGMMScorer {
             }
             l = lprime;
         }
-        results.oneFreeComponenLikelihood = l;
+        results.oneFreeComponentLikelihood = l;
+        results.lrHomozygous = l - results.nodelOneComponentLikelihood;
 
         return results;
     }

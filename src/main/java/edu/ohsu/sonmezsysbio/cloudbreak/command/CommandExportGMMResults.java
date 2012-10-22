@@ -65,6 +65,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
 
         String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
 
+        // todo: refactor to hide all of these writers
         BufferedWriter w0outputFileWriter = createWriter(w0fileName);
         if (w0outputFileWriter == null) return;
 
@@ -80,11 +81,15 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         BufferedWriter l1foutputFileWriter = createWriter(l1ffileName);
         if (l1foutputFileWriter == null) return;
 
-        BufferedWriter lroutputFileWriter = createWriter(lrfileName);
-        if (lroutputFileWriter == null) return;
+        BufferedWriter lrHetOutputFileWriter = createWriter(lrfileName);
+        if (lrHetOutputFileWriter == null) return;
+
+        BufferedWriter lrHomOutputFileWriter = createWriter(lrfileName);
+        if (lrHomOutputFileWriter == null) return;
 
         writeGMMResultWigFiles(conf, w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
-                l2outputFileWriter, lroutputFileWriter, l1foutputFileWriter, inputHDFSDir, faidx);
+                l2outputFileWriter, l1foutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
+                inputHDFSDir, faidx);
         w0outputFileWriter.close();
 
 //        System.err.println("Exporting regions with positive scores into " + pileupBedFileName);
@@ -114,14 +119,17 @@ public class CommandExportGMMResults implements CloudbreakCommand {
 
     private void writeGMMResultWigFiles(Configuration conf, Writer w0outputFileWriter, BufferedWriter mu1outputFileWriter,
                                         BufferedWriter l1outputFileWriter, BufferedWriter l2outputFileWriter,
-                                        BufferedWriter lroutputFileWriter, BufferedWriter l1foutputFileWriter, String inputHDFSDir1, FaidxFileHelper faix
+                                        BufferedWriter l1fOutputFileWriter, BufferedWriter lrHetOutputFileWriter,
+                                        BufferedWriter lrHomOutputFileWriter, String inputHDFSDir1,
+                                        FaidxFileHelper faix
     ) throws IOException {
         w0outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " w0\"\n");
         mu1outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " mu1\"\n");
         l1outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l1\"\n");
         l2outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l2\"\n");
-        l1foutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l1f\"\n");
-        lroutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " lr\"\n");
+        l1fOutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l1f\"\n");
+        lrHetOutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " lrHet\"\n");
+        lrHomOutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " lrHom\"\n");
 
         FileSystem dfs = DistributedFileSystem.get(conf);
         FileStatus[] stati = dfs.listStatus(new Path(inputHDFSDir1));
@@ -141,12 +149,14 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         }
 
         mergeSortedInputStreams(new DFSFacade(dfs, conf), w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
-                l2outputFileWriter, l1foutputFileWriter, lroutputFileWriter, faix, inputStreams);
+                l2outputFileWriter, l1fOutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
+                faix, inputStreams);
     }
 
     public void mergeSortedInputStreams(DFSFacade dfsFacade, Writer w0outputFileWriter, BufferedWriter mu1outputFileWriter,
                                         BufferedWriter l1outputFileWriter, BufferedWriter l2outputFileWriter,
-                                        BufferedWriter lroutputFileWriter, BufferedWriter l1foutputFileWriter, FaidxFileHelper faix,
+                                        BufferedWriter l1fOutputFileWriter, BufferedWriter lrHetOutputFileWriter,
+                                        BufferedWriter lrHomOutputFileWriter, FaidxFileHelper faix,
                                         List<Path> paths) throws IOException {
         short currentChromosome = -1;
         PriorityQueue<GMMResultsReaderAndLine> fileReaders = new PriorityQueue<GMMResultsReaderAndLine>();
@@ -166,8 +176,10 @@ public class CommandExportGMMResults implements CloudbreakCommand {
                 writeChromHeader(mu1outputFileWriter, faix, minNextLine);
                 writeChromHeader(l1outputFileWriter, faix, minNextLine);
                 writeChromHeader(l2outputFileWriter, faix, minNextLine);
-                writeChromHeader(l1foutputFileWriter, faix, minNextLine);
-                writeChromHeader(lroutputFileWriter, faix, minNextLine);
+                writeChromHeader(l1fOutputFileWriter, faix, minNextLine);
+                writeChromHeader(lrHetOutputFileWriter, faix, minNextLine);
+                writeChromHeader(lrHomOutputFileWriter, faix, minNextLine);
+
                 currentChromosome = minNextLine.getGenomicLocation().chromosome;
             }
 
@@ -175,8 +187,9 @@ public class CommandExportGMMResults implements CloudbreakCommand {
             mu1outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().mu2 + "\n");
             l1outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().nodelOneComponentLikelihood + "\n");
             l2outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().twoComponentLikelihood + "\n");
-            l1foutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().oneFreeComponenLikelihood + "\n");
-            lroutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().likelihoodRatio + "\n");
+            l1fOutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().oneFreeComponentLikelihood + "\n");
+            lrHetOutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().lrHeterozygous + "\n");
+            lrHomOutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().lrHomozygous + "\n");
 
             boolean gotLine;
             gotLine = readNextDataLine((GMMResultsReaderAndLine) minNextLine);

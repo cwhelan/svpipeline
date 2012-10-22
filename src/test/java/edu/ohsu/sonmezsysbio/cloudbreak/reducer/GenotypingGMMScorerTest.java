@@ -105,6 +105,11 @@ public class GenotypingGMMScorerTest {
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
         GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
+
+        assertTrue(results.oneFreeComponentLikelihood < 0);
+        assertTrue(results.twoComponentLikelihood < 0);
+        assertTrue(results.nodelOneComponentLikelihood < 0);
+
         assertEquals(0, results.w0, 0.0001);
     }
 
@@ -173,6 +178,10 @@ public class GenotypingGMMScorerTest {
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
         GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
+        assertTrue(results.oneFreeComponentLikelihood < 0);
+        assertTrue(results.twoComponentLikelihood < 0);
+        assertTrue(results.nodelOneComponentLikelihood < 0);
+
         assertEquals(0, results.w0, 0.0001);
     }
 
@@ -186,11 +195,14 @@ public class GenotypingGMMScorerTest {
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
         GMMScorerResults estimates = scorer.estimate(y, initialW, 200, sigma);
+        assertTrue(estimates.oneFreeComponentLikelihood < 0);
+        assertTrue(estimates.twoComponentLikelihood < 0);
+        assertTrue(estimates.nodelOneComponentLikelihood < 0);
         assertTrue(estimates.twoComponentLikelihood > estimates.nodelOneComponentLikelihood);
-        assertTrue(estimates.oneFreeComponenLikelihood >  estimates.nodelOneComponentLikelihood);
+        assertTrue(estimates.oneFreeComponentLikelihood >  estimates.nodelOneComponentLikelihood);
 
         // by only a tiny bit:
-        assertTrue(estimates.twoComponentLikelihood >  estimates.oneFreeComponenLikelihood);
+        assertTrue(estimates.twoComponentLikelihood > estimates.oneFreeComponentLikelihood);
     }
 
 }

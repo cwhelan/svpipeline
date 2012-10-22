@@ -111,5 +111,15 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
     --faidx $LOCAL_FAI \
     --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
 
-echo gzip *.wig *.bed
-gzip *.wig *.bed
+echo gzip *.wig
+gzip *.wig
+
+~/software/IGVTools/igvtools tile $NAME_w0.wig.gz $NAME_w0.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile $NAME_mu1.wig.gz $NAME_mu1.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile $NAME_l1.wig.gz $NAME_l1.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile $NAME_l2.wig.gz $NAME_l2.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile $NAME_l1f.wig.gz $NAME_l1f.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile $NAME_lrHet.wig.gz $NAME_lrHet.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile $NAME_lrHom.wig.gz $NAME_lrHom.wig.gz.tdf hg18
+
+
