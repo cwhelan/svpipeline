@@ -60,7 +60,7 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
     Long endFilter;
 
     @Parameter(names = {"--resolution"})
-    final int resolution = Cloudbreak.DEFAULT_RESOLUTION;
+    int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     @Parameter(names = {"--excludePairsMappingIn"})
     String exclusionRegionsFileName;
