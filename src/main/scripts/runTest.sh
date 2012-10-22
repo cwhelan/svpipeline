@@ -43,8 +43,8 @@ NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basenam
 
 echo Experiment name: $NAME
 
-mkdir $NAME
-pushd $NAME
+mkdir /tmp/$NAME
+pushd /tmp/$NAME
 
 exec > >(tee -a test.log)
 
@@ -99,10 +99,10 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
 
 cat <<EOF
 
-hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportWigAndBedFiles 
-   --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
-   --faidx $LOCAL_FAI 
-   --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
+    --faidx $LOCAL_FAI \
+    --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
 
 EOF
 
@@ -114,12 +114,12 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
 echo gzip *.wig
 gzip *.wig
 
-~/software/IGVTools/igvtools tile $NAME_w0.wig.gz $NAME_w0.wig.gz.tdf hg18
-~/software/IGVTools/igvtools tile $NAME_mu1.wig.gz $NAME_mu1.wig.gz.tdf hg18
-~/software/IGVTools/igvtools tile $NAME_l1.wig.gz $NAME_l1.wig.gz.tdf hg18
-~/software/IGVTools/igvtools tile $NAME_l2.wig.gz $NAME_l2.wig.gz.tdf hg18
-~/software/IGVTools/igvtools tile $NAME_l1f.wig.gz $NAME_l1f.wig.gz.tdf hg18
-~/software/IGVTools/igvtools tile $NAME_lrHet.wig.gz $NAME_lrHet.wig.gz.tdf hg18
-~/software/IGVTools/igvtools tile $NAME_lrHom.wig.gz $NAME_lrHom.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_w0.wig.gz ${NAME}_w0.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_mu1.wig.gz ${NAME}_mu1.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_l1.wig.gz ${NAME}_l1.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_l2.wig.gz ${NAME}_l2.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_l1f.wig.gz ${NAME}_l1f.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_lrHet.wig.gz ${NAME}_lrHet.wig.gz.tdf hg18
+~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_lrHom.wig.gz.tdf hg18
 
 

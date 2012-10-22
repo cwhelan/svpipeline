@@ -61,7 +61,8 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         String l1fileName = outputPrefix + "_l1.wig";
         String l2fileName = outputPrefix + "_l2.wig";
         String l1ffileName = outputPrefix + "_l1f.wig";
-        String lrfileName = outputPrefix + "_lr.wig";
+        String lrHetfileName = outputPrefix + "_lrHet.wig";
+        String lrHomfileName = outputPrefix + "_lrHom.wig";
 
         String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
 
@@ -81,27 +82,16 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         BufferedWriter l1foutputFileWriter = createWriter(l1ffileName);
         if (l1foutputFileWriter == null) return;
 
-        BufferedWriter lrHetOutputFileWriter = createWriter(lrfileName);
+        BufferedWriter lrHetOutputFileWriter = createWriter(lrHetfileName);
         if (lrHetOutputFileWriter == null) return;
 
-        BufferedWriter lrHomOutputFileWriter = createWriter(lrfileName);
+        BufferedWriter lrHomOutputFileWriter = createWriter(lrHomfileName);
         if (lrHomOutputFileWriter == null) return;
 
         writeGMMResultWigFiles(conf, w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
                 l2outputFileWriter, l1foutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
                 inputHDFSDir, faidx);
         w0outputFileWriter.close();
-
-//        System.err.println("Exporting regions with positive scores into " + pileupBedFileName);
-//        BufferedReader pileupWigFileReader = new BufferedReader(new FileReader(new File(w0fileName)));
-//        BufferedWriter piledupBedFileWriter = new BufferedWriter(new FileWriter(new File(pileupBedFileName)));
-//        try {
-//            medianFilterWindow = 1;
-//            WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, pileupWigFileReader, piledupBedFileWriter, 0, faidx, medianFilterWindow);
-//        } finally {
-//            pileupWigFileReader.close();
-//            piledupBedFileWriter.close();
-//        }
 
     }
 
