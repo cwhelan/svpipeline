@@ -13,7 +13,7 @@ public abstract class PairedAlignmentScorer {
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(PairedAlignmentScorer.class);
 
-    { logger.setLevel(Level.DEBUG); }
+    //{ logger.setLevel(Level.DEBUG); }
 
     public boolean validateInsertSize(int insertSize, String readPairId, Integer maxInsertSize1) {
         if (insertSize == 0) return false;

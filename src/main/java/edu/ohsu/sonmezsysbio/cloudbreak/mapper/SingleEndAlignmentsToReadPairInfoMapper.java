@@ -32,7 +32,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentsToReadPairInfoMapper.class);
 
-    { logger.setLevel(Level.DEBUG); }
+    //{ logger.setLevel(Level.DEBUG); }
 
     private boolean matePairs;
     private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
