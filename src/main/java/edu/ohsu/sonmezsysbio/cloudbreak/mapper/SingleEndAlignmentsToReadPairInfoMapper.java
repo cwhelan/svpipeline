@@ -285,12 +285,19 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
 
             int pos = genomeOffset + i;
+            if (targetDebug) {
+                logger.info("pos: "+ pos);
+            }
 
             if (getChromosomeFilter() != null) {
                 if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
                     pos < getStartFilter() || pos > getEndFilter()) {
                     if (targetDebug) {
                         logger.info("failed chrom,start,end filter");
+                        logger.info("chr filter: " + getChromosomeFilter());
+                        logger.info(" record1.getChromosomeName().equals(getChromosomeFilter()): " + record1.getChromosomeName().equals(getChromosomeFilter()));
+                        logger.info("startFilter: " + getStartFilter());
+                        logger.info("endFilter: " + getEndFilter());
                     }
                     return;
                 }

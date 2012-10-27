@@ -163,6 +163,9 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
 
         MockOutputCollector mockOutputCollector = new MockOutputCollector();
         mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
+        mapper.setChromosomeFilter("2");
+        mapper.setStartFilter(132512600l);
+        mapper.setEndFilter(132512800l);
 
         GenomicLocationWithQuality gl132512700 = new GenomicLocationWithQuality();
         gl132512700.chromosome = 0;
