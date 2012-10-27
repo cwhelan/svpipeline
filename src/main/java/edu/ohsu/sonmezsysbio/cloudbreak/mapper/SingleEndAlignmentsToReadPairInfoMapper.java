@@ -126,6 +126,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         String line = value.toString();
         if (line.contains("1bf17d")) {
             logger.info("got target line: " + line);
+            logger.setLevel(Level.DEBUG);
+            GenomicLocationWithQuality l = new GenomicLocationWithQuality((short) 0, 1, 0.0);
+            ReadPairInfo rpi = new ReadPairInfo(100, 0, (short) 0);
+            for (int i = 0; i < 100; i++) {
+                output.collect(l, rpi);
+            }
         }
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);

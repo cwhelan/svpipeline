@@ -169,6 +169,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         gl132512700.pMappingCorrect = -3.9301895071730983E-14;
 
         assertTrue(mockOutputCollector.keys.contains(gl132512700));
+        assertEquals(281, mockOutputCollector.values.get(0).insertSize);
     }
 
     @Test
