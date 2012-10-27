@@ -124,30 +124,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
-        logger.setLevel(Level.INFO);
-        boolean targetDebug = false;
-        if (line.contains("1bf17d")) {
-            logger.info("got target line: " + line);
-            targetDebug = true;
-            logger.setLevel(Level.DEBUG);
-            GenomicLocationWithQuality l = new GenomicLocationWithQuality((short) 0, 1, 0.0);
-            ReadPairInfo rpi = new ReadPairInfo(100, 0, (short) 0);
-            for (int i = 0; i < 100; i++) {
-                output.collect(l, rpi);
-            }
-        }
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
-        if (targetDebug) {
-            logger.info("read 1 alignments");
-            for (AlignmentRecord a : readPairAlignments.getRead1Alignments()) {
-                logger.info(a);
-            }
-            logger.info("read 2 alignments");
-            for (AlignmentRecord a : readPairAlignments.getRead2Alignments()) {
-                logger.info(a);
-            }
-
-        }
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
 
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
@@ -156,9 +133,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 for (AlignmentRecord record : readPairAlignments.getRead1Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         logger.debug("excluding record " + record);
-                        if (targetDebug) {
-                            logger.info("excluding record " + record);
-                        }
                         recordsInExcludedAreas.add(record);
                     }
                 }
@@ -166,9 +140,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 for (AlignmentRecord record : readPairAlignments.getRead2Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
                         logger.debug("excluding record " + record);
-                        if (targetDebug) {
-                            logger.info("excluding record " + record);
-                        }
                         recordsInExcludedAreas.add(record);
                     }
                 }
@@ -180,42 +151,34 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
 
         try {
-            emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas, targetDebug);
+            emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas, boolean targetDebug) throws Exception {
+    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
-                emitReadPairInfoForPair(record1, record2, readPairAlignments, output, targetDebug);
+                emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
             }
         }
     }
 
-    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, boolean targetDebug) throws IOException {
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
             if (logger.isDebugEnabled()) {
                 logger.debug("translocation: r1 = " + record1 + "; r2 = " + record2);
             }
-            if (targetDebug) {
-                logger.info("translocation: r1 = " + record1 + "; r2 = " + record2);
-            }
-
             return;
         }
 
         if (getChromosomeFilter() != null) {
             if (! record1.getChromosomeName().equals(getChromosomeFilter())) {
-                if (targetDebug) {
-                    logger.info("fail chr filter " + getChromosomeFilter());
-                }
-
                 return;
             }
         }
@@ -231,19 +194,12 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             if (logger.isDebugEnabled()) {
                 logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + matePairs);
             }
-            if (targetDebug) {
-                logger.info("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + matePairs);
-            }
-
             return;
         }
 
         insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) {
-            if (targetDebug) {
-                logger.info("failed validate insert size");
-            }
             return;
         }
 
@@ -285,20 +241,10 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
 
             int pos = genomeOffset + i;
-            if (targetDebug) {
-                logger.info("pos: "+ pos);
-            }
 
             if (getChromosomeFilter() != null) {
                 if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
                     pos < getStartFilter() || pos > getEndFilter()) {
-                    if (targetDebug) {
-                        logger.info("failed chrom,start,end filter");
-                        logger.info("chr filter: " + getChromosomeFilter());
-                        logger.info(" record1.getChromosomeName().equals(getChromosomeFilter()): " + record1.getChromosomeName().equals(getChromosomeFilter()));
-                        logger.info("startFilter: " + getStartFilter());
-                        logger.info("endFilter: " + getEndFilter());
-                    }
                     continue;
                 }
             }
