@@ -32,7 +32,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentsToReadPairInfoMapper.class);
 
-    //{ logger.setLevel(Level.DEBUG); }
+    { logger.setLevel(Level.INFO); }
 
     private boolean matePairs;
     private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
@@ -124,6 +124,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
+        if (line.contains("1bf17d")) {
+            logger.info("got target line: " + line);
+        }
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
 
@@ -245,7 +248,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 }
             }
 
-            logger.debug("Emitting insert size " + insertSize);
+            logger.info("Emitting insert size " + insertSize);
             GenomicLocationWithQuality genomicLocation = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
             output.collect(genomicLocation, readPairInfo);
 

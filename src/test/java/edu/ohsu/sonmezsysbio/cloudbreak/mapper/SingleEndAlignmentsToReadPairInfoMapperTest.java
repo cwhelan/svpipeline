@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -130,7 +131,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         assertEquals(101, collector.keys.size());
     }
 
-        private static class MockOutputCollector implements OutputCollector<GenomicLocationWithQuality, ReadPairInfo> {
+    private static class MockOutputCollector implements OutputCollector<GenomicLocationWithQuality, ReadPairInfo> {
 
         List<GenomicLocationWithQuality> keys = new ArrayList<GenomicLocationWithQuality>();
         List<ReadPairInfo> values = new ArrayList<ReadPairInfo>();
@@ -144,6 +145,30 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
             keys.clear();
             values.clear();
         }
+    }
+
+    @Test
+    public void testMap_real1() throws Exception {
+        String key = "@2_132385096_132385222_0_1_0_0_1:0:0_1:0:0_1bf17d/";
+        String val = "@2_132385096_132385222_0_1_0_0_1:0:0_1:0:0_1bf17d//1\tS\tTAAAAAGCCGCGGCGACTAAAAGCCGCTGAGAGGGGGCAAAAAGCAGCGG\t66554410000////1.0000/----,/,.,.,,++++-----+*-****\tU\t25\t139.09267\t>2\t132512583\tF\t.\t.\t.\t18A>T\tSVP_READ\t@2_132385096_132385222_0_1_0_0_1:0:0_1:0:0_1bf17d//2\tS\tCCCCTGCCCCGCCGCGGCTTTTTGCGGCTTTCCGCCCCGGCCGCCGCGGA\t33324110000////...000//---,,...,,,++++++++++*****,\tU\t23\t135.68983\t>2\t132512814\tR\t.\t.\t.\t1G>T";
+
+        mapper.setFaix(new FaidxFileHelper("foo") {
+            @Override
+            public Short getKeyForChromName(String name) throws IOException {
+                assertEquals("2", name);
+                return (short) 0;
+            }
+        });
+
+        MockOutputCollector mockOutputCollector = new MockOutputCollector();
+        mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
+
+        GenomicLocationWithQuality gl132512700 = new GenomicLocationWithQuality();
+        gl132512700.chromosome = 0;
+        gl132512700.pos = 132512700;
+        gl132512700.pMappingCorrect = -3.9301895071730983E-14;
+
+        assertTrue(mockOutputCollector.keys.contains(gl132512700));
     }
 
     @Test
