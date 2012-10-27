@@ -119,4 +119,16 @@ public class NovoalignNativeRecord implements AlignmentRecord {
         return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
     }
 
+    @Override
+    public String toString() {
+        return "NovoalignNativeRecord{" +
+                "chromosomeName='" + chromosomeName + '\'' +
+                ", position=" + position +
+                ", mappingStatus='" + mappingStatus + '\'' +
+                ", posteriorProb=" + posteriorProb +
+                ", forward=" + forward +
+                ", readId='" + readId + '\'' +
+                ", sequence='" + sequence + '\'' +
+                '}';
+    }
 }

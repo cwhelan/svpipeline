@@ -125,8 +125,10 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         logger.setLevel(Level.INFO);
+        boolean targetDebug = false;
         if (line.contains("1bf17d")) {
             logger.info("got target line: " + line);
+            targetDebug = true;
             logger.setLevel(Level.DEBUG);
             GenomicLocationWithQuality l = new GenomicLocationWithQuality((short) 0, 1, 0.0);
             ReadPairInfo rpi = new ReadPairInfo(100, 0, (short) 0);
@@ -135,6 +137,17 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
         }
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        if (targetDebug) {
+            logger.info("read 1 alignments");
+            for (AlignmentRecord a : readPairAlignments.getRead1Alignments()) {
+                logger.info(a);
+            }
+            logger.info("read 2 alignments");
+            for (AlignmentRecord a : readPairAlignments.getRead2Alignments()) {
+                logger.info(a);
+            }
+
+        }
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
 
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
