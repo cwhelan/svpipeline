@@ -299,7 +299,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                         logger.info("startFilter: " + getStartFilter());
                         logger.info("endFilter: " + getEndFilter());
                     }
-                    return;
+                    continue;
                 }
             }
 
