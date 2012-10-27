@@ -124,6 +124,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
+        logger.setLevel(Level.INFO);
         if (line.contains("1bf17d")) {
             logger.info("got target line: " + line);
             logger.setLevel(Level.DEBUG);
