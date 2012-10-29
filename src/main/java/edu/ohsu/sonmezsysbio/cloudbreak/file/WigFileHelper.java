@@ -125,6 +125,9 @@ public class WigFileHelper {
 
             } else {
                 String[] fields = line.split("\t");
+                if (fields.length < 2) {
+                    throw new RuntimeException("Failed to parse line: " + line);
+                }
                 long pos = Long.valueOf(fields[0]);
                 if (pos > faidx.getLengthForChromName(currentChromosome)) continue;
                 double val = Double.valueOf(fields[1]);

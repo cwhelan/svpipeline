@@ -115,11 +115,17 @@ echo gzip *.wig
 gzip *.wig
 
 ~/software/IGVTools/igvtools tile ${NAME}_w0.wig.gz ${NAME}_w0.wig.gz.tdf hg18
+
 ~/software/IGVTools/igvtools tile ${NAME}_mu1.wig.gz ${NAME}_mu1.wig.gz.tdf hg18
+
 ~/software/IGVTools/igvtools tile ${NAME}_l1.wig.gz ${NAME}_l1.wig.gz.tdf hg18
+
 ~/software/IGVTools/igvtools tile ${NAME}_l2.wig.gz ${NAME}_l2.wig.gz.tdf hg18
+
 ~/software/IGVTools/igvtools tile ${NAME}_l1f.wig.gz ${NAME}_l1f.wig.gz.tdf hg18
+
 ~/software/IGVTools/igvtools tile ${NAME}_lrHet.wig.gz ${NAME}_lrHet.wig.gz.tdf hg18
+
 ~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_lrHom.wig.gz.tdf hg18
 
 
