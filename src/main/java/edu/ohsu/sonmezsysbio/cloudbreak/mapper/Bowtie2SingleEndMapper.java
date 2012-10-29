@@ -6,6 +6,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.SAMAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -20,6 +21,8 @@ import java.util.Arrays;
 public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(Bowtie2SingleEndMapper.class);
+
+    { logger.setLevel(Level.DEBUG); }
 
     private OutputCollector<Text, Text> output;
     private String localDir;
@@ -50,13 +53,6 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
             System.err.println("file does not exist: " + s1File.getPath());
         } else {
             System.err.println("read file length: " + s1File.length());
-        }
-
-        File indexFile = new File(reference);
-        if (! indexFile.exists()) {
-            System.err.println("index file does not exist: " + indexFile.getPath());
-        } else {
-            System.err.println("index file length: " + indexFile.length());
         }
 
         String referenceBaseName = new File(reference).getName();
@@ -110,10 +106,10 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
         return firstErrorLine;
     }
 
-    protected static String[] buildCommandLine(String bowtie2executable, String reference, String path1, String numReports) {
+    protected static String[] buildCommandLine(String bowtie2executable, String referenceBaseName, String path1, String numReports) {
         String[] commandArray = {
                 "./" + bowtie2executable,
-                "-x", reference,
+                "-x", referenceBaseName,
                 "-U", path1,
                 "-k", numReports,
                 "--very-sensitive-local", "-mm"

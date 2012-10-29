@@ -249,7 +249,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 }
             }
 
-            logger.info("Emitting insert size " + insertSize);
+            logger.debug("Emitting insert size " + insertSize);
             GenomicLocationWithQuality genomicLocation = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
             output.collect(genomicLocation, readPairInfo);
 
