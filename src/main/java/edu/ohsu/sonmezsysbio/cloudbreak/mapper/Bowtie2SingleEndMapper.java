@@ -31,6 +31,11 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
     private String bowtie2Executable;
 
     @Override
+    protected boolean getCompressTempReadFile() {
+        return false;
+    }
+
+    @Override
     public void configure(JobConf job) {
         super.configure(job);
 
