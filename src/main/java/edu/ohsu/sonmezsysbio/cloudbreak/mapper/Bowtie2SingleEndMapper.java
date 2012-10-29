@@ -112,7 +112,7 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
                 "-x", referenceBaseName,
                 "-U", path1,
                 "-k", numReports,
-                "--very-sensitive-local", "-mm"
+                "--very-sensitive-local", "--mm"
         };
         return commandArray;
     }
