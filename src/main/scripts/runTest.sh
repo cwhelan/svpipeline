@@ -31,6 +31,7 @@ MAX_INSERT=$7
 TRUTH=$8
 THRESHOLD_MIN=$9
 SHORT_NAME=${10}
+MAX_MAPQ_DIFF=${11}
 
 pushd $BUILD_DIR
 git pull
@@ -39,7 +40,7 @@ mvn assembly:assembly
 SHORT_GIT_TAG=`git rev-parse --short HEAD`
 popd
 
-NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${SHORT_GIT_TAG}
+NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}
 
 echo Experiment name: $NAME
 
@@ -70,6 +71,7 @@ MAX_INSERT=$MAX_INSERT
 TRUTH=$TRUTH
 THRESHOLD_MIN=$THRESHOLD_MIN
 SHORT_NAME=$SHORT_NAME
+MAX_MAPQ_DIFF=$MAX_MAPQ_DIFF
 
 EOF
 
@@ -84,6 +86,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
    --excludePairsMappingIn $FILTER 
    --resolution $RESOLUTION 
    --aligner $ALIGNER
+   --maxLogMapqDiff $MAX_MAPQ_DIFF
 
 EOF
 
@@ -95,7 +98,8 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --mapabilityWeighting $MAPABILITY \
     --excludePairsMappingIn $FILTER \
     --resolution $RESOLUTION \
-    --aligner $ALIGNER
+    --aligner $ALIGNER \
+    --maxLogMapqDiff $MAX_MAPQ_DIFF
 
 cat <<EOF
 

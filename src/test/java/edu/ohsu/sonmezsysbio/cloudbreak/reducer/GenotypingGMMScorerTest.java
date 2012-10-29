@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -37,17 +38,22 @@ public class GenotypingGMMScorerTest {
             1229.633, 1184.879, 1230.889, 1169.125, 1200.363, 1262.897, 1155.817, 1164.294
     };
 
+    private GenotypingGMMScorer scorer;
+
+    @Before
+    public void setup() {
+        scorer = new GenotypingGMMScorer();
+    }
+
     @Test
     public void testLogsumexp() throws Exception {
         double[] x = new double[] {-7.018195, -309.17497};
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         assertEquals(-7.018195, scorer.logsumexp(x), 0.00001);
     }
 
     @Test
     public void testNnclean() throws Exception {
         double[] y = HET_DEL_5X_5N;
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double[] nonnoise = new double[] {260.0736, 197.4272,   194.8618,  1217.8588,
                 1228.2190,  1151.7017};
         assertArrayEquals(nonnoise, scorer.nnclean(y, 30, 2), 0.000001);
@@ -56,7 +62,6 @@ public class GenotypingGMMScorerTest {
     @Test
     public void testNncleanNotEnoughValues() throws Exception {
         double[] y = new double[] {260.0736, 1217.8588};
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double[] nonnoise = new double[] {};
         assertArrayEquals(nonnoise, scorer.nnclean(y, 30, 2), 0.000001);
     }
@@ -68,7 +73,6 @@ public class GenotypingGMMScorerTest {
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         assertEquals(.5, scorer.estimate(y, initialW, 200, sigma).w0, 0.0001);
     }
 
@@ -78,7 +82,6 @@ public class GenotypingGMMScorerTest {
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         assertEquals(1, scorer.estimate(y, initialW, 200, sigma).w0, 0.0001);
     }
 
@@ -100,8 +103,6 @@ public class GenotypingGMMScorerTest {
             rpis.add(rpi);
         }
 
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
-
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
         GMMScorerResults results = scorer.reduceReadPairInfos(rpis.iterator(), rgis);
@@ -117,7 +118,6 @@ public class GenotypingGMMScorerTest {
     public void testLikelihood() throws Exception {
         double[] y = NODEL_ISIZES;
 
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double l = scorer.likelihood(y, new double[] { Math.log(.5), Math.log(.5)}, new double[] {100, 1100}, 15);
         assertEquals(-29.90017, l, 0.0001);
 
@@ -127,7 +127,6 @@ public class GenotypingGMMScorerTest {
     public void testLikelihoodSingleComponent() throws Exception {
         double[] y = NODEL_ISIZES;
 
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
         double l = scorer.likelihood(y, new double[] { Math.log(1)}, new double[] {100}, 15);
         assertEquals(-29.2070, l, 0.0001);
     }
@@ -173,7 +172,7 @@ public class GenotypingGMMScorerTest {
             rpis.add(rpi);
         }
 
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
+        scorer.setMaxLogMapqDiff(5);
 
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);
@@ -188,8 +187,6 @@ public class GenotypingGMMScorerTest {
     @Test
     public void testHomDel1v2Components() throws Exception{
         double[] y = HOM_DEL_1000_20X_0N;
-
-        GenotypingGMMScorer scorer = new GenotypingGMMScorer();
 
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};

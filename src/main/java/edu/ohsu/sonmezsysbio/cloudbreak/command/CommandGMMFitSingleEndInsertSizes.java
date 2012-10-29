@@ -70,6 +70,9 @@ public class CommandGMMFitSingleEndInsertSizes extends BaseCloudbreakCommand {
     @Parameter(names = {"--aligner"})
     String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
 
+    @Parameter(names = {"--maxLogMapqDiff"})
+    Double maxLogMapqDiff = 5.0;
+
     public void run(Configuration conf) throws IOException, URISyntaxException {
         runHadoopJob(conf);
     }
@@ -115,6 +118,8 @@ public class CommandGMMFitSingleEndInsertSizes extends BaseCloudbreakCommand {
         conf.set("cloudbreak.aligner", aligner);
 
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
+
+        conf.set("max.log.mapq.diff", String.valueOf(maxLogMapqDiff));
 
         if (chrFilter != null) {
             conf.set("alignments.filterchr", chrFilter);

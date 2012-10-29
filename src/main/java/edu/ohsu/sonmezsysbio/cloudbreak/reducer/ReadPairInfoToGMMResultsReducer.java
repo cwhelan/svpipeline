@@ -64,6 +64,7 @@ public class ReadPairInfoToGMMResultsReducer extends MapReduceBase implements Re
             e.printStackTrace();
         }
 
+        readPairInfoScorer.setMaxLogMapqDiff(Double.parseDouble(job.get("max.log.mapq.diff")));
     }
 }
 

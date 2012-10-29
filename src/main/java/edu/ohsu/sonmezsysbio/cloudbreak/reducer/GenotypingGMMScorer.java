@@ -21,7 +21,15 @@ public class GenotypingGMMScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
     public static final int MAX_COVERAGE = 200;
-    public static final int MAX_LOG_MAPQ_DIFF = 5;
+    private double maxLogMapqDiff;
+
+    public void setMaxLogMapqDiff(double maxLogMapqDiff) {
+        this.maxLogMapqDiff = maxLogMapqDiff;
+    }
+
+    public double getMaxLogMapqDiff() {
+        return maxLogMapqDiff;
+    }
 
     { log.setLevel(Level.INFO); }
 
@@ -276,7 +284,7 @@ public class GenotypingGMMScorer {
         double bestMappingQuality = 0;
         while (values.hasNext()) {
             ReadPairInfo rpi = values.next();
-            if (! first & (bestMappingQuality - rpi.pMappingCorrect > MAX_LOG_MAPQ_DIFF)) {
+            if (! first & (bestMappingQuality - rpi.pMappingCorrect > getMaxLogMapqDiff())) {
                 break;
             }
             int insertSize = rpi.insertSize;
