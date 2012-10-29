@@ -76,13 +76,13 @@ MAX_MAPQ_DIFF=$MAX_MAPQ_DIFF
 EOF
 
 MAPABILITY_PARAM=""
-if [ $MAPABILITY -ne "None" ]
+if [ $MAPABILITY != "None" ]
 then
 MAPABILITY_PARAM="--mapabilityWeighting $MAPABILITY"
 fi
 
 FILTER_PARAM=""
-if [ $FILTER -ne "None" ]
+if [ $FILTER != "None" ]
 then
 FILTER_PARAM="--excludePairsMappingIn $FILTER"
 fi
