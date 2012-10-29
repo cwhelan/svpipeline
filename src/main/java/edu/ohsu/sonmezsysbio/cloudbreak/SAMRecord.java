@@ -42,12 +42,7 @@ public class SAMRecord implements AlignmentRecord {
     }
 
     public int getPosition() {
-        // todo: off-by-one error here?
-        if (isForward()) {
-            return position;
-        } else {
-            return position + sequence.length();
-        }
+        return position;
     }
 
     public int getInsertSize() {
