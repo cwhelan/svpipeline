@@ -21,14 +21,25 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
     protected OutputCollector<Text, Text> output;
     protected Reporter reporter;
 
+    protected boolean getCompressTempReadFile() {
+        return true;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
         this.localDir = job.get("mapred.child.tmp");
         try {
-            s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
-            s1File.createNewFile();
-            s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+            if (getCompressTempReadFile()) {
+                s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
+                s1File.createNewFile();
+                s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+            } else {
+                s1File = new File(localDir + "/temp1_sequence.fastq").getAbsoluteFile();
+                s1File.createNewFile();
+                s1FileWriter = new OutputStreamWriter(new FileOutputStream(s1File));
+
+            }
 
 
         } catch (IOException e) {
