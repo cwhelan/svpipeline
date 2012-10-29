@@ -77,11 +77,13 @@ EOF
 
 MAPABILITY_PARAM=""
 if [ $MAPABILITY -ne "None" ]
+then
 MAPABILITY_PARAM="--mapabilityWeighting $MAPABILITY"
 fi
 
 FILTER_PARAM=""
 if [ $FILTER -ne "None" ]
+then
 FILTER_PARAM="--excludePairsMappingIn $FILTER"
 fi
 
