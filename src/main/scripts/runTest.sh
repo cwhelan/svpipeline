@@ -75,6 +75,16 @@ MAX_MAPQ_DIFF=$MAX_MAPQ_DIFF
 
 EOF
 
+MAPABILITY_PARAM=""
+if [ $MAPABILITY -ne "None" ]
+MAPABILITY_PARAM="--mapabilityWeighting $MAPABILITY"
+fi
+
+FILTER_PARAM=""
+if [ $FILTER -ne "None" ]
+FILTER_PARAM="--excludePairsMappingIn $FILTER"
+fi
+
 cat <<EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 GMMFitSingleEndInsertSizes
@@ -82,8 +92,8 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
    --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME 
    --faidx $HDFS_FAI 
    --maxInsertSize $MAX_INSERT 
-   --mapabilityWeighting $MAPABILITY 
-   --excludePairsMappingIn $FILTER 
+   $MAPABILITY_PARAM
+   $FILTER_PARAM
    --resolution $RESOLUTION 
    --aligner $ALIGNER
    --maxLogMapqDiff $MAX_MAPQ_DIFF
@@ -95,8 +105,8 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --outputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $HDFS_FAI \
     --maxInsertSize $MAX_INSERT \
-    --mapabilityWeighting $MAPABILITY \
-    --excludePairsMappingIn $FILTER \
+    $MAPABILITY_PARAM \
+    $FILTER_PARAM \
     --resolution $RESOLUTION \
     --aligner $ALIGNER \
     --maxLogMapqDiff $MAX_MAPQ_DIFF
