@@ -22,7 +22,7 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(Bowtie2SingleEndMapper.class);
 
-    { logger.setLevel(Level.DEBUG); }
+    //{ logger.setLevel(Level.DEBUG); }
 
     private OutputCollector<Text, Text> output;
     private String localDir;
