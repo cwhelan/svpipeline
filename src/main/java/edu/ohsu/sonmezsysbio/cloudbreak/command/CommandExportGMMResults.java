@@ -88,10 +88,19 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         BufferedWriter lrHomOutputFileWriter = createWriter(lrHomfileName);
         if (lrHomOutputFileWriter == null) return;
 
-        writeGMMResultWigFiles(conf, w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
-                l2outputFileWriter, l1foutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
-                inputHDFSDir, faidx);
-        w0outputFileWriter.close();
+        try {
+            writeGMMResultWigFiles(conf, w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
+                    l2outputFileWriter, l1foutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
+                    inputHDFSDir, faidx);
+        } finally {
+            w0outputFileWriter.close();
+            mu1outputFileWriter.close();
+            l1outputFileWriter.close();
+            l2outputFileWriter.close();
+            lrHetOutputFileWriter.close();
+            lrHomOutputFileWriter.close();
+        }
+
 
     }
 
