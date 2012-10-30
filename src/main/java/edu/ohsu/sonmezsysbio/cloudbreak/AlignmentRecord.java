@@ -19,4 +19,5 @@ public interface AlignmentRecord {
 
     int getSequenceLength();
 
+    int getAlignmentScore();
 }

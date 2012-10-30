@@ -50,6 +50,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
     private double targetIsizeSD;
     private Short readGroupId;
 
+    private int minScore = -1;
+
+    public int getMinScore() {
+        return minScore;
+    }
+
+    public void setMinScore(int minScore) {
+        this.minScore = minScore;
+    }
+
     public FaidxFileHelper getFaix() {
         return faix;
     }
@@ -160,8 +170,18 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            if (getMinScore() != -1) {
+                if (record1.getAlignmentScore() < getMinScore()) {
+                    continue;
+                }
+            }
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
+                if (getMinScore() != -1) {
+                    if (record2.getAlignmentScore() < getMinScore()) {
+                        continue;
+                    }
+                }
+                if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) continue;
                 emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
             }
         }
@@ -330,6 +350,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
             logger.debug("configured max insert to " + maxInsertSize);
         }
+        minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
+
+
         logger.debug("done with configuration");
     }
 

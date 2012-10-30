@@ -40,6 +40,9 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
     @Parameter(names = {"--aligner"})
     String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
 
+    @Parameter(names = {"--minScore"})
+    int minScore = -1;
+
     public void run(Configuration configuration) throws IOException {
         runHadoopJob(configuration);
     }
@@ -61,6 +64,8 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
         conf.set("pileupDeletionScore.region", region);
+
+        conf.set("pileupDeletionScore.minScore", String.valueOf(minScore));
 
         conf.setMapperClass(SingleEndAlignmentsToBedSpansMapper.class);
         conf.setMapOutputKeyClass(Text.class);

@@ -59,6 +59,10 @@ public class MrfastAlignmentRecord implements AlignmentRecord {
         this.mismatches = mismatches;
     }
 
+    public int getAlignmentScore() {
+        return getSequenceLength() - getMismatches();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -71,6 +71,9 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
     @Parameter(names = {"--aligner"})
     String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
 
+    @Parameter(names = {"--minScore"})
+    int minScore = -1;
+
     public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
     }
@@ -118,6 +121,8 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
         conf.set("alignments.filterchr", chrFilter);
         conf.set("alignments.filterstart", startFilter.toString());
         conf.set("alignments.filterend", endFilter.toString());
+
+        conf.set("pileupDeletionScore.minScore", String.valueOf(minScore));
 
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocationWithQuality.class);

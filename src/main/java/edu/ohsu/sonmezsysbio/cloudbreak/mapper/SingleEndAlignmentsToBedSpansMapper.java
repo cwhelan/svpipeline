@@ -25,6 +25,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     private int regionStart;
     private int regionEnd;
     private PairedAlignmentScorer scorer;
+    private int minScore = -1;
 
     public Integer getMaxInsertSize() {
         return maxInsertSize;
@@ -66,6 +67,14 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         this.regionEnd = regionEnd;
     }
 
+    public int getMinScore() {
+        return minScore;
+    }
+
+    public void setMinScore(int minScore) {
+        this.minScore = minScore;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
@@ -73,6 +82,8 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         parseRegion(job.get("pileupDeletionScore.region"));
+
+        minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
     }
@@ -95,7 +106,15 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
     private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            if (getMinScore() != -1) {
+                if (record1.getAlignmentScore() < getMinScore()) {
+                    continue;
+                }
+            }
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
+                if (record2.getAlignmentScore() < getMinScore()) {
+                    continue;
+                }
                 emitBedSpanForPair(record1, record2, readPairAlignments, output);
             }
         }

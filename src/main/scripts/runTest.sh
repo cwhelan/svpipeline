@@ -32,6 +32,7 @@ TRUTH=$8
 THRESHOLD_MIN=$9
 SHORT_NAME=${10}
 MAX_MAPQ_DIFF=${11}
+MIN_ALIGNMENT_SCORE=${12}
 
 pushd $BUILD_DIR
 git pull
@@ -40,7 +41,7 @@ mvn assembly:assembly
 SHORT_GIT_TAG=`git rev-parse --short HEAD`
 popd
 
-NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}
+NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}_${MIN_ALIGNMENT_SCORE}
 
 echo Experiment name: $NAME
 
@@ -72,6 +73,7 @@ TRUTH=$TRUTH
 THRESHOLD_MIN=$THRESHOLD_MIN
 SHORT_NAME=$SHORT_NAME
 MAX_MAPQ_DIFF=$MAX_MAPQ_DIFF
+MIN_ALIGNMENT_SCORE=$MIN_ALIGNMENT_SCORE
 
 EOF
 
@@ -99,6 +101,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
    --resolution $RESOLUTION 
    --aligner $ALIGNER
    --maxLogMapqDiff $MAX_MAPQ_DIFF
+   --minScore $MIN_ALIGNMENT_SCORE
 
 EOF
 
@@ -112,6 +115,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --resolution $RESOLUTION \
     --aligner $ALIGNER \
     --maxLogMapqDiff $MAX_MAPQ_DIFF
+     --minScore $MIN_ALIGNMENT_SCORE
 
 cat <<EOF
 
@@ -129,6 +133,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
 
 echo gzip *.wig
 gzip *.wig
+
 
 ~/software/IGVTools/igvtools tile ${NAME}_w0.wig.gz ${NAME}_w0.wig.gz.tdf hg18
 

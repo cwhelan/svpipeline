@@ -126,6 +126,10 @@ public class SAMRecord implements AlignmentRecord {
         flag = i;
     }
 
+    public int getAlignmentScore() {
+        return Integer.parseInt(tags.get("AS"));
+    }
+
     @Override
     public String toString() {
         return "SAMRecord{" +

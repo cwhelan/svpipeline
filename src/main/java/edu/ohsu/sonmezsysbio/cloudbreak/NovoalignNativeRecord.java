@@ -16,6 +16,11 @@ public class NovoalignNativeRecord implements AlignmentRecord {
     String readId;
     String sequence;
 
+    // todo: not implemented
+    public int getAlignmentScore() {
+        return 0;
+    }
+
     public boolean isMapped() {
         return "U".equals(getMappingStatus()) || "R".equals(getMappingStatus());
     }
