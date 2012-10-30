@@ -58,8 +58,6 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
         conf.setInputFormat(SequenceFileInputFormat.class);
 
         conf.set("cloudbreak.aligner", aligner);
-        conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
-        conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
         conf.set("pileupDeletionScore.region", region);
