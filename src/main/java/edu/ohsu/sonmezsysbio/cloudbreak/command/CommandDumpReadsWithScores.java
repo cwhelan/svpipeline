@@ -28,12 +28,6 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
     @Parameter(names = {"--outputHDFSDir"}, required = true)
     String ouptutHDFSDir;
 
-    @Parameter(names = {"--targetIsize"}, required = true)
-    int targetIsize;
-
-    @Parameter(names = {"--targetIsizeSD"}, required = true)
-    int targetIsizeSD;
-    
     @Parameter(names = {"--region"}, required = true)
     String region;
 
