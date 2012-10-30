@@ -19,9 +19,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
-    private Double targetIsize;
-    private Double targetIsizeSD;
-    
+
     // region to dump spans over
     private String chromosome;
     private int regionStart;
@@ -42,23 +40,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
     public void setMatePairs(boolean matePairs) {
         this.matePairs = matePairs;
-    }
-
-
-    public Double getTargetIsize() {
-        return targetIsize;
-    }
-
-    public void setTargetIsize(Double targetIsize) {
-        this.targetIsize = targetIsize;
-    }
-
-    public Double getTargetIsizeSD() {
-        return targetIsizeSD;
-    }
-
-    public void setTargetIsizeSD(Double targetIsizeSD) {
-        this.targetIsizeSD = targetIsizeSD;
     }
 
     public String getChromosome() {
@@ -88,8 +69,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     @Override
     public void configure(JobConf job) {
         super.configure(job);
-        targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
-        targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
 
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
         matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
@@ -131,8 +110,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
 
         int insertSize;
-        Double isizeMean;
-        Double isizeSD;
 
         AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
@@ -143,29 +120,14 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
                leftRead.getPosition() < regionEnd && rightRead.getPosition() > regionStart))
             return;
 
-        isizeMean = targetIsize;
-        isizeSD = targetIsizeSD;
-        if (matePairs) {
-            if (!scorer.isMatePairNotSmallFragment(record1, record2)) {
-                isizeMean = 150.0;
-                isizeSD = 15.0;
-            }
-        }
-
         insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
         double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
-        double deletionScore = scorer.computeDeletionScore(
-                insertSize,
-                isizeMean,
-                isizeSD,
-                pMappingCorrect
-        );
 
         output.collect(new Text(leftRead.getReadId()),
-                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + insertSize + "\t" + pMappingCorrect + "\t" + deletionScore));
+                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + insertSize + "\t" + pMappingCorrect));
 
     }
 }
