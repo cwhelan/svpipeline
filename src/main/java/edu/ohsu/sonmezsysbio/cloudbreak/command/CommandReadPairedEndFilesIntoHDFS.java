@@ -48,6 +48,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     Double trigramEntropyFilter = -1.0;
 
     private long numRecords;
+    private long numFilteredRecords;
 
     public void copyReadFilesToHdfs() throws IOException {
         Configuration config = new Configuration();
@@ -130,7 +131,8 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
             String readPrefix = greatestCommonPrefix(read1, read2);
 
             if (! (passesEntropyFilter(seq1, trigramEntropyFilter) && passesEntropyFilter(seq2, trigramEntropyFilter))) {
-                log.info("Skipping read pair " + readPrefix + " because seqs " + seq1 + ", " + seq2 + " don't pass entropy filter.");
+                log.debug("Skipping read pair " + readPrefix + " because seqs " + seq1 + ", " + seq2 + " don't pass entropy filter.");
+                numFilteredRecords++;
                 continue;
             }
 
@@ -188,6 +190,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     public void run(Configuration conf) throws Exception {
         copyReadFilesToHdfs();
         log.info("Loaded " + numRecords + " records.");
+        log.info("Filtered " + numFilteredRecords + " records due to trigram entropy filter.");
     }
 
 }
