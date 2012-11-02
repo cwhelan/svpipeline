@@ -134,6 +134,8 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
 echo gzip *.wig
 gzip *.wig
 
+# igv seems to not return proper error codes
+unset -e
 
 ~/software/IGVTools/igvtools tile ${NAME}_w0.wig.gz ${NAME}_w0.wig.gz.tdf hg18
 
