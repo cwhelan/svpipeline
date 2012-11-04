@@ -20,6 +20,18 @@
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
 
+        <repository>
+            <id>project-repo</id>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>file://${project.basedir}/repo</url>
+        </repository>
+
 	</repositories>
   <dependencies>
     <dependency>
@@ -81,16 +93,12 @@
           <groupId>org.broad</groupId>
           <artifactId>bigwig</artifactId>
           <version>0.1</version>
-          <scope>system</scope>
-          <systemPath>${project.basedir}/lib/BigWig.jar</systemPath>
       </dependency>
 
       <dependency>
           <groupId>net.sf</groupId>
           <artifactId>samtools</artifactId>
           <version>1.78</version>
-          <scope>system</scope>
-          <systemPath>${project.basedir}/lib/sam-1.78.jar</systemPath>
       </dependency>
 
       <dependency>
@@ -125,6 +133,7 @@
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-jar-plugin</artifactId>
+            <version>2.3.2</version>
 			<configuration>
 				<archive>
 					<manifest>
