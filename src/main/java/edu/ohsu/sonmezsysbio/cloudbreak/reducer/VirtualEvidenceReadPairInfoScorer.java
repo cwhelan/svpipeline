@@ -4,6 +4,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -19,14 +20,16 @@ public class VirtualEvidenceReadPairInfoScorer
         ReadPairInfoScorer
 {
 
+    private static org.apache.log4j.Logger logger = Logger.getLogger(VirtualEvidenceReadPairInfoScorer.class);
+
     public double reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         LogNormalDistribution logNormalDistribution = new LogNormalDistribution(6, 0.6);
 
         double deletionPrior = Math.log(2432.0 / 2700000000.0);
         double noDeletionPrior = Math.log(1 - 2432.0 / 2700000000.0);
 
-        System.err.println("del prior: " + deletionPrior);
-        System.err.println("no del prior: " + noDeletionPrior);
+        logger.debug("del prior: " + deletionPrior);
+        logger.debug("no del prior: " + noDeletionPrior);
 
         double pDeletionFactorProduct = deletionPrior;
         double pNoDeletionFactorProduct = noDeletionPrior;
@@ -34,9 +37,9 @@ public class VirtualEvidenceReadPairInfoScorer
         while (values.hasNext()) {
             ReadPairInfo readPairInfo = values.next();
             int insertSize = readPairInfo.insertSize;
-            System.err.println("insert size: " + insertSize);
+            logger.debug("insert size: " + insertSize);
             double pMappingCorrect = readPairInfo.pMappingCorrect;
-            System.err.println("p mapping correct: " + pMappingCorrect);
+            logger.debug("p mapping correct: " + pMappingCorrect);
             short readGroupId = readPairInfo.readGroupId;
 
             ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupId);
@@ -45,26 +48,26 @@ public class VirtualEvidenceReadPairInfoScorer
 
             NormalDistribution fragmentSizeDistribution = new NormalDistribution(targetIsize, targetIsizeSD);
             double pISgivenDeletion = Math.log(logNormalDistribution.density(insertSize));         // todo add fragment size
-            System.err.println("pISgivenDeletion: " + pISgivenDeletion);
+            logger.debug("pISgivenDeletion: " + pISgivenDeletion);
             double pISgivenNoDeletion = Math.log(fragmentSizeDistribution.density(insertSize));
             // todo
             // need to cap p(IS | NoDel) because it goes to infinity as the insert size gets large
             if (insertSize > targetIsize + 30 * targetIsizeSD) {
                 pISgivenNoDeletion = Math.log(fragmentSizeDistribution.density(targetIsize + 30 * targetIsizeSD));
             }
-            System.err.println("pISgivenNoDeletion: " + pISgivenNoDeletion);
+            logger.debug("pISgivenNoDeletion: " + pISgivenNoDeletion);
 
             double pMappingIncorrect = Math.log(1 - Math.exp(pMappingCorrect));
 
             double pDeletion = logAdd(pISgivenDeletion + pMappingCorrect, deletionPrior + pMappingIncorrect);
-            System.err.println("pDeletion: " + pDeletion);
+            logger.debug("pDeletion: " + pDeletion);
             double pNoDeletion = logAdd(pISgivenNoDeletion + pMappingCorrect, noDeletionPrior + pMappingIncorrect);
-            System.err.println("pNoDeletion: " + pNoDeletion);
+            logger.debug("pNoDeletion: " + pNoDeletion);
 
             pDeletionFactorProduct = pDeletionFactorProduct + pDeletion;
-            System.err.println("pDeletionFactorProduct: " + pDeletionFactorProduct);
+            logger.debug("pDeletionFactorProduct: " + pDeletionFactorProduct);
             pNoDeletionFactorProduct = pNoDeletionFactorProduct + pNoDeletion;
-            System.err.println("pNoDeletionFactorProduct: " + pNoDeletionFactorProduct);
+            logger.debug("pNoDeletionFactorProduct: " + pNoDeletionFactorProduct);
 
         }
 

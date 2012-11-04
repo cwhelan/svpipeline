@@ -98,7 +98,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
             throws IOException {
 
         String line = value.toString();
-        //System.err.println("LINE: " + line);
 
         ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
         emitDeletionScoresForAllPairs(readPairAlignments, output);

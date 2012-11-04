@@ -55,9 +55,9 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
         s1FileWriter.close();
 
         if (! s1File.exists()) {
-            System.err.println("file does not exist: " + s1File.getPath());
+            logger.error("file does not exist: " + s1File.getPath());
         } else {
-            System.err.println("read file length: " + s1File.length());
+            logger.info("read file length: " + s1File.length());
         }
 
         String referenceBaseName = new File(reference).getName();
@@ -76,7 +76,9 @@ public class Bowtie2SingleEndMapper extends SingleEndAlignmentMapper {
         String outLine;
         SAMAlignmentReader alignmentReader = new SAMAlignmentReader();
         while ((outLine = stdInput.readLine()) != null) {
-            // System.err.println("LINE: " + outLine);
+            if (logger.isDebugEnabled()) {
+                logger.debug("LINE: " + outLine);
+            }
             if (outLine.startsWith("@"))  {
                 logger.debug("SAM HEADER LINE: " + outLine);
                 continue;

@@ -15,6 +15,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import java.util.PriorityQueue;
  */
 @Parameters(separators = "=", commandDescription = "Export Wig files and Bed file of deletions")
 public class CommandExportGMMResults implements CloudbreakCommand {
+
+    private static org.apache.log4j.Logger logger = Logger.getLogger(CommandExportGMMResults.class);
+
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 
@@ -107,11 +111,11 @@ public class CommandExportGMMResults implements CloudbreakCommand {
     private BufferedWriter createWriter(String fileName) throws IOException {
         File w0outputFile = new File(fileName);
         if (! w0outputFile.createNewFile()) {
-            System.err.println("Failed to create file " + w0outputFile);
+            logger.error("Failed to create file " + w0outputFile);
             return null;
         }
 
-        System.err.println("Writing file " + fileName);
+        logger.info("Writing file " + fileName);
         BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(w0outputFile));
         return outputFileWriter;
     }
@@ -133,7 +137,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         FileSystem dfs = DistributedFileSystem.get(conf);
         FileStatus[] stati = dfs.listStatus(new Path(inputHDFSDir1));
         if (stati == null) {
-            System.err.println("Could not find input directory " + inputHDFSDir1);
+            logger.error("Could not find input directory " + inputHDFSDir1);
             return;
         }
 
@@ -141,7 +145,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         for (FileStatus s : stati) {
             if (s.getPath().getName().startsWith("part")) {
                 Path path = s.getPath();
-                System.out.println(path);
+                logger.info(path);
                 inputStreams.add(path);
 //                inputStreams.add(dfs.open(path));
             }
@@ -164,7 +168,6 @@ public class CommandExportGMMResults implements CloudbreakCommand {
             GenomicLocation gl = new GenomicLocation();
             GMMScorerResults results = new GMMScorerResults();
             reader.next(gl, results);
-            //System.err.println("Read " + gl);
             fileReaders.add(new GMMResultsReaderAndLine(reader, gl, results));
         }
 

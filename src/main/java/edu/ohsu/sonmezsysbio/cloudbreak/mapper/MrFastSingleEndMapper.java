@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import java.util.zip.GZIPInputStream;
  */
 public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
 
+    private static Logger logger = Logger.getLogger(MrFastSingleEndMapper.class);
+
     private String reference;
     private String mrfastExecutable;
     private int threshold = -1;
@@ -24,7 +27,7 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
     @Override
     public void configure(JobConf job) {
         super.configure(job);
-        System.err.println("Current dir: " + new File(".").getAbsolutePath());
+        logger.info("Current dir: " + new File(".").getAbsolutePath());
         reference = job.get("mrfast.reference");
         mrfastExecutable = job.get("mrfast.executable");
         if (job.get("mrfast.threshold") != null) {
@@ -39,22 +42,22 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
         s1FileWriter.close();
 
         if (! s1File.exists()) {
-            System.err.println("file does not exist: " + s1File.getPath());
+            logger.error("file does not exist: " + s1File.getPath());
         } else {
-            System.err.println("read file length: " + s1File.length());
+            logger.info("read file length: " + s1File.length());
         }
 
         File indexFile = new File(reference);
         if (! indexFile.exists()) {
-            System.err.println("index file does not exist: " + indexFile.getPath());
+            logger.error("index file does not exist: " + indexFile.getPath());
         } else {
-            System.err.println("index file length: " + indexFile.length());
+            logger.info("index file length: " + indexFile.length());
         }
 
         String[] commandLine = buildCommandLine(mrfastExecutable, reference, s1File.getPath(), threshold);
-        System.err.println("Executing command: " + Arrays.toString(commandLine));
+        logger.info("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
-        System.err.println("Exec'd");
+        logger.debug("Exec'd");
 
         try {
             p.waitFor();
@@ -62,7 +65,7 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        System.err.println("process finished with exit code: " + p.exitValue());
+        logger.info("process finished with exit code: " + p.exitValue());
 
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(new GZIPInputStream(new FileInputStream(new File("output.gz")))));
@@ -75,7 +78,7 @@ public class MrFastSingleEndMapper extends SingleEndAlignmentMapper {
         String errLine;
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
         while ((errLine = errorReader.readLine()) != null) {
-            System.err.println("ERROR: " + errLine);
+            logger.error("ERROR: " + errLine);
         }
 
         String outLine;

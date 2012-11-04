@@ -115,7 +115,6 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;
         if (matePairs) {
-            //System.err.println("insert size: " + insertSize);
             if (!scorer.isMatePairNotSmallFragment(record1, record2)) {
                 isizeMean = 150.0;
                 isizeSD = 15.0;
@@ -134,7 +133,6 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
                 isizeSD,
                 pMappingCorrect
         );
-        //System.err.println("computed deletion score : " + deletionScore);
 
         int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % resolution;
 

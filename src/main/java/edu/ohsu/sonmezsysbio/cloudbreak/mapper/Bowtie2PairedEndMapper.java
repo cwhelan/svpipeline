@@ -81,7 +81,9 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
         String outLine;
         SAMAlignmentReader alignmentReader = new SAMAlignmentReader();
         while ((outLine = stdInput.readLine()) != null) {
-            // System.err.println("LINE: " + outLine);
+            if (logger.isDebugEnabled()) {
+                logger.debug("LINE: " + outLine);
+            }
             if (outLine.startsWith("@"))  {
                 logger.debug("SAM HEADER LINE: " + outLine);
                 continue;

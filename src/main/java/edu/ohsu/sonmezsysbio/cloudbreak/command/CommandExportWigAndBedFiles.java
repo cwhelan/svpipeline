@@ -129,7 +129,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
         for (FileStatus s : stati) {
             if (s.getPath().getName().startsWith("part")) {
                 Path path = s.getPath();
-                System.out.println(path);
+                System.err.println(path);
                 inputStreams.add(path);
 //                inputStreams.add(dfs.open(path));
             }

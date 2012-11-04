@@ -1,5 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.file;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.util.*;
  * Time: 3:28 PM
  */
 public class WigFileHelper {
+
+    private static org.apache.log4j.Logger logger = Logger.getLogger(WigFileHelper.class);
 
     public static void averageWigOverSlidingWindow(int resolution, int windowSizeToAverageOver, BufferedReader inFileReader, BufferedWriter outFileWriter) throws IOException {
 
@@ -44,11 +48,11 @@ public class WigFileHelper {
                 String[] fields = line.split("\t");
                 Integer pos = Integer.parseInt(fields[0]);
                 if (pos - lastPos > resolution) {
-                    // System.err.println("hit a gap between " + lastPos + " and " + pos);
+                    logger.info("hit a gap between " + lastPos + " and " + pos);
                 }
                 while (pos - lastPos > resolution) {
                     lastPos = lastPos + resolution;
-                    //System.err.println("adding "+ lastPos + ", " + 0);
+                    logger.debug("adding "+ lastPos + ", " + 0);
                     window.put(lastPos,0d);
                     if (window.keySet().size() > windowSizeToAverageOver) {
                         windowTotal = writeVal(outFileWriter, window, windowTotal, lastPos, windowSizeToAverageOver, resolution);
@@ -56,7 +60,7 @@ public class WigFileHelper {
                 }
                 lastPos = pos;
                 Double val = Double.parseDouble(fields[1]);
-                //System.err.println("adding "+ pos + ", " + val);
+                logger.debug("adding "+ pos + ", " + val);
                 window.put(pos,val);
                 windowTotal += val;
 
@@ -71,7 +75,7 @@ public class WigFileHelper {
         Double avg = windowTotal / windowToAverageOver;
 
         if (! window.containsKey(pos -  (windowToAverageOver / 2) * resolution)) {
-            System.err.println("Current position = " + pos + ", but did not have mid position " + (pos - (windowToAverageOver / 2) * resolution));
+            logger.warn("Current position = " + pos + ", but did not have mid position " + (pos - (windowToAverageOver / 2) * resolution));
         }
         Double midVal = window.get(pos - (windowToAverageOver / 2) * resolution);
 
@@ -79,10 +83,10 @@ public class WigFileHelper {
 
         int positionToLeave = pos - windowToAverageOver * resolution;
         if (! window.containsKey(pos -  windowToAverageOver * resolution)) {
-            System.err.println("Current position = " + pos + ", but did not have begin position " + (pos - windowToAverageOver * resolution));
+            logger.warn("Current position = " + pos + ", but did not have begin position " + (pos - windowToAverageOver * resolution));
             List<Integer> positions = new ArrayList<Integer>(window.keySet());
             Collections.sort(positions);
-            System.err.println("lowest positions = " + positions.get(0) + ", " + positions.get(1));
+            logger.warn("lowest positions = " + positions.get(0) + ", " + positions.get(1));
         }
 
         writer.write(Integer.toString(pos - (windowToAverageOver / 2) * resolution)  + "\t" + modVal + "\n");
@@ -90,9 +94,7 @@ public class WigFileHelper {
 
         Double leaving = window.get(positionToLeave);
 
-        //Double leaving = windowValues.removeLast();
         windowTotal -= leaving;
-        //System.err.println("removing " + positionToLeave + ", new total = " + windowTotal);
         window.remove(positionToLeave);
         return windowTotal;
     }
