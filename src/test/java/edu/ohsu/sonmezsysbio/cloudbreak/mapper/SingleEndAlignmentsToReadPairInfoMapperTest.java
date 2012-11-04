@@ -1,14 +1,13 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
+import edu.ohsu.sonmezsysbio.cloudbreak.ProbabilisticPairedAlignmentScorer;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.ProbabilisticPairedAlignmentScorer;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
-import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
-import org.apache.hadoop.io.LongWritable;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.SAMAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
@@ -16,9 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -180,5 +181,26 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
     public void testGetInputPath() throws Exception {
         assertEquals("/user/whelanch/cloudbreak/jcvi_chr2_lc/se_alignments_t180/part-00000",
                 SingleEndAlignmentsToReadPairInfoMapper.getInputPath("hdfs://bigbird51.csee.ogi.edu:50030/user/whelanch/cloudbreak/jcvi_chr2_lc/se_alignments_t180/part-00000"));
+    }
+
+    @Test
+    public void testEmitConcordantAlignmentIfFound() throws Exception {
+        File testInput = new File(getClass().getResource("test_alignment.txt").getFile());
+        String content = new Scanner(testInput).useDelimiter("\\Z").next();
+        String key = content.substring(0,content.indexOf("\t"));
+        String val = content.substring(content.indexOf("\t") + 1);
+
+        MockOutputCollector mockOutputCollector = new MockOutputCollector();
+        mapper.setAlignmentReader(new SAMAlignmentReader());
+        mapper.setFaix(new FaidxFileHelper("foo") {
+            @Override
+            public Short getKeyForChromName(String name) throws IOException {
+                assertEquals("2", name);
+                return (short) 9;
+            }
+        });
+        mapper.setMaxInsertSize(2500);
+        mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
+
     }
 }

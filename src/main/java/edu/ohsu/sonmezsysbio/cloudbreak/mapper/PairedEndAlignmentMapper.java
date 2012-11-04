@@ -1,6 +1,5 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
@@ -15,13 +14,15 @@ import java.util.zip.GZIPOutputStream;
  * Date: 7/17/12
  * Time: 5:27 PM
  */
-public abstract class SingleEndAlignmentMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+public abstract class PairedEndAlignmentMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
-    private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentMapper.class);
+    private static Logger logger = Logger.getLogger(PairedEndAlignmentMapper.class);
 
     private String localDir;
     protected Writer s1FileWriter;
     protected File s1File;
+    protected Writer s2FileWriter;
+    protected File s2File;
     protected OutputCollector<Text, Text> output;
     protected Reporter reporter;
 
@@ -38,11 +39,18 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
                 s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
                 s1File.createNewFile();
                 s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+
+                s2File = new File(localDir + "/temp2_sequence.fastq.gz").getAbsoluteFile();
+                s2File.createNewFile();
+                s2FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s2File)));
             } else {
                 s1File = new File(localDir + "/temp1_sequence.fastq").getAbsoluteFile();
                 s1File.createNewFile();
                 s1FileWriter = new OutputStreamWriter(new FileOutputStream(s1File));
 
+                s2File = new File(localDir + "/temp2_sequence.fastq").getAbsoluteFile();
+                s2File.createNewFile();
+                s2FileWriter = new OutputStreamWriter(new FileOutputStream(s2File));
             }
 
 
@@ -62,14 +70,14 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
 
         String line = value.toString();
         String[] reads = line.split("\n");
-        splitRead(key, reads[0]);
-        splitRead(key, reads[1]);
+        splitRead(key, reads[0], s1FileWriter);
+        splitRead(key, reads[1], s2FileWriter);
 
         reporter.progress();
         logger.debug("Done with map method, real work will happen in close");
     }
 
-    private void splitRead(LongWritable key, String line) throws IOException {
+    private void splitRead(LongWritable key, String line, Writer fileWriter) throws IOException {
         String[] fields = line.split("\t");
 
         if (fields[1].length() != fields[3].length()) {
@@ -80,10 +88,10 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
             logger.warn(fields[3]);
             logger.warn("DONE WARNING");
         }
-        s1FileWriter.write(fields[0] + "\n");
-        s1FileWriter.write(fields[1] + "\n");
-        s1FileWriter.write(fields[2] + "\n");
-        s1FileWriter.write(fields[3] + "\n");
+        fileWriter.write(fields[0] + "\n");
+        fileWriter.write(fields[1] + "\n");
+        fileWriter.write(fields[2] + "\n");
+        fileWriter.write(fields[3] + "\n");
     }
 
     public OutputCollector<Text, Text> getOutput() {
