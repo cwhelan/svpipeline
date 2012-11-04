@@ -114,6 +114,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandConvertTextAlignmentsToSnappySequence convertTextAlignmentsToSnappySequence = new CommandConvertTextAlignmentsToSnappySequence();
         jc.addCommand("convertTextAlignmentsToSnappySequence", convertTextAlignmentsToSnappySequence);
 
+        CommandExportAlignmentsFromHDFS commandExportAlignmentsFromHDFS = new CommandExportAlignmentsFromHDFS();
+        jc.addCommand("exportAlignmentsFromHDFS", commandExportAlignmentsFromHDFS);
+
         jc.setProgramName("Cloudbreak");
         return jc;
     }

@@ -5,6 +5,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.BaseAlignmentReader;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import org.apache.hadoop.fs.Path;
@@ -134,7 +135,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
-        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
         alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
 
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();

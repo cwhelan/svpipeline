@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.CloudbreakMapReduceBase;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.BaseAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -21,7 +22,7 @@ public class SingleEndAlignmentSummaryMapper extends CloudbreakMapReduceBase imp
 
     public void map(Text key, Text value, OutputCollector output, Reporter reporter) throws IOException {
         String line = value.toString();
-        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
 
         output.collect(outKey, new Text("1\t" + (readPairAlignments.getRead1Alignments().size() * readPairAlignments.getRead2Alignments().size())));
 

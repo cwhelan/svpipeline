@@ -1,8 +1,8 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.*;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.BaseAlignmentReader;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
@@ -83,7 +83,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
             throws IOException {
         String line = value.toString();
 
-        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
         emitDeletionScoresForAllPairs(readPairAlignments, output);
     }
 

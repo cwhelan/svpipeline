@@ -11,6 +11,11 @@ import edu.ohsu.sonmezsysbio.cloudbreak.SAMRecord;
  * Time: 1:36 PM
  */
 public class SAMAlignmentReader extends BaseAlignmentReader {
+
+    public AlignmentRecord parseRecord(String alignmentRecord) {
+        return parseRecord(alignmentRecord.split("\t"));
+    }
+
     public AlignmentRecord parseRecord(String[] fields) {
         return SAMRecord.parseSamRecord(fields);
     }

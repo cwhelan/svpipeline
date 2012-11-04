@@ -90,7 +90,7 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
             }
 
             String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
-            AlignmentRecord alignment = alignmentReader.parseRecord(outLine.split("\t"));
+            AlignmentRecord alignment = alignmentReader.parseRecord(outLine);
 
             if (! alignment.isMapped()) {
                 continue;

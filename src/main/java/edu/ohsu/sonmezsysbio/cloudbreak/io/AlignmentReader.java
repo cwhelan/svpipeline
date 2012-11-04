@@ -13,13 +13,15 @@ import java.util.List;
  * Time: 2:05 PM
  */
 public interface AlignmentReader {
-    AlignmentRecord parseRecord(String[] fields);
+    AlignmentRecord parseRecord(String alignmentRecord);
 
     List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments);
 
     double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2);
 
     void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments);
+
+    ReadPairAlignments parsePairAlignmentLine(String line);
 
     public static class AlignmentReaderFactory {
         public static AlignmentReader getInstance(String aligner) {

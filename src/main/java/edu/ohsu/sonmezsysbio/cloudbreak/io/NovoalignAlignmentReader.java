@@ -11,6 +11,11 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
  * Time: 1:56 PM
  */
 public class NovoalignAlignmentReader extends BaseAlignmentReader {
+
+    public AlignmentRecord parseRecord(String alignmentRecord) {
+        return parseRecord(alignmentRecord.split("\t"));
+    }
+
     public AlignmentRecord parseRecord(String[] fields) {
         NovoalignNativeRecord record = new NovoalignNativeRecord();
         record.setReadId(fields[0]);
