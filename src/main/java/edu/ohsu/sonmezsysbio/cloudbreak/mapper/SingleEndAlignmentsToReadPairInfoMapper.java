@@ -171,6 +171,8 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
 
+        if (!emitConcordantAlignmentIfFound(readPairAlignments, output)) {
+
             for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
                 if (getMinScore() != -1) {
                     if (record1.getAlignmentScore() < getMinScore()) {
@@ -187,12 +189,14 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                     emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
                 }
             }
+        }
     }
 
     private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
         // if we find single concordant pairing just emit that one
         AlignmentRecord record1ConcAlignment;
         AlignmentRecord record2ConcAlignment;
+        boolean foundConcordant = false;
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
                 if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) continue;
@@ -206,11 +210,11 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                     record1ConcAlignment = record1;
                     record2ConcAlignment = record2;
                     emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
-                    return true;
+                    foundConcordant = true;
                 }
             }
         }
-        return false;
+        return foundConcordant;
     }
 
     private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {

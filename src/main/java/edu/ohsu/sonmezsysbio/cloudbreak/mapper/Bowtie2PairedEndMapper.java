@@ -1,6 +1,7 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
+import edu.ohsu.sonmezsysbio.cloudbreak.SAMRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.SAMAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
@@ -9,6 +10,8 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -80,6 +83,9 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
         String outLine;
         SAMAlignmentReader alignmentReader = new SAMAlignmentReader();
+        String currentReadPairId = null;
+        Set<String> r1Locations = new HashSet<String>();
+        Set<String> r2Locations = new HashSet<String>();
         while ((outLine = stdInput.readLine()) != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("LINE: " + outLine);
@@ -90,10 +96,29 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
             }
 
             String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
-            AlignmentRecord alignment = alignmentReader.parseRecord(outLine);
+            if (!readPairId.equals(currentReadPairId)) {
+                r1Locations.clear();
+                r2Locations.clear();
+            }
 
+            SAMRecord alignment = (SAMRecord) alignmentReader.parseRecord(outLine);
             if (! alignment.isMapped()) {
                 continue;
+            }
+
+            String location = alignment.getChromosomeName() + ":" + alignment.getPosition();
+            if (alignment.isAlignmentOfFirstRead()) {
+                if (r1Locations.contains(location)) {
+                    continue;
+                } else {
+                    r1Locations.add(location);
+                }
+            } else {
+                if (r2Locations.contains(location)) {
+                    continue;
+                } else {
+                    r2Locations.add(location);
+                }
             }
 
             getOutput().collect(new Text(readPairId), new Text(outLine));
@@ -119,13 +144,14 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
     }
 
     protected static String[] buildCommandLine(String bowtie2executable, String referenceBaseName, String path1, String path2, String numReports) {
+        // todo adjust insert size here
         String[] commandArray = {
                 "./" + bowtie2executable,
                 "-x", referenceBaseName,
                 "-1", path1,
                 "-2", path2,
                 "-k", numReports,
-                "--very-sensitive-local", "--mm", "--score-min", "L,0,1.7", "--no-unal"
+                "--very-sensitive-local", "--mm", "--score-min", "L,0,1.75", "--no-unal", "-I", "0", "-X", "600"
         };
         return commandArray;
     }
