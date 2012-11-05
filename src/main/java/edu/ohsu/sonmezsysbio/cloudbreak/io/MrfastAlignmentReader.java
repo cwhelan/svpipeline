@@ -17,6 +17,10 @@ public class MrfastAlignmentReader extends BaseAlignmentReader {
     private Double read1AlignmentNormalization;
     private Double read2AlignmentNormalization;
 
+    public AlignmentRecord parseRecord(String alignmentRecord) {
+        return parseRecord(alignmentRecord.split("\t"));
+    }
+
     public AlignmentRecord parseRecord(String[] fields) {
         MrfastAlignmentRecord record = new MrfastAlignmentRecord();
 
