@@ -26,9 +26,6 @@ public class CommandExportAlignmentsFromHDFS implements CloudbreakCommand {
     @Parameter(names = {"--inputHDFSDir"}, required = true)
     String inputHDFSDir;
 
-    @Parameter(names = {"--outputPrefix"}, required = true)
-    String outputPrefix;
-
     public void run(Configuration conf) throws Exception {
         FileSystem dfs = DistributedFileSystem.get(conf);
         FileStatus[] stati = dfs.listStatus(new Path(inputHDFSDir));

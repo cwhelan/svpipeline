@@ -5,6 +5,7 @@ import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.Bowtie2PairedEndMapper;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.Bowtie2SingleEndMapper;
+import edu.ohsu.sonmezsysbio.cloudbreak.reducer.PairedEndSAMAlignmentsToPairsReducer;
 import edu.ohsu.sonmezsysbio.cloudbreak.reducer.SingleEndAlignmentsToPairsReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -72,7 +73,7 @@ public class CommandBowtie2PairedEnds extends BaseCloudbreakCommand {
         conf.setMapOutputValueClass(Text.class);
         conf.setCompressMapOutput(true);
 
-        conf.setReducerClass(SingleEndAlignmentsToPairsReducer.class);
+        conf.setReducerClass(PairedEndSAMAlignmentsToPairsReducer.class);
         conf.setOutputFormat(SequenceFileOutputFormat.class);
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(Text.class);
