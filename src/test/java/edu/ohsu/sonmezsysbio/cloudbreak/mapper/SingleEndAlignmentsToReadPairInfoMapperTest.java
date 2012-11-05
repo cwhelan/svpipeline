@@ -183,24 +183,4 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
                 SingleEndAlignmentsToReadPairInfoMapper.getInputPath("hdfs://bigbird51.csee.ogi.edu:50030/user/whelanch/cloudbreak/jcvi_chr2_lc/se_alignments_t180/part-00000"));
     }
 
-    @Test
-    public void testEmitConcordantAlignmentIfFound() throws Exception {
-        File testInput = new File(getClass().getResource("test_alignment.txt").getFile());
-        String content = new Scanner(testInput).useDelimiter("\\Z").next();
-        String key = content.substring(0,content.indexOf("\t"));
-        String val = content.substring(content.indexOf("\t") + 1);
-
-        MockOutputCollector mockOutputCollector = new MockOutputCollector();
-        mapper.setAlignmentReader(new SAMAlignmentReader());
-        mapper.setFaix(new FaidxFileHelper("foo") {
-            @Override
-            public Short getKeyForChromName(String name) throws IOException {
-                assertEquals("2", name);
-                return (short) 9;
-            }
-        });
-        mapper.setMaxInsertSize(2500);
-        mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
-
-    }
 }

@@ -171,8 +171,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
 
-        if (!emitConcordantAlignmentIfFound(readPairAlignments, output)) {
-
             for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
                 if (getMinScore() != -1) {
                     if (record1.getAlignmentScore() < getMinScore()) {
@@ -189,7 +187,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                     emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
                 }
             }
-        }
     }
 
     private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
