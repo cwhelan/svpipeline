@@ -95,10 +95,11 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
                 continue;
             }
 
-            String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
+            String readPairId = outLine.substring(0,outLine.indexOf('\t'));
             if (!readPairId.equals(currentReadPairId)) {
                 r1Locations.clear();
                 r2Locations.clear();
+                currentReadPairId = readPairId;
             }
 
             SAMRecord alignment = (SAMRecord) alignmentReader.parseRecord(outLine);
