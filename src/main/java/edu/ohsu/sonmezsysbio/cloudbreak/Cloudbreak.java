@@ -105,6 +105,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandDebugReadPairInfo commandDebugReadPairInfo = new CommandDebugReadPairInfo();
         jc.addCommand("debugReadPairInfo", commandDebugReadPairInfo);
 
+        CommandFindAlignment commandFindAlignment = new CommandFindAlignment();
+        jc.addCommand("findAlignment", commandFindAlignment);
+
         CommandSummarizeAlignments commandSummarizeAlignments = new CommandSummarizeAlignments();
         jc.addCommand("summarizeAlignments", commandSummarizeAlignments);
 
