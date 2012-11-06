@@ -17,11 +17,10 @@ import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -64,39 +63,20 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
 
         int idx = 0;
         for (int i = 43039500; i <= 43049500; i = i + Cloudbreak.DEFAULT_RESOLUTION) {
-            assertEquals((short) 9, collector.keys.get(idx).chromosome);
-            assertEquals(i, collector.keys.get(idx).pos);
+            GenomicLocationWithQuality genomicLocationWithQuality = new GenomicLocationWithQuality();
+            genomicLocationWithQuality.chromosome = 9;
+            genomicLocationWithQuality.pos = i;
+            genomicLocationWithQuality.pMappingCorrect = -9.210340371976185;
 
-            assertEquals(10017, collector.values.get(idx).insertSize);
-            assertEquals(-9.2103, collector.values.get(idx).pMappingCorrect, .0001);
-            assertEquals((short) 3, (short) collector.values.get(idx).readGroupId);
+            assertTrue(collector.keys.contains(genomicLocationWithQuality));
+
+            assertEquals(10017, collector.values.get(collector.keys.indexOf(genomicLocationWithQuality)).insertSize);
+            assertEquals(-9.2103, collector.values.get(collector.keys.indexOf(genomicLocationWithQuality)).pMappingCorrect, .0001);
+            assertEquals((short) 3, (short) collector.values.get(collector.keys.indexOf(genomicLocationWithQuality)).readGroupId);
             idx++;
         }
 
         assertEquals(idx, collector.keys.size());
-//
-//        String complexInputLine ="@ERR000545.10000241 EAS139_44:1:93:535:874\t@ERR000545.10000241 EAS139_44:1:93:535:874/1\tS\tTAGGTAATGTTTGGGAGGGAGTTGTTGGTTTTGTTGATTTATTATATCTTG\t??==>79>=?@@==>9>>=5>:?<>?<<<>??>;?=<=>?7?>;?8=4>>8\tR\t0\t60\t>10\t81550461\tR\t.\t.\t.\t" +
-//                "SVP_ALIGNMENT\t@ERR000545.10000241 EAS139_44:1:93:535:874/1\tS\tTAGGTAATGTTTGGGAGGGAGTTGTTGGTTTTGTTGATTTATTATATCTTG\t??==>79>=?@@==>9>>=5>:?<>?<<<>??>;?=<=>?7?>;?8=4>>8\tR\t60\t0\t>10\t89072620\tR\t.\t.\t.\t48A>C 49T>C\t" +
-//                "SVP_READ\t@ERR000545.10000241 EAS139_44:1:93:535:874/2\tS\tTATTATATTTTTTAATTTGACAGAGTAGTGCAGGCAATAATGAAATGGTAT\t<>==>A?@=?@A@>=??>>;>>;-<==;:<<<:>;==>>8?<::<>;80;>\tR\t0\t3\t>10\t89072431\tF\t.\t.\t.\t" +
-//                "SVP_ALIGNMENT\t@ERR000545.10000241 EAS139_44:1:93:535:874/2\tS\tTATTATATTTTTTAATTTGACAGAGTAGTGCAGGCAATAATGAAATGGTAT\t<>==>A?@=?@A@>=??>>;>>;-<==;:<<<:>;==>>8?<::<>;80;>\tR\t0\t3\t>10\t81550273\tF\t.\t.\t.";
-//
-//        collector = Mockito.mock(OutputCollector.class);
-//        reporter = Mockito.mock(Reporter.class);
-//
-//        mapper.map(new LongWritable(1), new Text(complexInputLine), collector, reporter);
-//
-//        for (int i = 81550200; i <= 81550500; i = i + Cloudbreak.DEFAULT_RESOLUTION) {
-//            verify(collector).collect(new Text("10\t" + i),
-//                    new DoubleWritable(1));
-//        }
-//
-//        for (int i = 89072400; i <= 89072700; i = i + Cloudbreak.DEFAULT_RESOLUTION) {
-//            verify(collector).collect(new Text("10\t" + i),
-//                    new DoubleWritable(1));
-//        }
-//
-//        verifyNoMoreInteractions(collector);
-//
 
     }
 
@@ -225,6 +205,8 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         mapper.setTargetIsizeSD(30);
         mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
 
+        assertEquals(11, mockOutputCollector.keys.size());
+        assertEquals(new HashSet(mockOutputCollector.keys).size(), mockOutputCollector.keys.size());
     }
 
 }

@@ -5,9 +5,9 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.BaseAlignmentReader;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
+import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
@@ -18,6 +18,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -151,6 +152,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
+
         ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
@@ -176,16 +178,24 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
 
         try {
-            emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
+            Map<GenomicLocation, ReadPairInfo> bestScoresForGL = emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
+            for (GenomicLocation genomicLocation : bestScoresForGL.keySet()) {
+                ReadPairInfo bestRpi = bestScoresForGL.get(genomicLocation);
+                GenomicLocationWithQuality genomicLocationWithQuality =
+                        new GenomicLocationWithQuality(genomicLocation.chromosome, genomicLocation.pos, bestRpi.pMappingCorrect);
+                output.collect(genomicLocationWithQuality, bestRpi);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
-
-        if (!emitConcordantAlignmentIfFound(readPairAlignments, output)) {
+    private Map<GenomicLocation, ReadPairInfo> emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments,
+                                             OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
+                                             Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
+        Map<GenomicLocation, ReadPairInfo> bestScoresForGL = new HashMap<GenomicLocation, ReadPairInfo>();
+        if (!emitConcordantAlignmentIfFound(readPairAlignments, output, bestScoresForGL)) {
 
             for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
                 if (getMinScore() != -1) {
@@ -200,13 +210,16 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                         }
                     }
                     if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) continue;
-                    emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
+                    emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
                 }
             }
         }
+        return bestScoresForGL;
     }
 
-    private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
+    private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments,
+                                                   OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
+                                                   Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
         // if we find single concordant pairing just emit that one
         AlignmentRecord record1ConcAlignment;
         AlignmentRecord record2ConcAlignment;
@@ -223,7 +236,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 if (Math.abs(insertSize - targetIsize) < 6 * targetIsizeSD) {
                     record1ConcAlignment = record1;
                     record2ConcAlignment = record2;
-                    emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
+                    emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
                     foundConcordant = true;
                 }
             }
@@ -231,7 +244,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         return foundConcordant;
     }
 
-    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments,
+                                         OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
+                                         Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
 
         // todo: not handling translocations for now
         if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
@@ -314,9 +329,13 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             }
 
             logger.debug("Emitting insert size " + insertSize);
-            GenomicLocationWithQuality genomicLocation = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
-            output.collect(genomicLocation, readPairInfo);
-
+            GenomicLocationWithQuality genomicLocationWithQuality = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
+            GenomicLocation genomicLocation = new GenomicLocation(genomicLocationWithQuality.chromosome, genomicLocationWithQuality.pos);
+            if (bestScoresForGL.containsKey(genomicLocation) && bestScoresForGL.get(genomicLocation).pMappingCorrect >= readPairInfo.pMappingCorrect) {
+                continue;
+            } else {
+                bestScoresForGL.put(genomicLocation, readPairInfo);
+            }
         }
 
     }
