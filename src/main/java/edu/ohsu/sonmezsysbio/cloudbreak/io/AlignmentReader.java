@@ -17,9 +17,7 @@ public interface AlignmentReader {
 
     List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments);
 
-    double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2);
-
-    void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments);
+    double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments);
 
     ReadPairAlignments parsePairAlignmentLine(String line);
 

@@ -1,7 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.*;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.BaseAlignmentReader;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
@@ -125,7 +124,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
+        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,

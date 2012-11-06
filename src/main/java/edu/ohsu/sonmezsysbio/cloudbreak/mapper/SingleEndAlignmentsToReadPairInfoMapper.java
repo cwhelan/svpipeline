@@ -133,11 +133,25 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         this.readGroupId = readGroupId;
     }
 
+    public double getTargetIsize() {
+        return targetIsize;
+    }
+
+    public void setTargetIsize(double targetIsize) {
+        this.targetIsize = targetIsize;
+    }
+
+    public double getTargetIsizeSD() {
+        return targetIsizeSD;
+    }
+
+    public void setTargetIsizeSD(double targetIsizeSD) {
+        this.targetIsizeSD = targetIsizeSD;
+    }
+
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
         ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
-        alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
-
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
             if (exclusionRegions != null) {
@@ -261,7 +275,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 (resolution - rightRead.getPosition() % resolution);
 
 
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
         if (mapabilityWeighting != null) {
             if (insertSize > targetIsize + 6 * targetIsizeSD) {

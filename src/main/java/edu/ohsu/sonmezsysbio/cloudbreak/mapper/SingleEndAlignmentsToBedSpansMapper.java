@@ -1,7 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.*;
-import edu.ohsu.sonmezsysbio.cloudbreak.io.BaseAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
@@ -143,7 +142,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
         output.collect(new Text(leftRead.getReadId()),
                 new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + insertSize + "\t" + pMappingCorrect));
