@@ -4,6 +4,8 @@ import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
 import edu.ohsu.sonmezsysbio.cloudbreak.SAMRecord;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: cwhelan
@@ -21,9 +23,18 @@ public class SAMAlignmentReader extends BaseAlignmentReader {
     }
 
     public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
-        return 0;
+        double r1normalization = sumAlignmentScores(readPairAlignments.getRead1Alignments());
+        double r2normalization = sumAlignmentScores(readPairAlignments.getRead2Alignments());
+        return Math.log(((double) record1.getAlignmentScore()) / r1normalization) + Math.log(((double) record2.getAlignmentScore()) / r2normalization);
     }
 
-    public void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments) {
+    private double sumAlignmentScores(List<AlignmentRecord> alignments) {
+        double sumAlignmentScores = 0;
+        for (AlignmentRecord record : alignments) {
+            SAMRecord samRecord = (SAMRecord) record;
+            sumAlignmentScores += samRecord.getAlignmentScore();
+        }
+        return sumAlignmentScores;
     }
+
 }
