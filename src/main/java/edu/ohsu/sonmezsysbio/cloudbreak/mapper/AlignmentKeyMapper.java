@@ -22,7 +22,7 @@ public class AlignmentKeyMapper extends CloudbreakMapReduceBase implements Mappe
     @Override
     public void configure(JobConf job) {
         super.configure(job);
-        readId = job.get("findalignment.readid");
+        readId = job.get("findalignment.read");
     }
 
     public void map(Text key, Text value, OutputCollector<Text, Text> textTextOutputCollector, Reporter reporter) throws IOException {

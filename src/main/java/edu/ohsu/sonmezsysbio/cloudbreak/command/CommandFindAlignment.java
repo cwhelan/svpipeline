@@ -52,7 +52,7 @@ public class CommandFindAlignment extends BaseCloudbreakCommand {
 
         conf.setInputFormat(SequenceFileInputFormat.class);
 
-        conf.set("findalignment.readid", read);
+        conf.set("findalignment.read", read);
 
         conf.setMapperClass(AlignmentKeyMapper.class);
         conf.setMapOutputKeyClass(Text.class);
