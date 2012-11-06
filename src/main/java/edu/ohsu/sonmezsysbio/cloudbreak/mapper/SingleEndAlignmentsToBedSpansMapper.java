@@ -27,6 +27,9 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     private PairedAlignmentScorer scorer;
     private int minScore = -1;
 
+    private double targetIsize;
+    private double targetIsizeSD;
+
     public Integer getMaxInsertSize() {
         return maxInsertSize;
     }
@@ -75,6 +78,22 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         this.minScore = minScore;
     }
 
+    public double getTargetIsize() {
+        return targetIsize;
+    }
+
+    public void setTargetIsize(double targetIsize) {
+        this.targetIsize = targetIsize;
+    }
+
+    public double getTargetIsizeSD() {
+        return targetIsizeSD;
+    }
+
+    public void setTargetIsizeSD(double targetIsizeSD) {
+        this.targetIsizeSD = targetIsizeSD;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
@@ -84,6 +103,9 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         parseRegion(job.get("pileupDeletionScore.region"));
 
         minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
+
+        targetIsize = Integer.parseInt(job.get("pileupDeletionScore.targetIsize"));
+        targetIsize = Integer.parseInt(job.get("pileupDeletionScore.targetIsizeSD"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
     }
@@ -104,19 +126,47 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     }
 
     private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
-        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
-            if (getMinScore() != -1) {
-                if (record1.getAlignmentScore() < getMinScore()) {
-                    continue;
+        if (!emitConcordantAlignmentIfFound(readPairAlignments, output)) {
+
+            for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+                if (getMinScore() != -1) {
+                    if (record1.getAlignmentScore() < getMinScore()) {
+                        continue;
+                    }
                 }
-            }
-            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                if (record2.getAlignmentScore() < getMinScore()) {
-                    continue;
+                for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
+                    if (record2.getAlignmentScore() < getMinScore()) {
+                        continue;
+                    }
+                    emitBedSpanForPair(record1, record2, readPairAlignments, output);
                 }
-                emitBedSpanForPair(record1, record2, readPairAlignments, output);
             }
         }
+    }
+
+    private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
+        AlignmentRecord record1ConcAlignment;
+        AlignmentRecord record2ConcAlignment;
+        boolean foundConcordant = false;
+        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
+            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
+                if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) continue;
+                AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
+                        record1 : record2;
+                AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
+                        record2 : record1;
+
+                int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
+                if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
+                    record1ConcAlignment = record1;
+                    record2ConcAlignment = record2;
+                    emitBedSpanForPair(record1, record2, readPairAlignments, output);
+                    foundConcordant = true;
+                }
+            }
+        }
+        return foundConcordant;
+
     }
 
     public void emitBedSpanForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {

@@ -209,4 +209,27 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         assertEquals(new HashSet(mockOutputCollector.keys).size(), mockOutputCollector.keys.size());
     }
 
+    @Test
+    public void testMultipleConcordantMappings2() throws Exception {
+        File testInput = new File(getClass().getResource("e7421.txt").getFile());
+        String content = new Scanner(testInput).useDelimiter("\\Z").next();
+        String key = content.substring(0,content.indexOf("\t"));
+        String val = content.substring(content.indexOf("\t") + 1);
+
+        MockOutputCollector mockOutputCollector = new MockOutputCollector();
+        mapper.setAlignmentReader(new SAMAlignmentReader());
+        mapper.setFaix(new FaidxFileHelper("foo") {
+            @Override
+            public Short getKeyForChromName(String name) throws IOException {
+                assertEquals("2", name);
+                return (short) 9;
+            }
+        });
+        mapper.setMaxInsertSize(2500);
+        mapper.setTargetIsize(300);
+        mapper.setTargetIsizeSD(30);
+        mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
+
+    }
+
 }

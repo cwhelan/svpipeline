@@ -43,6 +43,12 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
     @Parameter(names = {"--minScore"})
     int minScore = -1;
 
+    @Parameter(names = {"--targetIsize"}, required = true)
+    int targetIsize;
+
+    @Parameter(names = {"--targetIsizeSD"}, required = true)
+    int targetIsizeSD;
+
     public void run(Configuration configuration) throws IOException {
         runHadoopJob(configuration);
     }
@@ -64,6 +70,9 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
         conf.set("pileupDeletionScore.maxInsertSize", String.valueOf(maxInsertSize));
         conf.set("pileupDeletionScore.region", region);
+
+        conf.set("pileupDeletionScore.targetIsize", String.valueOf(targetIsize));
+        conf.set("pileupDeletionScore.targetIsizeSD", String.valueOf(targetIsizeSD));
 
         conf.set("pileupDeletionScore.minScore", String.valueOf(minScore));
 
