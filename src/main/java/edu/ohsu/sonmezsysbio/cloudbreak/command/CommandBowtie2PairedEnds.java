@@ -41,6 +41,15 @@ public class CommandBowtie2PairedEnds extends BaseCloudbreakCommand {
     @Parameter(names = {"--HDFSPathToBowtieAlign"}, required = true)
     String pathToBowtie2;
 
+    @Parameter(names = {"--targetIsize"}, required = true)
+    int targetIsize;
+
+    @Parameter(names = {"--targetIsizeSD"}, required = true)
+    int targetIsizeSD;
+
+    @Parameter(names = {"--isizeRange"}, required = true)
+    int isizeRange;
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -65,6 +74,10 @@ public class CommandBowtie2PairedEnds extends BaseCloudbreakCommand {
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
         conf.set("bowtie2.num.reports", numReports);
+
+        conf.set("bowtie2.targetIsize", String.valueOf(targetIsize));
+        conf.set("bowtie2.targetIsizeSD", String.valueOf(targetIsizeSD));
+        conf.set("bowtie2.isizeRange", String.valueOf(isizeRange));
 
         conf.setInputFormat(SequenceFileInputFormat.class);
 

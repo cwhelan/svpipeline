@@ -30,6 +30,9 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
     private String reference;
     private String numReports;
     private String bowtie2Executable;
+    private int targetIsize;
+    private int targetIsizeSD;
+    private int isizeRange;
 
     @Override
     protected boolean getCompressTempReadFile() {
@@ -46,7 +49,9 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
         reference = job.get("bowtie2.reference");
         numReports = job.get("bowtie2.num.reports");
         bowtie2Executable = job.get("bowtie2.executable");
-
+        targetIsize = Integer.parseInt(job.get("bowtie2.targetIsize"));
+        targetIsizeSD = Integer.parseInt(job.get("bowtie2.targetIsizeSD"));
+        isizeRange = Integer.parseInt(job.get("bowtie2.isizeRange"));
     }
 
     @Override
@@ -69,7 +74,11 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
         }
 
         String referenceBaseName = new File(reference).getName();
-        String[] commandLine = buildCommandLine(bowtie2Executable, referenceBaseName, s1File.getPath(), s2File.getPath(), numReports);
+        int minConcIsize = targetIsize - isizeRange * targetIsizeSD;
+        int maxConcIsize = targetIsize + isizeRange * targetIsizeSD;
+        String[] commandLine = buildCommandLine(bowtie2Executable, referenceBaseName,
+                s1File.getPath(), s2File.getPath(), numReports,
+                minConcIsize, maxConcIsize);
         logger.debug("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         logger.debug("Exec'd");
@@ -144,7 +153,9 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
         return firstErrorLine;
     }
 
-    protected static String[] buildCommandLine(String bowtie2executable, String referenceBaseName, String path1, String path2, String numReports) {
+    protected static String[] buildCommandLine(String bowtie2executable, String referenceBaseName,
+                                               String path1, String path2, String numReports,
+                                               int minConcIsize, int maxConcIsize) {
         // todo adjust insert size here
         String[] commandArray = {
                 "./" + bowtie2executable,
@@ -152,7 +163,8 @@ public class Bowtie2PairedEndMapper extends PairedEndAlignmentMapper {
                 "-1", path1,
                 "-2", path2,
                 "-k", numReports,
-                "--very-sensitive-local", "--mm", "--score-min", "L,0,1.75", "--no-unal", "-I", "0", "-X", "600"
+                "--very-sensitive-local", "--mm", "--score-min", "L,0,1.75", "--no-unal",
+                "-I", String.valueOf(minConcIsize), "-X", String.valueOf(maxConcIsize)
         };
         return commandArray;
     }
