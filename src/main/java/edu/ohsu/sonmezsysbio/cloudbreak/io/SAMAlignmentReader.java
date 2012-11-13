@@ -23,18 +23,24 @@ public class SAMAlignmentReader extends BaseAlignmentReader {
     }
 
     public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
-        double r1normalization = sumAlignmentScores(readPairAlignments.getRead1Alignments());
-        double r2normalization = sumAlignmentScores(readPairAlignments.getRead2Alignments());
-        return Math.log(((double) record1.getAlignmentScore()) / r1normalization) + Math.log(((double) record2.getAlignmentScore()) / r2normalization);
+        double r1normalization = sumMismatchScores(readPairAlignments.getRead1Alignments());
+        double r2normalization = sumMismatchScores(readPairAlignments.getRead2Alignments());
+        return Math.log(mismatchScore(record1) / r1normalization) + Math.log(mismatchScore(record2) / r2normalization);
     }
 
-    private double sumAlignmentScores(List<AlignmentRecord> alignments) {
+    private double sumMismatchScores(List<AlignmentRecord> alignments) {
         double sumAlignmentScores = 0;
         for (AlignmentRecord record : alignments) {
-            SAMRecord samRecord = (SAMRecord) record;
-            sumAlignmentScores += samRecord.getAlignmentScore();
+            sumAlignmentScores += mismatchScore(record);
         }
         return sumAlignmentScores;
+    }
+
+    private double mismatchScore(AlignmentRecord record) {
+        SAMRecord samRecord = (SAMRecord) record;
+        int mismatches = samRecord.getMismatches();
+        return Math.exp( -1 * mismatches / 2);
+
     }
 
 }

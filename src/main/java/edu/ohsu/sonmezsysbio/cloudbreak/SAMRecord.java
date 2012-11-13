@@ -143,4 +143,8 @@ public class SAMRecord implements AlignmentRecord {
                 ", sequence='" + sequence + '\'' +
                 '}';
     }
+
+    public int getMismatches() {
+        return Integer.parseInt(tags.get("NM"));
+    }
 }
