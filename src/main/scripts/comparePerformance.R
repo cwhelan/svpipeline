@@ -39,14 +39,15 @@ dev.off()
 totalDels <- 372
 hydraPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/hydra.perf.txt', header=TRUE)
 cloudbreak <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim_chr2_lc/maxins_25000_sdseqfilter.perf.txt', header=TRUE)
+cloudbreakPerf2 <- cloudbreak[seq(1,dim(cloudbreakPerf)[1],by=12),]
 breakdancerPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/breakdancer_35_2.perf.txt', header=TRUE)
 gasvPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/gasv.perf.txt', header=TRUE)
 dellyPerf <- read.table('~/Documents/gene_rearrange/sv/jcvi_sim/chr2_lc/delly.perf.txt', header=TRUE)
 #breakdancerSensitive <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/breakdancer_rmdup_sensitive_perf.txt', header=TRUE)
 #cloudbreak.new <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_sim_lc/test_max_insert_25000_sdseqfilter_t180.perf.txt', header=TRUE)
 
-perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreak, delly=dellyPerf)
-pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/CHR2SIMLC_ROC_NEW.pdf')
+perfsList <- list(hydra=hydraPerf, breakdancer=breakdancerPerf, gasv=gasvPerf, cloudbreak=cloudbreakPerf2, delly=dellyPerf)
+pdf('~/Documents/gene_rearrange/svpipeline/CHR2SIMLC_ROC_NEW.pdf')
 plotROC(perfsList, c("Hydra", "Breakdancer", "GASV", "Cloudbreak", "Delly"), totalDels, "chr2 Simulated (5X)")
 dev.off()
 
@@ -109,5 +110,19 @@ cloudbreak <- read.table('~/Documents/gene_rearrange/sv/NA12156/test_max_insert_
 perfsList <- list(breakdancer, gasv, cloudbreak)
 pdf('~/Documents/gene_rearrange/svpipeline/cslu_seminar_08132012/NA12156_ROC_NEW.pdf')
 plotROC(perfsList, c("Breakdancer", "GASV", "Cloudbreak"), totalDels, "NA12156 (2X)", sim=FALSE)
+dev.off()
+
+
+#chr2 gt 50 100bp diploid
+totalDels <- 372
+cloudbreakPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/c7lssmall_readGroupsBt2Pe500L0175fix_None_None_25000_25_3_sam_7_deee666_175_lrHet.perf.txt', header=TRUE)
+cloudbreakPerf2 <- cloudbreakPerf[seq(1,dim(cloudbreakPerf)[1],by=12),]
+breakdancerPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/breakdancer_35_2_4.perf.txt', header=TRUE)
+gasvPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/gasv.perf.txt', header=TRUE)
+dellyPerf <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/delly.perf.txt', header=TRUE)
+
+perfsList <- list(breakdancer=breakdancerPerf, gasv=gasvPerf, delly=dellyPerf, cloudbreak=cloudbreakPerf2)
+pdf('~/Documents/gene_rearrange/svpipeline/CHR2SIM_ROC_NEW.pdf')
+plotROC(perfsList, c("Breakdancer","GASV", "DELLY", "Cloudbreak"), totalDels, "diploid chr2 Simulated (30X)")
 dev.off()
 
