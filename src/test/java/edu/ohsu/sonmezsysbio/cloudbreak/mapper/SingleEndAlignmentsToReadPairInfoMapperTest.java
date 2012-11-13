@@ -179,7 +179,9 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
                 return (short) 9;
             }
         });
-        mapper.setMaxInsertSize(2500);
+        mapper.setMaxInsertSize(25000);
+        mapper.setTargetIsize(300);
+        mapper.setTargetIsizeSD(30);
         mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
 
     }

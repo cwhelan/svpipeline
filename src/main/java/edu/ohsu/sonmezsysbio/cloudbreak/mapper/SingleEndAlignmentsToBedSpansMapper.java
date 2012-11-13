@@ -94,6 +94,14 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         this.targetIsizeSD = targetIsizeSD;
     }
 
+    public PairedAlignmentScorer getScorer() {
+        return scorer;
+    }
+
+    public void setScorer(PairedAlignmentScorer scorer) {
+        this.scorer = scorer;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
@@ -105,7 +113,7 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
 
         targetIsize = Integer.parseInt(job.get("pileupDeletionScore.targetIsize"));
-        targetIsize = Integer.parseInt(job.get("pileupDeletionScore.targetIsizeSD"));
+        targetIsizeSD = Integer.parseInt(job.get("pileupDeletionScore.targetIsizeSD"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
     }
@@ -145,8 +153,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     }
 
     private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
-        AlignmentRecord record1ConcAlignment;
-        AlignmentRecord record2ConcAlignment;
         boolean foundConcordant = false;
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
@@ -158,8 +164,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
                 int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
                 if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
-                    record1ConcAlignment = record1;
-                    record2ConcAlignment = record2;
                     emitBedSpanForPair(record1, record2, readPairAlignments, output);
                     foundConcordant = true;
                 }

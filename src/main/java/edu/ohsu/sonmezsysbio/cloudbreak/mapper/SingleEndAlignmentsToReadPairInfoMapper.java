@@ -220,8 +220,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
     private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments,
                                                    OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
                                                    Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
-        AlignmentRecord record1ConcAlignment;
-        AlignmentRecord record2ConcAlignment;
         boolean foundConcordant = false;
         for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
             for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
@@ -233,8 +231,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
                 int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
                 if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
-                    record1ConcAlignment = record1;
-                    record2ConcAlignment = record2;
                     emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
                     foundConcordant = true;
                 }
