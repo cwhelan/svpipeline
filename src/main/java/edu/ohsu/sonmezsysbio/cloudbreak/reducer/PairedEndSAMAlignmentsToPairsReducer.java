@@ -6,6 +6,8 @@ import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,18 +24,27 @@ import java.util.List;
 public class PairedEndSAMAlignmentsToPairsReducer extends MapReduceBase
         implements Reducer<Text,Text,Text,Text> {
 
+    private static Logger logger = Logger.getLogger(PairedEndSAMAlignmentsToPairsReducer.class);
+
+    { logger.setLevel(Level.DEBUG); }
+
     public void reduce(Text key, Iterator<Text> values,
                        OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
         List<String> read1Alignments = new ArrayList<String>();
         List<String> read2Alignments = new ArrayList<String>();
         while (values.hasNext()) {
             String alignment = values.next().toString();
+            if (logger.isDebugEnabled()) {
+                logger.debug("got alignment " + alignment);
+            }
             String[] fields = alignment.split("\t");
             int flag = Integer.parseInt(fields[1]);
 
             if ((flag & 0x40) == 0x40) {
+                logger.debug("adding to read1 alignments");
                 read1Alignments.add(alignment);
             } else {
+                logger.debug("adding to read2 alignments");
                 read2Alignments.add(alignment);
             }
         }
