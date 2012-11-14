@@ -30,6 +30,7 @@ public class PairedEndSAMAlignmentsToPairsReducer extends MapReduceBase
 
     public void reduce(Text key, Iterator<Text> values,
                        OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
+        logger.debug("reducing for key " + key);
         List<String> read1Alignments = new ArrayList<String>();
         List<String> read2Alignments = new ArrayList<String>();
         while (values.hasNext()) {
