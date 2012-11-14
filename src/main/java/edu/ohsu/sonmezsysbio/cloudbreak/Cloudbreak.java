@@ -72,6 +72,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandBowtie2PairedEnds bowtie2PairedEnds  = new CommandBowtie2PairedEnds();
         jc.addCommand("bowtie2PairedEnds", bowtie2PairedEnds);
 
+        CommandRazerS3PairedEnds razerS3PairedEnds  = new CommandRazerS3PairedEnds();
+        jc.addCommand("razerS3PairedEnds", razerS3PairedEnds);
+
         CommandMrFastSingleEnds mrFastSingleEnds  = new CommandMrFastSingleEnds();
         jc.addCommand("mrfastSingleEnds", mrFastSingleEnds);
 
