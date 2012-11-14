@@ -183,7 +183,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         int i = 0;
         // find the greatest common prefix, ignoring the '/1' and '/2' at the end of older fastq reads
         while (i < Math.max(read1.length(), read2.length()) && read1.charAt(i) == read2.charAt(i) &&
-                (! (read1.charAt(i) == '/') && read2.charAt(i) == '/')) {
+                (! ((read1.charAt(i) == '/') && (read2.charAt(i) == '/')))) {
             i = i + 1;
         }
         return read1.substring(0,i);
