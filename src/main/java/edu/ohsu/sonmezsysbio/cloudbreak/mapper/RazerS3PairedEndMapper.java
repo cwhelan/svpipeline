@@ -77,20 +77,27 @@ public class RazerS3PairedEndMapper extends PairedEndAlignmentMapper {
         logger.debug("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
         logger.debug("Exec'd");
+        try {
+            p.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        logger.debug("done");
 
         BufferedReader stdInput = new BufferedReader(new
-                         InputStreamReader(p.getInputStream()));
+                FileReader("map.result"));
 
         readAlignments(stdInput, p.getErrorStream());
     }
 
-    protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
+    protected void readAlignments(BufferedReader input, InputStream errorStream) throws IOException {
         String outLine;
         SAMAlignmentReader alignmentReader = new SAMAlignmentReader();
         String currentReadPairId = null;
         Set<String> r1Locations = new HashSet<String>();
         Set<String> r2Locations = new HashSet<String>();
-        while ((outLine = stdInput.readLine()) != null) {
+        while ((outLine = input.readLine()) != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("LINE: " + outLine);
             }
@@ -154,7 +161,7 @@ public class RazerS3PairedEndMapper extends PairedEndAlignmentMapper {
         // todo adjust insert size here
         String[] commandArray = {
                 "./" + razers3Executable,
-                "-of", "sam", "-rr", "100", "-i", "96", "-m", numReports,
+                "-o", "map.result", "-of", "sam", "-rr", "100", "-i", "96", "-m", numReports,
                 "--library-length", String.valueOf(midIsize), "--library-error", String.valueOf(isizeError),
                 referenceBaseName,
                 path1,
