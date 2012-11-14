@@ -106,7 +106,7 @@ public class RazerS3PairedEndMapper extends PairedEndAlignmentMapper {
                 continue;
             }
 
-            String readPairId = outLine.substring(0,outLine.indexOf('\t'));
+            String readPairId = outLine.substring(0,outLine.indexOf('\t') - 2);
             if (!readPairId.equals(currentReadPairId)) {
                 r1Locations.clear();
                 r2Locations.clear();
