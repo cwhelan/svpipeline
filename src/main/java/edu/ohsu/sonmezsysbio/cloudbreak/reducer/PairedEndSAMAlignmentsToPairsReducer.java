@@ -26,7 +26,7 @@ public class PairedEndSAMAlignmentsToPairsReducer extends MapReduceBase
 
     private static Logger logger = Logger.getLogger(PairedEndSAMAlignmentsToPairsReducer.class);
 
-    { logger.setLevel(Level.DEBUG); }
+    // { logger.setLevel(Level.DEBUG); }
 
     public void reduce(Text key, Iterator<Text> values,
                        OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
