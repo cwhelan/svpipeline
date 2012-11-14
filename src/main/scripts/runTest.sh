@@ -89,6 +89,13 @@ then
 FILTER_PARAM="--excludePairsMappingIn $FILTER"
 fi
 
+MIN_ALIGN_SCORE_PARAM=""
+if [ $MIN_ALIGNMENT_SCORE != "None" ]
+then
+MIN_ALIGN_SCORE_PARAM="--minScore $MIN_ALIGNMENT_SCORE"
+fi
+
+
 cat <<EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tasks=200 GMMFitSingleEndInsertSizes
@@ -101,7 +108,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
    --resolution $RESOLUTION 
    --aligner $ALIGNER
    --maxLogMapqDiff $MAX_MAPQ_DIFF
-   --minScore $MIN_ALIGNMENT_SCORE
+   $MIN_ALIGN_SCORE_PARAM
 
 EOF
 
