@@ -44,4 +44,17 @@ public class SAMRecordTest {
         assertTrue(! r2.isForward());
     }
 
+    @Test
+    public void testGetSequenceLength() throws Exception {
+        SAMRecord r = new SAMRecord();
+        r.cigar = "100M";
+        assertEquals(100, r.getSequenceLength());
+
+        r.cigar = "31M1D69M";
+        assertEquals(100, r.getSequenceLength());
+
+        r.cigar = "70M1I29M";
+        assertEquals(100, r.getSequenceLength());
+    }
+
 }

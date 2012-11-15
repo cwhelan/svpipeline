@@ -1,5 +1,8 @@
 package edu.ohsu.sonmezsysbio.cloudbreak;
 
+import net.sf.samtools.Cigar;
+import net.sf.samtools.TextCigarCodec;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +22,7 @@ public class SAMRecord implements AlignmentRecord {
     int insertSize;
     String readPairId;
     String sequence;
+    String cigar;
 
     public static SAMRecord parseSamRecord(String[] fields) {
         SAMRecord samRecord = new SAMRecord();
@@ -26,6 +30,7 @@ public class SAMRecord implements AlignmentRecord {
         samRecord.flag = Integer.parseInt(fields[1]);
         samRecord.referenceName = fields[2];
         samRecord.position = Integer.parseInt(fields[3]);
+        samRecord.cigar = fields[5];
         samRecord.sequence = fields[9];
         if (! samRecord.isMapped()) {
             return samRecord;
@@ -119,7 +124,8 @@ public class SAMRecord implements AlignmentRecord {
     }
 
     public int getSequenceLength() {
-        return getSequence().length();
+        Cigar cigar = TextCigarCodec.getSingleton().decode(this.cigar);
+        return cigar.getReadLength();
     }
 
     public void setFlag(int i) {
