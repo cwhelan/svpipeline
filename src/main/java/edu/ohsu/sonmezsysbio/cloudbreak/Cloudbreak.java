@@ -23,7 +23,6 @@ public class Cloudbreak extends Configured implements Tool
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new Cloudbreak(), args);
-
         System.exit(res);
     }
 
@@ -68,6 +67,9 @@ public class Cloudbreak extends Configured implements Tool
 
         CommandBowtie2SingleEnds bowtie2SingleEnds  = new CommandBowtie2SingleEnds();
         jc.addCommand("bowtie2SingleEnds", bowtie2SingleEnds);
+
+        CommandRazerS3SingleEnds razerS3SingleEnds  = new CommandRazerS3SingleEnds();
+        jc.addCommand("razerS3SingleEnds", razerS3SingleEnds);
 
         CommandBowtie2PairedEnds bowtie2PairedEnds  = new CommandBowtie2PairedEnds();
         jc.addCommand("bowtie2PairedEnds", bowtie2PairedEnds);
