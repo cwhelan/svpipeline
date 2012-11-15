@@ -73,6 +73,7 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
         logger.debug("done");
 
         BufferedReader stdInput = new BufferedReader(new FileReader("map.result"));
+        readAlignments(stdInput, p.getErrorStream());
     }
 
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
