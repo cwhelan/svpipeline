@@ -143,8 +143,10 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
                     }
                 }
                 for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                    if (record2.getAlignmentScore() < getMinScore()) {
-                        continue;
+                    if (getMinScore() != -1) {
+                        if (record2.getAlignmentScore() < getMinScore()) {
+                            continue;
+                        }
                     }
                     emitBedSpanForPair(record1, record2, readPairAlignments, output);
                 }
