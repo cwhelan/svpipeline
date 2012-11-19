@@ -36,6 +36,9 @@ public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
     @Parameter(names = {"--medianFilterWindow"})
     int medianFilterWindow = 1;
 
+    @Parameter(names = {"--extraWigFileToAverage"})
+    String extraWigFileToAverage;
+
     public void run(Configuration conf) throws Exception {
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
@@ -45,9 +48,21 @@ public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
         } else {
             wigFileReader = new BufferedReader(new FileReader(new File(inputWigFile)));
         }
+
+        BufferedReader extraWigFileReader = null;
+        if (extraWigFileToAverage != null) {
+            if (extraWigFileToAverage.endsWith(".gz")) {
+                extraWigFileReader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(new File(extraWigFileToAverage)))));
+            } else {
+                extraWigFileReader = new BufferedReader(new FileReader(new File(extraWigFileToAverage)));
+            }
+
+        }
+
         BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(outputBedFile)));
+
         try {
-            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow);
+            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow, extraWigFileReader);
         } finally {
             wigFileReader.close();
             bedFileWriter.close();
