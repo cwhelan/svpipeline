@@ -41,7 +41,7 @@ for line in open_file(temp_file_name):
         continue
     fields = line.split()
     length = int(fields[2]) - int(fields[1])
-    avg_mu = double(fields[5])
+    avg_mu = float(fields[5])
     # todo fix this hardcoded tolerance
     if (abs(avg_mu - length) > 500):
         continue
