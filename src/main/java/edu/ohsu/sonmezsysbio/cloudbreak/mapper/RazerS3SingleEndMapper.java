@@ -67,7 +67,12 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
         ReportableProcess p = new ReportableProcess(Runtime.getRuntime().exec(commandLine), reporter);
         logger.debug("Exec'd");
 
-
+        try {
+            p.waitForWhileReporting();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         logger.debug("done");
 
         BufferedReader stdInput = new BufferedReader(new FileReader("map.result"));
