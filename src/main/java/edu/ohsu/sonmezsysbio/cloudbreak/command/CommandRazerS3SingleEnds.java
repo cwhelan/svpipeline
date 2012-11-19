@@ -40,6 +40,9 @@ public class CommandRazerS3SingleEnds extends BaseCloudbreakCommand {
     @Parameter(names = {"--HDFSPathToRazerS3"}, required = true)
     String pathToRazerS3;
 
+    @Parameter(names = {"--pctIdentity"}, required = true)
+    int pctIdentity;
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -56,6 +59,7 @@ public class CommandRazerS3SingleEnds extends BaseCloudbreakCommand {
         DistributedCache.createSymlink(conf);
         conf.set("mapred.task.timeout", "3600000");
         conf.set("razers3.num.reports", numReports);
+        conf.set("razers3.pct.identity", String.valueOf(pctIdentity));
 
         conf.setInputFormat(SequenceFileInputFormat.class);
 
