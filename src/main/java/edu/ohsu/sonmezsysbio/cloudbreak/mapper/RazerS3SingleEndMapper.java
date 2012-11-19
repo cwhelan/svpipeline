@@ -5,6 +5,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.SAMAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reporter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -63,19 +64,14 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
         String referenceBaseName = new File(reference).getName();
         String[] commandLine = buildCommandLine(razerS3Executable, referenceBaseName, s1File.getPath(), numReports, pctIdentity);
         logger.debug("Executing command: " + Arrays.toString(commandLine));
-        Process p = Runtime.getRuntime().exec(commandLine);
+        ReportableProcess p = new ReportableProcess(Runtime.getRuntime().exec(commandLine), reporter);
         logger.debug("Exec'd");
 
-        try {
-            p.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+
         logger.debug("done");
 
         BufferedReader stdInput = new BufferedReader(new FileReader("map.result"));
-        readAlignments(stdInput, p.getErrorStream());
+        readAlignments(stdInput, p.process.getErrorStream());
     }
 
     protected void readAlignments(BufferedReader stdInput, InputStream errorStream) throws IOException {
@@ -127,5 +123,31 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
                 path1
         };
         return commandArray;
+    }
+
+    private class ReportableProcess {
+        private Process process;
+        private Reporter reporter;
+
+        public ReportableProcess(Process exec, Reporter reporter) {
+            this.process = exec;
+            this.reporter = reporter;
+        }
+
+        public int waitForWhileReporting() throws InterruptedException {
+            while (true) {
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    throw e;
+                }
+                try {
+                    int exitVal = process.exitValue();
+                    return exitVal;
+                } catch (IllegalThreadStateException e) {
+                    reporter.progress();
+                }
+            }
+        }
     }
 }
