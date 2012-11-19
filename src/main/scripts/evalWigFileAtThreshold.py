@@ -23,12 +23,13 @@ wig_filename = sys.argv[2]
 truth_filename = sys.argv[3]
 faidx_filename = sys.argv[4]
 median_filter_window = sys.argv[5]
+mu_file = sys.argv[6]
 
 #sys.stderr.write("quantile " + str(q) + "\n")
 #temp_file_name = "tmp/tmp_" + str(q) + ".bed"
 temp_file = tempfile.NamedTemporaryFile()
 temp_file_name = temp_file.name
-extract_regions_cmd = ['hadoop', 'jar', '/l2/users/whelanch/gene_rearrange/svpipeline/lib/cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window]
+extract_regions_cmd = ['hadoop', 'jar', '/l2/users/whelanch/gene_rearrange/svpipeline/lib/cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window, "--extraWigFileToAverage", mu_file]
 subprocess.call(extract_regions_cmd)
 
 num_predictions = 0
@@ -39,8 +40,13 @@ for line in open_file(temp_file_name):
     if line.startswith("track"):
         continue        
     fields = line.split()
+    length = int(fields[2]) - int(fields[1])
+    avg_mu = double(fields[5])
+    # todo fix this hardcoded tolerance
+    if (abs(avg_mu - length) > 500):
+        continue
     num_predictions += 1
-    predicted_region += int(fields[2]) - int(fields[1])
+    predicted_region += length
     bed_line = line.strip()
     bed_lines.append(bed_line)
         

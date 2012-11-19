@@ -16,6 +16,7 @@ truth_filename = sys.argv[2]
 faidx_filename = sys.argv[3]
 medianFilterWindow = sys.argv[4]
 lower_threshold = float(sys.argv[5])
+mu_filename = sys.argv[6]
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
@@ -67,7 +68,7 @@ sys.stderr.write(str(quantiles))
 sys.stderr.write("\n")
 
 def process_quantile(q):
-    eval_at_q_cmd = ['condor_run', 'python', '/l2/users/whelanch/gene_rearrange/svpipeline/src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow]
+    eval_at_q_cmd = ['condor_run', 'python', '/l2/users/whelanch/gene_rearrange/svpipeline/src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow, mu_filename]
     #print eval_at_q_cmd
     result = subprocess.Popen(eval_at_q_cmd, stdout=subprocess.PIPE).communicate()[0]
     result_fields = result.split()
