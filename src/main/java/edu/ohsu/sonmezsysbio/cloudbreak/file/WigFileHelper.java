@@ -157,12 +157,12 @@ public class WigFileHelper {
                 values[tileNum] = val;
 
                 if (extraWigFileReader != null) {
-                    String[] extraFields = line.split("\t");
+                    String[] extraFields = extraWigLine.split("\t");
                     if (extraFields.length < 2) {
                         throw new RuntimeException("Failed to parse line: " + line);
                     }
-                    double extraVal = Double.valueOf(fields[1]);
-                    values[tileNum] = extraVal;
+                    double extraVal = Double.valueOf(extraFields[1]);
+                    extraWigFileValues[tileNum] = extraVal;
 
                 }
             }
@@ -228,7 +228,7 @@ public class WigFileHelper {
                     long endPosition = pos - 1;
                     bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
                     if (extraWigFileValues != null) {
-                        bedFileWriter.write("\t" + extraWigValueSum / (endPosition - peakStart));
+                        bedFileWriter.write("\t" + extraWigValueSum * resolution / ((endPosition + 1) - peakStart));
                     }
                     bedFileWriter.write("\n");
                     peakNum += 1;
@@ -243,7 +243,7 @@ public class WigFileHelper {
             if (endPosition < peakStart) return peakNum;
             bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
             if (extraWigFileValues != null) {
-                bedFileWriter.write("\t" + extraWigValueSum / (endPosition - peakStart));
+                bedFileWriter.write("\t" + extraWigValueSum * resolution / ((endPosition + 1) - peakStart));
             }
             bedFileWriter.write("\n");
             peakNum += 1;
