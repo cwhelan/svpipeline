@@ -155,4 +155,10 @@ gzip *.wig
 
 ~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_lrHom.wig.gz.tdf hg18 || true
 
+popd
 
+cp ${NAME}/${NAME}_lrHet.wig.gz .
+cp ${NAME}/${NAME}_mu1.wig.gz .
+
+python ../build/svpipeline/src/main/scripts/evalWigFile.py \
+    ${NAME}_lrHet.wig.gz $TRUTH $LOCAL_FAI $MEDIAN_FILTER_WINDOW 0.5 ${NAME}_mu1.wig.gz > ${NAME}_lrHet.perf.tx
