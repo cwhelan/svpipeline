@@ -39,10 +39,13 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     String readFile2;
 
     @Parameter(names = {"--outFileName"})
-    String outFileName = "reads.txt";
+    String outFileName = "reads";
 
     @Parameter(names = {"--compress"})
-    String compress = "none";
+    String compress = "snappy";
+
+    @Parameter(names = {"--clipReadIdsAtWhitespace"})
+    boolean clipReadIdsAtWhitespace = true;
 
     @Parameter(names = {"--trigramEntropyFilter"})
     Double trigramEntropyFilter = -1.0;
@@ -127,6 +130,11 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
             String seq2 = inputReader2.readLine();
             String sep2 = inputReader2.readLine();
             String qual2 = inputReader2.readLine();
+
+            if (clipReadIdsAtWhitespace) {
+                read1 = read1.split("\\s+")[0];
+                read2 = read2.split("\\s+")[0];
+            }
 
             String readPrefix = greatestCommonPrefix(read1, read2);
 
