@@ -41,7 +41,7 @@ mvn assembly:assembly
 SHORT_GIT_TAG=`git rev-parse --short HEAD`
 popd
 
-NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${MEDIAN_FILTER_WINDOW}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}_${MIN_ALIGNMENT_SCORE}
+NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}_${MIN_ALIGNMENT_SCORE}
 
 echo Experiment name: $NAME
 
@@ -129,14 +129,14 @@ cat <<EOF
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $LOCAL_FAI \
-    --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
+    --resolution $RESOLUTION --outputPrefix $NAME
 
 EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
     --faidx $LOCAL_FAI \
-    --resolution $RESOLUTION --medianFilterWindow $MEDIAN_FILTER_WINDOW --outputPrefix $NAME
+    --resolution $RESOLUTION --outputPrefix $NAME
 
 echo gzip *.wig
 gzip *.wig
