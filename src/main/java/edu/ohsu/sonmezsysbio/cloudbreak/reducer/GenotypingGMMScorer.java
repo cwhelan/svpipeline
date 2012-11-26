@@ -225,6 +225,10 @@ public class GenotypingGMMScorer {
             results.w0 = -1;
             return results;
         }
+        double[] cleanMappingScores = new double[ysWithCloseNeighbors.size()];
+        for (int i = 0; i < ysWithCloseNeighbors.size(); i++) {
+            cleanMappingScores[i] = mappingScoreArray[ysWithCloseNeighbors.get(i)];
+        }
         results.nodelOneComponentLikelihood = likelihood(yclean, new double[]{Math.log(1)}, new double[]{initialMu1}, sigma);
 
         log.debug("estimating with two components, one fixed");
@@ -257,8 +261,8 @@ public class GenotypingGMMScorer {
         results.w0 = Math.exp(w[0]);
         results.c1membership = Math.exp(updates.n[0]);
         results.c2membership = Math.exp(updates.n[1]);
-        results.weightedC1membership = Math.exp(weightByMappingScore(updates.gamma[0], mappingScoreArray));
-        results.weightedC2membership = Math.exp(weightByMappingScore(updates.gamma[1], mappingScoreArray));
+        results.weightedC1membership = Math.exp(weightByMappingScore(updates.gamma, cleanMappingScores, 0));
+        results.weightedC2membership = Math.exp(weightByMappingScore(updates.gamma, cleanMappingScores, 1));
 
         log.debug("estimating with one free component");
         initialMu = new double[]{mean(yclean)};
@@ -289,10 +293,11 @@ public class GenotypingGMMScorer {
         return results;
     }
 
-    private double weightByMappingScore(double[] memberships, double[] mappingScoreArray) {
-        double[] weightedMemberships = new double[memberships.length];
-        for (int i = 0; i < memberships.length; i++) {
-            weightedMemberships[i] = memberships[i] + mappingScoreArray[i];
+    private double weightByMappingScore(double[][] memberships, double[] mappingScoreArray, int component) {
+
+        double[] weightedMemberships = new double[mappingScoreArray.length];
+        for (int i = 0; i < mappingScoreArray.length; i++) {
+            weightedMemberships[i] = memberships[i][component] + mappingScoreArray[i];
         }
         return logsumexp(weightedMemberships);
     }
