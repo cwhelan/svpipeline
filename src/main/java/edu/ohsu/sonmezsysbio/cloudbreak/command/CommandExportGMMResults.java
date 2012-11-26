@@ -41,30 +41,18 @@ public class CommandExportGMMResults implements CloudbreakCommand {
     @Parameter(names = {"--faidx"}, required = true)
     private String faidxFileName;
 
-    @Parameter(names = {"--medianFilterWindow"})
-    int medianFilterWindow = 1;
-
     @Parameter(names = {"--resolution"})
     int resolution = Cloudbreak.DEFAULT_RESOLUTION;
-
-    public String getFaidxFileName() {
-        return faidxFileName;
-    }
-
-    public void setFaidxFileName(String faidxFileName) {
-        this.faidxFileName = faidxFileName;
-    }
 
     public void run(Configuration conf) throws Exception {
 
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
         List<String> outputs = Arrays.asList("w0", "mu2", "nodelOneComponentLikelihood", "twoComponentLikelihood",
-                "oneFreeComponentLikelihood", "lrHeterozygous", "lrHomozygous");
+                "oneFreeComponentLikelihood", "lrHeterozygous", "lrHomozygous", "cleanCoverage", "c1membership",
+                "c2membership", "weightedC1membership", "weightedC2membership");
 
         Map<String, BufferedWriter> writers = createWritersForOutputs(outputs);
-
-        String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
 
         try {
             writeGMMResultWigFiles(conf, writers,
@@ -97,8 +85,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         }
 
         logger.info("Writing file " + fileName);
-        BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(outputFile));
-        return outputFileWriter;
+        return new BufferedWriter(new FileWriter(outputFile));
     }
 
     private void writeGMMResultWigFiles(Configuration conf, Map<String, BufferedWriter> writers, String inputHDFSDir1,

@@ -21,16 +21,27 @@ public class GMMScorerResults implements Writable {
     public double lrHeterozygous;
     public double lrHomozygous;
 
+    public int cleanCoverage;
+    public double c1membership;
+    public double c2membership;
+    public double weightedC1membership;
+    public double weightedC2membership;
+
     @Override
     public String toString() {
         return "GMMScorerResults{" +
                 "w0=" + w0 +
                 ", mu2=" + mu2 +
-                ", twoComponentLikelihood=" + twoComponentLikelihood +
                 ", nodelOneComponentLikelihood=" + nodelOneComponentLikelihood +
+                ", twoComponentLikelihood=" + twoComponentLikelihood +
                 ", oneFreeComponentLikelihood=" + oneFreeComponentLikelihood +
                 ", lrHeterozygous=" + lrHeterozygous +
                 ", lrHomozygous=" + lrHomozygous +
+                ", cleanCoverage=" + cleanCoverage +
+                ", c1membership=" + c1membership +
+                ", c2membership=" + c2membership +
+                ", weightedC1membership=" + weightedC1membership +
+                ", weightedC2membership=" + weightedC2membership +
                 '}';
     }
 
@@ -42,6 +53,11 @@ public class GMMScorerResults implements Writable {
         dataOutput.writeDouble(oneFreeComponentLikelihood);
         dataOutput.writeDouble(lrHeterozygous);
         dataOutput.writeDouble(lrHomozygous);
+        dataOutput.writeInt(cleanCoverage);
+        dataOutput.writeDouble(c1membership);
+        dataOutput.writeDouble(c2membership);
+        dataOutput.writeDouble(weightedC1membership);
+        dataOutput.writeDouble(weightedC2membership);
     }
 
     public void readFields(DataInput dataInput) throws IOException {
@@ -52,5 +68,10 @@ public class GMMScorerResults implements Writable {
         oneFreeComponentLikelihood = dataInput.readDouble();
         lrHeterozygous = dataInput.readDouble();
         lrHomozygous = dataInput.readDouble();
+        cleanCoverage = dataInput.readInt();
+        c1membership = dataInput.readDouble();
+        c2membership = dataInput.readDouble();
+        weightedC1membership = dataInput.readDouble();
+        weightedC2membership = dataInput.readDouble();
     }
 }

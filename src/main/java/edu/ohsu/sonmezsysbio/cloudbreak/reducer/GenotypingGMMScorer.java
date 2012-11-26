@@ -124,12 +124,15 @@ public class GenotypingGMMScorer {
     private static class EMUpdates {
         double[] w;
         double[] mu;
+        public double[] n;
+        public double[][] gamma;
 
         @Override
         public String toString() {
             return "EMUpdates{" +
                     "w=" + w +
                     ", mu=" + mu +
+                    ", n=" + n +
                     '}';
         }
     }
@@ -149,6 +152,7 @@ public class GenotypingGMMScorer {
         }
 
         EMUpdates updates = new EMUpdates();
+        updates.gamma = gamma;
         updates.mu = Arrays.copyOf(mu, mu.length);
 
         double[] wprime = updateW(n, y);
@@ -163,37 +167,41 @@ public class GenotypingGMMScorer {
             log.debug("mu[" + j + "] prime: " + mujprime);
             updates.mu[j] = mujprime;
         }
+        updates.n = n;
 
         return updates;
     }
 
-    public double[] nnclean(double[] y, double sigma, int m) {
-        if (m >= y.length) return new double[]{};
-        List<Double> ysWithCloseNeighbors = new ArrayList<Double>();
-
-        // todo: there's a much better way to do this: sort ys and only calculate distances of neigbors
-        double[][] dist = new double[y.length][y.length];
-        for (int i = 0; i < y.length; i++) {
-            for (int j = 0; j < y.length; j++) {
-                dist[i][j] = Math.abs(y[i] - y[j]);
-            }
-        }
-        for (int i = 0; i < y.length; i++) {
-            Arrays.sort(dist[i]);
-            double distanceToMthNeighbor = dist[i][m];
-            if (distanceToMthNeighbor < 5 * sigma) {
-                ysWithCloseNeighbors.add(y[i]);
-            }
-        }
-
+    public double[] nnclean(double[] y, List<Integer> ysWithCloseNeighbors) {
         double[] result = new double[ysWithCloseNeighbors.size()];
         for (int i = 0; i < ysWithCloseNeighbors.size(); i++) {
-            result[i] = ysWithCloseNeighbors.get(i);
+            result[i] = y[ysWithCloseNeighbors.get(i)];
         }
         return result;
     }
 
-    public GMMScorerResults estimate(double[] y, double[] initialW, double initialMu1, double sigma) {
+    public List<Integer> cleanYIndices(double[] y, double sigma, int m, int clusterCutoffInSDs) {
+        List<Integer> ysWithCloseNeighbors = new ArrayList<Integer>();
+        if (m < y.length) {
+            // todo: there's a much better way to do this: sort ys and only calculate distances of neigbors
+            double[][] dist = new double[y.length][y.length];
+            for (int i = 0; i < y.length; i++) {
+                for (int j = 0; j < y.length; j++) {
+                    dist[i][j] = Math.abs(y[i] - y[j]);
+                }
+            }
+            for (int i = 0; i < y.length; i++) {
+                Arrays.sort(dist[i]);
+                double distanceToMthNeighbor = dist[i][m];
+                if (distanceToMthNeighbor < clusterCutoffInSDs * sigma) {
+                    ysWithCloseNeighbors.add(i);
+                }
+            }
+        }
+        return ysWithCloseNeighbors;
+    }
+
+    public GMMScorerResults estimate(double[] y, double[] initialW, double initialMu1, double sigma, double[] mappingScoreArray) {
         GMMScorerResults results = new GMMScorerResults();
         int maxIterations = 10;
         if (log.isDebugEnabled()) {
@@ -202,7 +210,9 @@ public class GenotypingGMMScorer {
                 log.debug(y[i]);
             }
         }
-        double[] yclean = nnclean(y, sigma, 2);
+        List<Integer> ysWithCloseNeighbors = cleanYIndices(y, sigma, 2, 5);
+        double[] yclean = nnclean(y, ysWithCloseNeighbors);
+        results.cleanCoverage = yclean.length;
         if (log.isDebugEnabled()) {
             log.debug("ycleans:");
             for (int i = 0; i < yclean.length; i++) {
@@ -224,8 +234,10 @@ public class GenotypingGMMScorer {
         double[] mu = initialMu;
         double l = likelihood(yclean, w, mu, sigma);
         log.debug("initial likelihood: " + l);
+        EMUpdates updates;
         while(true) {
-            EMUpdates updates = emStep(yclean, w, mu, sigma, new int[] {1});
+            updates = emStep(yclean, w, mu, sigma, new int[] {1});
+
             if (log.isDebugEnabled()) {
                 log.debug("updates: " + updates.toString());
             }
@@ -243,6 +255,10 @@ public class GenotypingGMMScorer {
         results.lrHeterozygous = l - results.nodelOneComponentLikelihood;
         results.mu2 = mu[1];
         results.w0 = Math.exp(w[0]);
+        results.c1membership = Math.exp(updates.n[0]);
+        results.c2membership = Math.exp(updates.n[1]);
+        results.weightedC1membership = Math.exp(weightByMappingScore(updates.gamma[0], mappingScoreArray));
+        results.weightedC2membership = Math.exp(weightByMappingScore(updates.gamma[1], mappingScoreArray));
 
         log.debug("estimating with one free component");
         initialMu = new double[]{mean(yclean)};
@@ -253,7 +269,7 @@ public class GenotypingGMMScorer {
         log.debug("initial likelihood: " + l);
 
         while(true) {
-            EMUpdates updates = emStep(yclean, w, mu, sigma, new int[] {0});
+            updates = emStep(yclean, w, mu, sigma, new int[]{0});
             if (log.isDebugEnabled()) {
                 log.debug("updates: " + updates.toString());
             }
@@ -273,8 +289,17 @@ public class GenotypingGMMScorer {
         return results;
     }
 
+    private double weightByMappingScore(double[] memberships, double[] mappingScoreArray) {
+        double[] weightedMemberships = new double[memberships.length];
+        for (int i = 0; i < memberships.length; i++) {
+            weightedMemberships[i] = memberships[i] + mappingScoreArray[i];
+        }
+        return logsumexp(weightedMemberships);
+    }
+
     public GMMScorerResults reduceReadPairInfos(Iterator<ReadPairInfo> values, Map<Short, ReadGroupInfo> readGroupInfos) {
         List<Double> insertSizes = new ArrayList<Double>();
+        List<Double> mappingScores = new ArrayList<Double>();
         double maxSD = 0;
         if (readGroupInfos.values().size() > 1) {
             throw new UnsupportedOperationException("GMM Reducer can't work with more than one read group right now");
@@ -291,6 +316,7 @@ public class GenotypingGMMScorer {
             short readGroupId = rpi.readGroupId;
             ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupId);
             insertSizes.add((double) (insertSize));
+            mappingScores.add(rpi.pMappingCorrect);
             if (readGroupInfo.isizeSD > maxSD) {
                 maxSD = readGroupInfo.isizeSD;
             }
@@ -308,7 +334,11 @@ public class GenotypingGMMScorer {
         for (int i = 0; i < insertSizes.size(); i++) {
             insertSizeArray[i] = insertSizes.get(i);
         }
+        double[] mappingScoreArray = new double[mappingScores.size()];
+        for (int i = 0; i < mappingScores.size(); i++) {
+            mappingScoreArray[i] = mappingScores.get(i);
+        }
 
-        return estimate(insertSizeArray, initialW, targetIsize, maxSD);
+        return estimate(insertSizeArray, initialW, targetIsize, maxSD, mappingScoreArray);
     }
 }

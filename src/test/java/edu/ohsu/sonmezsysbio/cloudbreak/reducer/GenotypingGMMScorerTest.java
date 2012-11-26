@@ -56,14 +56,14 @@ public class GenotypingGMMScorerTest {
         double[] y = HET_DEL_5X_5N;
         double[] nonnoise = new double[] {260.0736, 197.4272,   194.8618,  1217.8588,
                 1228.2190,  1151.7017};
-        assertArrayEquals(nonnoise, scorer.nnclean(y, 30, 2), 0.000001);
+        assertArrayEquals(nonnoise, scorer.nnclean(y, scorer.cleanYIndices(y, 30, 2, 5)), 0.000001);
     }
 
     @Test
     public void testNncleanNotEnoughValues() throws Exception {
         double[] y = new double[] {260.0736, 1217.8588};
         double[] nonnoise = new double[] {};
-        assertArrayEquals(nonnoise, scorer.nnclean(y, 30, 2), 0.000001);
+        assertArrayEquals(nonnoise, scorer.nnclean(y, scorer.cleanYIndices(y, 30, 2, 5)), 0.000001);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class GenotypingGMMScorerTest {
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
-        assertEquals(.5, scorer.estimate(y, initialW, 200, sigma).w0, 0.0001);
+        assertEquals(.5, scorer.estimate(y, initialW, 200, sigma, new double[y.length]).w0, 0.0001);
     }
 
     public void testEstimateWNoValues() throws Exception {
@@ -82,7 +82,7 @@ public class GenotypingGMMScorerTest {
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
-        assertEquals(1, scorer.estimate(y, initialW, 200, sigma).w0, 0.0001);
+        assertEquals(1, scorer.estimate(y, initialW, 200, sigma, new double[y.length]).w0, 0.0001);
     }
 
 
@@ -191,7 +191,7 @@ public class GenotypingGMMScorerTest {
         double sigma = 30;
         double[] initialW = new double[] {Math.log(.5),Math.log(.5)};
 
-        GMMScorerResults estimates = scorer.estimate(y, initialW, 200, sigma);
+        GMMScorerResults estimates = scorer.estimate(y, initialW, 200, sigma, new double[y.length]);
         assertTrue(estimates.oneFreeComponentLikelihood < 0);
         assertTrue(estimates.twoComponentLikelihood < 0);
         assertTrue(estimates.nodelOneComponentLikelihood < 0);
