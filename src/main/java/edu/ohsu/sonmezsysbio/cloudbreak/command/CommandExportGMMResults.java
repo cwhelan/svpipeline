@@ -18,9 +18,8 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,79 +59,55 @@ public class CommandExportGMMResults implements CloudbreakCommand {
 
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
-        String w0fileName = outputPrefix + "_w0.wig";
-        String mu1fileName = outputPrefix + "_mu1.wig";
-        String l1fileName = outputPrefix + "_l1.wig";
-        String l2fileName = outputPrefix + "_l2.wig";
-        String l1ffileName = outputPrefix + "_l1f.wig";
-        String lrHetfileName = outputPrefix + "_lrHet.wig";
-        String lrHomfileName = outputPrefix + "_lrHom.wig";
+        List<String> outputs = Arrays.asList("w0", "mu2", "nodelOneComponentLikelihood", "twoComponentLikelihood",
+                "oneFreeComponentLikelihood", "lrHeterozygous", "lrHomozygous");
+
+        Map<String, BufferedWriter> writers = createWritersForOutputs(outputs);
 
         String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
 
-        // todo: refactor to hide all of these writers
-        BufferedWriter w0outputFileWriter = createWriter(w0fileName);
-        if (w0outputFileWriter == null) return;
-
-        BufferedWriter mu1outputFileWriter = createWriter(mu1fileName);
-        if (mu1outputFileWriter == null) return;
-
-        BufferedWriter l1outputFileWriter = createWriter(l1fileName);
-        if (l1outputFileWriter == null) return;
-
-        BufferedWriter l2outputFileWriter = createWriter(l2fileName);
-        if (l2outputFileWriter == null) return;
-
-        BufferedWriter l1foutputFileWriter = createWriter(l1ffileName);
-        if (l1foutputFileWriter == null) return;
-
-        BufferedWriter lrHetOutputFileWriter = createWriter(lrHetfileName);
-        if (lrHetOutputFileWriter == null) return;
-
-        BufferedWriter lrHomOutputFileWriter = createWriter(lrHomfileName);
-        if (lrHomOutputFileWriter == null) return;
-
         try {
-            writeGMMResultWigFiles(conf, w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
-                    l2outputFileWriter, l1foutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
+            writeGMMResultWigFiles(conf, writers,
                     inputHDFSDir, faidx);
         } finally {
-            w0outputFileWriter.close();
-            mu1outputFileWriter.close();
-            l1outputFileWriter.close();
-            l2outputFileWriter.close();
-            lrHetOutputFileWriter.close();
-            lrHomOutputFileWriter.close();
+            for (BufferedWriter writer : writers.values()) {
+                writer.close();
+            }
         }
 
 
     }
 
+    private Map<String, BufferedWriter> createWritersForOutputs(List<String> outputs) throws IOException {
+        Map<String, BufferedWriter> writers = new HashMap<String, BufferedWriter>();
+        for (String outputName : outputs) {
+            String filename = outputPrefix + "_" + outputName + ".wig";
+            BufferedWriter writer = createWriter(filename);
+            if (writer == null) throw new RuntimeException("Failed to create file");
+            writers.put(outputName, writer);
+        }
+        return writers;
+    }
+
     private BufferedWriter createWriter(String fileName) throws IOException {
-        File w0outputFile = new File(fileName);
-        if (! w0outputFile.createNewFile()) {
-            logger.error("Failed to create file " + w0outputFile);
+        File outputFile = new File(fileName);
+        if (! outputFile.createNewFile()) {
+            logger.error("Failed to create file " + outputFile);
             return null;
         }
 
         logger.info("Writing file " + fileName);
-        BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(w0outputFile));
+        BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(outputFile));
         return outputFileWriter;
     }
 
-    private void writeGMMResultWigFiles(Configuration conf, Writer w0outputFileWriter, BufferedWriter mu1outputFileWriter,
-                                        BufferedWriter l1outputFileWriter, BufferedWriter l2outputFileWriter,
-                                        BufferedWriter l1fOutputFileWriter, BufferedWriter lrHetOutputFileWriter,
-                                        BufferedWriter lrHomOutputFileWriter, String inputHDFSDir1,
+    private void writeGMMResultWigFiles(Configuration conf, Map<String, BufferedWriter> writers, String inputHDFSDir1,
                                         FaidxFileHelper faix
-    ) throws IOException {
-        w0outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " w0\"\n");
-        mu1outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " mu1\"\n");
-        l1outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l1\"\n");
-        l2outputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l2\"\n");
-        l1fOutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " l1f\"\n");
-        lrHetOutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " lrHet\"\n");
-        lrHomOutputFileWriter.write("track type=wiggle_0 name=\"" + outputPrefix + " lrHom\"\n");
+    ) throws IOException, NoSuchFieldException, IllegalAccessException {
+        for (String name : writers.keySet()) {
+            BufferedWriter writer = writers.get(name);
+            writer.write("track type=wiggle_0 name=\"" + outputPrefix + " " + name + "\"\n");
+        }
 
         FileSystem dfs = DistributedFileSystem.get(conf);
         FileStatus[] stati = dfs.listStatus(new Path(inputHDFSDir1));
@@ -151,16 +126,12 @@ public class CommandExportGMMResults implements CloudbreakCommand {
             }
         }
 
-        mergeSortedInputStreams(new DFSFacade(dfs, conf), w0outputFileWriter, mu1outputFileWriter, l1outputFileWriter,
-                l2outputFileWriter, l1fOutputFileWriter, lrHetOutputFileWriter, lrHomOutputFileWriter,
+        mergeSortedInputStreams(new DFSFacade(dfs, conf), writers,
                 faix, inputStreams);
     }
 
-    public void mergeSortedInputStreams(DFSFacade dfsFacade, Writer w0outputFileWriter, BufferedWriter mu1outputFileWriter,
-                                        BufferedWriter l1outputFileWriter, BufferedWriter l2outputFileWriter,
-                                        BufferedWriter l1fOutputFileWriter, BufferedWriter lrHetOutputFileWriter,
-                                        BufferedWriter lrHomOutputFileWriter, FaidxFileHelper faix,
-                                        List<Path> paths) throws IOException {
+    public void mergeSortedInputStreams(DFSFacade dfsFacade, Map<String, BufferedWriter> writers, FaidxFileHelper faix,
+                                        List<Path> paths) throws IOException, NoSuchFieldException, IllegalAccessException {
         short currentChromosome = -1;
         PriorityQueue<GMMResultsReaderAndLine> fileReaders = new PriorityQueue<GMMResultsReaderAndLine>();
         for (Path path : paths) {
@@ -174,27 +145,21 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         while (! fileReaders.isEmpty()) {
             GMMResultsReaderAndLine minNextLine = fileReaders.poll();
             if (currentChromosome != minNextLine.getGenomicLocation().chromosome) {
-                writeChromHeader(w0outputFileWriter, faix, minNextLine);
-                writeChromHeader(mu1outputFileWriter, faix, minNextLine);
-                writeChromHeader(l1outputFileWriter, faix, minNextLine);
-                writeChromHeader(l2outputFileWriter, faix, minNextLine);
-                writeChromHeader(l1fOutputFileWriter, faix, minNextLine);
-                writeChromHeader(lrHetOutputFileWriter, faix, minNextLine);
-                writeChromHeader(lrHomOutputFileWriter, faix, minNextLine);
+                for (BufferedWriter writer : writers.values()) {
+                    writeChromHeader(writer, faix, minNextLine);
+                }
 
                 currentChromosome = minNextLine.getGenomicLocation().chromosome;
             }
 
-            w0outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().w0 + "\n");
-            mu1outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().mu2 + "\n");
-            l1outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().nodelOneComponentLikelihood + "\n");
-            l2outputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().twoComponentLikelihood + "\n");
-            l1fOutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().oneFreeComponentLikelihood + "\n");
-            lrHetOutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().lrHeterozygous + "\n");
-            lrHomOutputFileWriter.write(minNextLine.getGenomicLocation().pos + "\t" + minNextLine.getNextValue().lrHomozygous + "\n");
+            for (String name : writers.keySet()) {
+                Field f = GMMScorerResults.class.getField(name);
+                BufferedWriter writer = writers.get(name);
+                writer.write(minNextLine.getGenomicLocation().pos + "\t" + f.getDouble(minNextLine.getNextValue()) + "\n");
+            }
 
             boolean gotLine;
-            gotLine = readNextDataLine((GMMResultsReaderAndLine) minNextLine);
+            gotLine = readNextDataLine(minNextLine);
 
             if (gotLine) {
                 fileReaders.add(minNextLine);
