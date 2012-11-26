@@ -43,6 +43,9 @@ public class CommandRazerS3SingleEnds extends BaseCloudbreakCommand {
     @Parameter(names = {"--pctIdentity"}, required = true)
     int pctIdentity;
 
+    @Parameter(names = {"--sensitivity"}, required = true)
+    int sensitivity;
+
     public void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
@@ -60,6 +63,7 @@ public class CommandRazerS3SingleEnds extends BaseCloudbreakCommand {
         conf.set("mapred.task.timeout", "3600000");
         conf.set("razers3.num.reports", numReports);
         conf.set("razers3.pct.identity", String.valueOf(pctIdentity));
+        conf.set("razers3.sensitivity", String.valueOf(sensitivity));
 
         conf.setInputFormat(SequenceFileInputFormat.class);
 

@@ -29,6 +29,7 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
     private String numReports;
     private String razerS3Executable;
     private String pctIdentity;
+    private String sensitivity;
 
     @Override
     protected boolean getCompressTempReadFile() {
@@ -45,6 +46,7 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
         reference = job.get("razers3.reference");
         numReports = job.get("razers3.num.reports");
         pctIdentity = job.get("razers3.pct.identity");
+        sensitivity = job.get("razers3.sensitivity");
         razerS3Executable = job.get("razers3.executable");
 
     }
@@ -62,7 +64,7 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
         }
 
         String referenceBaseName = new File(reference).getName();
-        String[] commandLine = buildCommandLine(razerS3Executable, referenceBaseName, s1File.getPath(), numReports, pctIdentity);
+        String[] commandLine = buildCommandLine(razerS3Executable, referenceBaseName, s1File.getPath(), numReports, pctIdentity, sensitivity);
         logger.debug("Executing command: " + Arrays.toString(commandLine));
         ReportableProcess p = new ReportableProcess(Runtime.getRuntime().exec(commandLine), reporter);
         logger.debug("Exec'd");
@@ -120,10 +122,14 @@ public class RazerS3SingleEndMapper extends SingleEndAlignmentMapper {
         return firstErrorLine;
     }
 
-    protected static String[] buildCommandLine(String razers3Executable, String referenceBaseName, String path1, String numReports, String pctIdentity) {
+    protected static String[] buildCommandLine(String razers3Executable, String referenceBaseName,
+                                               String path1, String numReports, String pctIdentity,
+                                               String sensitivity
+    ) {
         String[] commandArray = {
                 "./" + razers3Executable,
-                "-o", "map.result", "-of", "sam", "-rr", "100", "-i", pctIdentity, "-m", numReports,
+                "-o", "map.result", "-of", "sam", "-rr", sensitivity, "-i", pctIdentity, "-m", numReports,
+                "--full-readid",
                 referenceBaseName,
                 path1
         };
