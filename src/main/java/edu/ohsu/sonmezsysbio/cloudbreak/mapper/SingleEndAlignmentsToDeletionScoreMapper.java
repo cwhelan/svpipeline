@@ -83,6 +83,11 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         String line = value.toString();
 
         ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
+        // ignoring OEA for now
+        if (readPairAlignments.getRead1Alignments().size() == 0 || readPairAlignments.getRead2Alignments().size() == 0) {
+            return;
+        }
+
         emitDeletionScoresForAllPairs(readPairAlignments, output);
     }
 

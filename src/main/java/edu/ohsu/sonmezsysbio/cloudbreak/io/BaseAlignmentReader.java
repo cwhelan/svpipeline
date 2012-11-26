@@ -4,8 +4,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.AlignmentRecord;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,13 +17,22 @@ public abstract class BaseAlignmentReader implements AlignmentReader {
     public ReadPairAlignments parsePairAlignmentLine(String line) {
         String[] reads = line.split(Cloudbreak.READ_SEPARATOR);
         String read1AlignmentsString = reads[0];
-        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-
-        List<AlignmentRecord> read1AlignmentRecords = parseAlignmentsIntoRecords(read1Alignments);
+        List<AlignmentRecord> read1AlignmentRecords;
+        if (! "".equals(read1AlignmentsString)) {
+            String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
+            read1AlignmentRecords = parseAlignmentsIntoRecords(read1Alignments);
+        } else {
+            read1AlignmentRecords = new ArrayList<AlignmentRecord>();
+        }
 
         String read2AlignmentsString = reads[1];
-        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<AlignmentRecord> read2AlignmentRecords = parseAlignmentsIntoRecords(read2Alignments);
+        List<AlignmentRecord> read2AlignmentRecords;
+        if (! "".equals(read2AlignmentsString)) {
+            String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
+            read2AlignmentRecords = parseAlignmentsIntoRecords(read2Alignments);
+        } else {
+            read2AlignmentRecords = new ArrayList<AlignmentRecord>();
+        }
         return new ReadPairAlignments(read1AlignmentRecords, read2AlignmentRecords);
     }
 
