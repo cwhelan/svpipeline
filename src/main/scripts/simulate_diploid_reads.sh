@@ -24,7 +24,7 @@ cat ${HAP1_REF}.bwa.read2.fastq ${HAP2_REF}.bwa.read2.fastq | gzip -c > ${OUTPUT
 
 rm ${HAP1_REF}.bwa.read1.fastq
 rm ${HAP1_REF}.bwa.read2.fastq
-rm ${HAP1_REF}.bfastq.fastq
+rm ${HAP1_REF}.bfast.fastq
 
 rm ${HAP2_REF}.bwa.read1.fastq
 rm ${HAP2_REF}.bwa.read2.fastq
