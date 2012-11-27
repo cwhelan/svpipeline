@@ -25,9 +25,9 @@ public abstract class BaseAlignmentReader implements AlignmentReader {
             read1AlignmentRecords = new ArrayList<AlignmentRecord>();
         }
 
-        String read2AlignmentsString = reads[1];
         List<AlignmentRecord> read2AlignmentRecords;
-        if (! "".equals(read2AlignmentsString)) {
+        if (reads.length > 1) {
+            String read2AlignmentsString = reads[1];
             String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
             read2AlignmentRecords = parseAlignmentsIntoRecords(read2Alignments);
         } else {
