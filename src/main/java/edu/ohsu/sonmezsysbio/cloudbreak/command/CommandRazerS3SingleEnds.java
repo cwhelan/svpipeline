@@ -22,7 +22,7 @@ import java.net.URISyntaxException;
  * Date: 5/18/11
  * Time: 2:01 PM
  */
-@Parameters(separators = "=", commandDescription = "Run a bowtie2 alignment")
+@Parameters(separators = "=", commandDescription = "Run a razerS3 alignment")
 public class CommandRazerS3SingleEnds extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--HDFSDataDir"}, required = true)
