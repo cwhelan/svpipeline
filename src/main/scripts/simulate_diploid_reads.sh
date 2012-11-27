@@ -28,4 +28,4 @@ rm ${HAP1_REF}.bfastq.fastq
 
 rm ${HAP2_REF}.bwa.read1.fastq
 rm ${HAP2_REF}.bwa.read2.fastq
-rm ${HAP2_REF}.bfastq.fastq
+rm ${HAP2_REF}.bfast.fastq
