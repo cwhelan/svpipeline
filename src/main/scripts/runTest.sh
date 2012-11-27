@@ -143,27 +143,27 @@ gzip *.wig
 
 ~/software/IGVTools/igvtools tile ${NAME}_w0.wig.gz ${NAME}_w0.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_mu1.wig.gz ${NAME}_mu1.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_mu2.wig.gz ${NAME}_mu2.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_l1.wig.gz ${NAME}_nodelOneComponentLikelihood.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_nodelOneComponentLikelihood.wig.gz ${NAME}_nodelOneComponentLikelihood.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_l2.wig.gz ${NAME}_twoComponentLikelihood.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_twoComponentLikelihood.wig.gz ${NAME}_twoComponentLikelihood.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_l1f.wig.gz ${NAME}_oneFreeComponentLikelihood.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_oneFreeComponentLikelihood.wig.gz ${NAME}_oneFreeComponentLikelihood.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHet.wig.gz ${NAME}_lrHeterozygous.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_lrHeterozygous.wig.gz ${NAME}_lrHeterozygous.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_lrHomozygous.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_lrHomozygous.wig.gz ${NAME}_lrHomozygous.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_cleanCoverage.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_cleanCoverage.wig.gz ${NAME}_cleanCoverage.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_c1membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_c1membership.wig.gz ${NAME}_c1membership.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_c2membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_c2membership.wig.gz ${NAME}_c2membership.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_weightedC1membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_weightedC1membership.wig.gz ${NAME}_weightedC1membership.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHom.wig.gz ${NAME}_weightedC2membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_weightedC2membership.wig.gz ${NAME}_weightedC2membership.wig.gz.tdf hg18 || true
 
 popd
 
