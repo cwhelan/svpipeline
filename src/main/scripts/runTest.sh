@@ -167,8 +167,8 @@ gzip *.wig
 
 popd
 
-cp /tmp/${NAME}/${NAME}_lrHet.wig.gz .
-cp /tmp/${NAME}/${NAME}_mu1.wig.gz .
+cp /tmp/${NAME}/${NAME}_lrHeterozygous.wig.gz .
+cp /tmp/${NAME}/${NAME}_mu2.wig.gz .
 
 python ../build/svpipeline/src/main/scripts/evalWigFile.py \
-    ${NAME}_lrHeterozygous.wig.gz $TRUTH $LOCAL_FAI $MEDIAN_FILTER_WINDOW 0.5 ${NAME}_mu1.wig.gz > ${NAME}_lrHeterozygous.perf.tx
+    ${NAME}_lrHeterozygous.wig.gz $TRUTH $LOCAL_FAI $MEDIAN_FILTER_WINDOW 0.5 ${NAME}_mu2.wig.gz > ${NAME}_lrHeterozygous.perf.tx

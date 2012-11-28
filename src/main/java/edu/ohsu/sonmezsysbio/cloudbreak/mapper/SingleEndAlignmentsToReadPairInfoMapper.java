@@ -236,7 +236,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                         record2 : record1;
 
                 int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
-                if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
+                if (Math.abs(insertSize - targetIsize) < 2 * targetIsizeSD) {
                     emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
                     foundConcordant = true;
                 }
