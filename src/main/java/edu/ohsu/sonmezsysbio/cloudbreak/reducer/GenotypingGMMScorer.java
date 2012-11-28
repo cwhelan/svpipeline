@@ -21,6 +21,7 @@ public class GenotypingGMMScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
     public static final int MAX_COVERAGE = 200;
+    public static final int MIN_COVERAGE = 5;
     private double maxLogMapqDiff;
 
     public void setMaxLogMapqDiff(double maxLogMapqDiff) {
@@ -220,7 +221,7 @@ public class GenotypingGMMScorer {
             }
         }
 
-        if (yclean.length == 0) {
+        if (yclean.length <= MIN_COVERAGE) {
             log.debug("not enough ycleans, returning 1");
             results.w0 = -1;
             return results;
