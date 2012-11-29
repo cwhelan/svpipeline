@@ -25,8 +25,8 @@ OUTNAME=${OUTPUT_PREFIX}_c${COV_PER_HAPLOTYPE}_i${ISIZE}_s${ISIZE_SD}_rl${READ_L
 dwgsim -e 0.02-0.02 -E 0.02-0.02 -d $ISIZE -s $ISIZE_SD -1 $READ_LENGTH -2 $READ_LENGTH -C $COV_PER_HAPLOTYPE -r 0.0010 -R 0 -H -P hap1 $HAP1_REF $HAP1_REF
 dwgsim -e 0.02-0.02 -E 0.02-0.02 -d $ISIZE -s $ISIZE_SD -1 $READ_LENGTH -2 $READ_LENGTH -C $COV_PER_HAPLOTYPE -r 0.0010 -R 0 -H -P hap2 $HAP2_REF $HAP2_REF
 
-cat ${HAP1_REF}.bwa.read1.fastq ${HAP2_REF}.bwa.read1.fastq | gzip -c > ${OUTPUTNAME}.read1.fastq.gz
-cat ${HAP1_REF}.bwa.read2.fastq ${HAP2_REF}.bwa.read2.fastq | gzip -c > ${OUTPUTNAME}.read2.fastq.gz
+cat ${HAP1_REF}.bwa.read1.fastq ${HAP2_REF}.bwa.read1.fastq | gzip -c > ${OUTNAME}.read1.fastq.gz
+cat ${HAP1_REF}.bwa.read2.fastq ${HAP2_REF}.bwa.read2.fastq | gzip -c > ${OUTNAME}.read2.fastq.gz
 
 rm ${HAP1_REF}.bwa.read1.fastq
 rm ${HAP1_REF}.bwa.read2.fastq
