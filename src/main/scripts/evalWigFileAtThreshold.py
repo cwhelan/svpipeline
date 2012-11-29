@@ -33,7 +33,6 @@ extract_regions_cmd = ['hadoop', 'jar', '/l2/users/whelanch/gene_rearrange/svpip
 subprocess.call(extract_regions_cmd)
 
 num_predictions = 0
-predicted_region = 0
 
 bed_lines = []
 for line in open_file(temp_file_name):
@@ -46,11 +45,9 @@ for line in open_file(temp_file_name):
     if (abs(avg_mu - length) > 300):
         continue
     num_predictions += 1
-    predicted_region += length
     bed_line = line.strip()
     bed_lines.append(bed_line)
         
-matches = evalBedFile.eval_bed(truth_filename, bed_lines)
-    
-temp_file.close()
-print "\t".join(map(str, [q, num_predictions, predicted_region, matches]))
+(qualified_calls, matches, short_calls) = evalBedFile.eval_bed(truth_filename, calls_gte_threshold)
+tpr = float(matches) / (long_calls + qualified_calls)
+print "\t".join(map(str, [q, qualified_calls, matches, 0, 0, short_calls, tpr]))

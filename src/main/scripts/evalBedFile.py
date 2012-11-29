@@ -3,24 +3,82 @@
 import sys
 import subprocess
 
-def eval_bed(truth_filename, predictions):
-    bedtools_process = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-u"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    pstdout = bedtools_process.communicate("\n".join(predictions))[0]
+def eval_bed(truth_filename, calls):
+    size_threshold = 25
+    max_short_hit_length = 75
+    bedtools_process = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-loj"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    pstdout = bedtools_process.communicate("\n".join(calls))[0]
     matches = 0
+    short_hits = 0
+    found_features = set()
+    calls = 0
+    valid_short_hit_calls = 0
+    current_call = ""
+    current_call_length = -1
+    hit_for_current_call = False
+    short_hit_for_current_call = False
     for line in pstdout.split("\n"):
-        #	print "line: " + line
-        matches += 1
-        # for the last newline
-    matches = matches - 1
-    return matches
+        if line == "":
+            continue
+        fields = line.split("\t")
+        call = "\t".join(fields[0:3])
+        if (current_call == ""):
+            current_call = call
+            current_call_length = int(fields[2]) - int(fields[1])
+        if (call != current_call):
+            # process the call we just finsished reading lines for
+            if hit_for_current_call:
+                matches = matches + 1
+                calls += 1
+            elif short_hit_for_current_call:
+                if (current_call_length <= max_short_hit_length):
+                    short_hits += 1
+                else:
+                    calls += 1
+            else:
+                calls += 1
+
+            # reset
+            hit_for_current_call = False
+            short_hit_for_current_call = False
+            current_call = call
+            current_call_length = int(fields[2]) - int(fields[1])
+
+        if (fields[len(fields) - 3] != "."):
+            found_feature = "\t".join(fields[(len(fields) - 3):len(fields)])
+            if not found_feature in found_features:
+                found_features.add(found_feature)
+                found_feature_length = int(fields[(len(fields) - 1)]) - int(fields[(len(fields) - 2)])
+                if found_feature_length <= size_threshold:
+                    short_hit_for_current_call = True
+                else:
+                    hit_for_current_call = True
+
+
+    if hit_for_current_call:
+        matches = matches + 1
+        calls += 1
+    elif short_hit_for_current_call:
+        if (current_call_length <= max_short_hit_length):
+            short_hits += 1
+        else:
+            calls += 1
+    else:
+        calls += 1
+
+    return (calls, matches, short_hits)
 
 # this script evaluates a series of bed lines from stdin against a truth file (passed as an argument) and returns the number of correct calls
 if __name__ == "__main__":
     import sys
 
-    # slurp all the bed lines into memory
-    predictions = []
-    for line in sys.stdin:
-        predictions.append(line)
+    truth_file = sys.argv[1]
+    calls_file = sys.argv[2]
 
-    eval_bed(sys.argv[1], predictions)
+    # slurp all the bed lines into memory
+
+    calls = []
+    for line in open(calls_file, 'r'):
+        calls.append(line)
+
+    print eval_bed(sys.argv[1], calls)

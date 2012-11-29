@@ -73,17 +73,18 @@ def process_quantile(q):
     result = subprocess.Popen(eval_at_q_cmd, stdout=subprocess.PIPE).communicate()[0]
     result_fields = result.split()
     num_predictions = int(result_fields[1])
-    predicted_region = int(result_fields[2])
-    num_matches = int(result_fields[3])
+    num_matches = int(result_fields[2])
+    num_short_calls = int(result_fields[5])
     if num_predictions == 0:
         print "Warning: zero predictions in line: " + result
-        return (q, 0, 0, 0, 0)
+        return (q, 0, 0, 0, 0, 0, 0)
     else:
-        return (q, num_predictions, predicted_region, num_matches, float(num_matches) / num_predictions)
+        return (q, num_predictions, num_matches, 0, 0, num_short_calls, float(num_matches) / num_predictions)
     
 p=Pool(50)
 results = p.map(process_quantile, quantiles)
 
-print "\t".join(["Thresh", "Calls", "Region", "TP", "TPR"])
+    print "\t".join(map(str, [v, long_calls + len(qualified_calls), matches, long_calls, non_del_calls, short_calls, tpr]))
+print "\t".join(["Thresh", "Calls", "TP", "Long", "Wrong Type", "Short", "TPR"])
 for q in results:
     print "\t".join(map(str, q))

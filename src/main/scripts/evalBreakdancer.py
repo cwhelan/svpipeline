@@ -58,9 +58,9 @@ for v in unique_score_values:
         fields = line.split("\t")
         bed_line = "\t".join([fields[0], fields[1], fields[4]])
         bed_lines.append(bed_line)
-    matches = evalBedFile.eval_bed(truth_filename, bed_lines)
-    calls = long_calls + len(calls_gte_threshold)
-    tpr = float(matches) / calls
-    print "\t".join(map(str, [v, calls, matches, long_calls, non_del_calls, tpr]))
+
+    (qualified_calls, matches, short_calls) = evalBedFile.eval_bed(truth_filename, calls_gte_threshold)
+    tpr = float(matches) / (long_calls + qualified_calls)
+    print "\t".join(map(str, [v, long_calls + qualified_calls, matches, long_calls, non_del_calls, short_calls, tpr]))
     
     
