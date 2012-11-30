@@ -75,11 +75,12 @@ def process_quantile(q):
     num_predictions = int(result_fields[1])
     num_matches = int(result_fields[2])
     num_short_calls = int(result_fields[5])
+    tpr = float(result_fields[6])
     if num_predictions == 0:
         print "Warning: zero predictions in line: " + result
         return (q, 0, 0, 0, 0, 0, 0)
     else:
-        return (q, num_predictions, num_matches, 0, 0, num_short_calls, float(num_matches) / num_predictions)
+        return (q, num_predictions, num_matches, 0, 0, num_short_calls,tpr)
     
 p=Pool(50)
 results = p.map(process_quantile, quantiles)

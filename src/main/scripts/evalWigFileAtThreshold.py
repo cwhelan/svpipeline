@@ -49,5 +49,5 @@ for line in open_file(temp_file_name):
     bed_lines.append(bed_line)
         
 (qualified_calls, matches, short_calls) = evalBedFile.eval_bed(truth_filename, bed_lines)
-tpr = float(matches) / (long_calls + qualified_calls)
+tpr = float(matches) / (qualified_calls)
 print "\t".join(map(str, [q, qualified_calls, matches, 0, 0, short_calls, tpr]))
