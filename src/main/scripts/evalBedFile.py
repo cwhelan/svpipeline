@@ -7,7 +7,7 @@ def eval_bed(truth_filename, calls):
     size_threshold = 25
     max_short_hit_length = 75
     bedtools_process = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-loj"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    pstdout = bedtools_process.communicate("\n".join(calls))[0]
+    pstdout = bedtools_process.communicate("\n".join(calls) + "\n")[0]
     matches = 0
     short_hits = 0
     found_features = set()

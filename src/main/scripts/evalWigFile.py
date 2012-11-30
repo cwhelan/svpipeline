@@ -84,7 +84,6 @@ def process_quantile(q):
 p=Pool(50)
 results = p.map(process_quantile, quantiles)
 
-    print "\t".join(map(str, [v, long_calls + len(qualified_calls), matches, long_calls, non_del_calls, short_calls, tpr]))
 print "\t".join(["Thresh", "Calls", "TP", "Long", "Wrong Type", "Short", "TPR"])
 for q in results:
     print "\t".join(map(str, q))

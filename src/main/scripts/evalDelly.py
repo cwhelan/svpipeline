@@ -29,7 +29,7 @@ delly_file.close()
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "WrongType", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "Long", "WrongType", "Short", "TPR"])
 for v in unique_score_values:
     calls_gte_threshold = []
     delly_file = open(delly_filename, "r")
