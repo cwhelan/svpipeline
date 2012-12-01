@@ -169,7 +169,7 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         }
     }
 
-    private Double trigramEntropy(String seq) {
+    protected Double trigramEntropy(String seq) {
         Map<String, Double> counts = new HashMap<String, Double>();
         for (int i = 2; i < seq.length(); i++) {
             String trigram = seq.substring(i - 2, i);

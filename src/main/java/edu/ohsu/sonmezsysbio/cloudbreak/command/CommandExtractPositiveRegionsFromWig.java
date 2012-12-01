@@ -7,6 +7,10 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.WigFileHelper;
 import org.apache.hadoop.conf.Configuration;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -36,8 +40,8 @@ public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
     @Parameter(names = {"--medianFilterWindow"})
     int medianFilterWindow = 1;
 
-    @Parameter(names = {"--extraWigFileToAverage"})
-    String extraWigFileToAverage;
+    @Parameter(names = {"--extraWigFilesToAverage"})
+    List<String> extraWigFilesToAverage = new ArrayList<String>();
 
     public void run(Configuration conf) throws Exception {
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
@@ -49,20 +53,21 @@ public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
             wigFileReader = new BufferedReader(new FileReader(new File(inputWigFile)));
         }
 
-        BufferedReader extraWigFileReader = null;
-        if (extraWigFileToAverage != null) {
+        Map<String, BufferedReader> extraWigFileReaders = new HashMap<String, BufferedReader>();
+        for (String extraWigFileToAverage : extraWigFilesToAverage) {
+            BufferedReader extraWigFileReader;
             if (extraWigFileToAverage.endsWith(".gz")) {
                 extraWigFileReader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(new File(extraWigFileToAverage)))));
             } else {
                 extraWigFileReader = new BufferedReader(new FileReader(new File(extraWigFileToAverage)));
             }
-
+            extraWigFileReaders.put(extraWigFileToAverage, extraWigFileReader);
         }
 
         BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(outputBedFile)));
 
         try {
-            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow, extraWigFileReader);
+            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow, extraWigFileReaders);
         } finally {
             wigFileReader.close();
             bedFileWriter.close();

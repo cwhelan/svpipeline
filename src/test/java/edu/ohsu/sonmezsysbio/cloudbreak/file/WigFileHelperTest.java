@@ -1,8 +1,11 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.file;
 
+import org.apache.hadoop.util.hash.Hash;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -84,12 +87,14 @@ public class WigFileHelperTest {
                 "2000\t3.0\n" +
                 "3000\t2.0\n";
         BufferedReader extraWigFileReader = new BufferedReader(new StringReader(extraWigFile));
+        Map<String, BufferedReader> extraWigFileReaders = new HashMap<String, BufferedReader>();
+        extraWigFileReaders.put("foo", extraWigFileReader);
 
         StringWriter stringWriter = new StringWriter();
         BufferedWriter bedFileWriter = new BufferedWriter(stringWriter);
         double threshold = 4.5;
 
-        WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 1, extraWigFileReader);
+        WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 1, extraWigFileReaders);
         bedFileWriter.close();
 
         String expectedOutput =

@@ -100,15 +100,16 @@ public class WigFileHelper {
     }
 
     public static void exportRegionsOverThresholdFromWig(String name, BufferedReader wigFileReader, BufferedWriter bedFileWriter,
-                                                         Double threshold, FaidxFileHelper faidx, int medianFilterWindow) throws IOException {
-        exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow, null);
+                                                         Double threshold, FaidxFileHelper faidx, int medianFilterWindow
+                                                         ) throws IOException {
+        exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow, new HashMap<String, BufferedReader>());
 
     }
 
     public static void exportRegionsOverThresholdFromWig(String outputPrefix, BufferedReader wigFileReader,
                                                          BufferedWriter bedFileWriter, double threshold,
                                                          FaidxFileHelper faidx, int medianFilterWindow,
-                                                         BufferedReader extraWigFileReader)
+                                                         Map<String, BufferedReader> extraWigFileReaders)
             throws IOException {
         String trackName = outputPrefix + " peaks over " + threshold;
         bedFileWriter.write("track name = \"" + trackName + "\"\n");
@@ -117,16 +118,16 @@ public class WigFileHelper {
         String currentChromosome = "";
 
         double[] values = null;
-        double[] extraWigFileValues = null;
+        Map<String, double[]> extraWigFileValues = new HashMap<String, double[]>();
 
         int resolution = 0;
         int peakNum = 1;
 
-        String extraWigLine = null;
+        Map<String, String> extraWigLines = new HashMap<String, String>();
 
         while ((line = wigFileReader.readLine()) != null) {
-            if (extraWigFileReader != null) {
-                extraWigLine = extraWigFileReader.readLine();
+            for (String extraWigFile : extraWigFileReaders.keySet()) {
+                extraWigLines.put(extraWigFile, extraWigFileReaders.get(extraWigFile).readLine());
             }
             if (line.startsWith("track")) {
                 continue;
@@ -141,8 +142,8 @@ public class WigFileHelper {
                 resolution = Integer.valueOf(line.split(" ")[2].split("=")[1]);
                 int numTiles = (int) Math.ceil(((double) faidx.getLengthForChromName(currentChromosome)) / resolution);
                 values = new double[numTiles];
-                if (extraWigFileReader != null) {
-                    extraWigFileValues = new double[numTiles];
+                for (String extraWigFile : extraWigFileReaders.keySet()) {
+                    extraWigFileValues.put(extraWigFile, new double[numTiles]);
                 }
 
             } else {
@@ -156,13 +157,13 @@ public class WigFileHelper {
                 int tileNum = (int) pos / resolution;
                 values[tileNum] = val;
 
-                if (extraWigFileReader != null) {
-                    String[] extraFields = extraWigLine.split("\t");
+                for (String extraWigFile : extraWigFileReaders.keySet()) {
+                    String[] extraFields = extraWigLines.get(extraWigFile).split("\t");
                     if (extraFields.length < 2) {
-                        throw new RuntimeException("Failed to parse line: " + line);
+                        throw new RuntimeException("Failed to parse line in " + extraWigFile + ": " + line);
                     }
                     double extraVal = Double.valueOf(extraFields[1]);
-                    extraWigFileValues[tileNum] = extraVal;
+                    extraWigFileValues.get(extraWigFile)[tileNum] = extraVal;
 
                 }
             }
@@ -202,13 +203,16 @@ public class WigFileHelper {
 
     private static int writePositiveRegions(double[] filteredVals, BufferedWriter bedFileWriter,
                                             String currentChromosome, FaidxFileHelper faidx, int resolution,
-                                            int peakNum, double[] extraWigFileValues) throws IOException {
+                                            int peakNum, Map<String, double[]> extraWigFileValues) throws IOException {
         boolean inPositivePeak = false;
         long peakStart = 0;
         int idx = 0;
         double peakMax = 0;
 
-        double extraWigValueSum = 0;
+        Map<String, Double> extraWigValueSums = new HashMap<String, Double>();
+        for (String extraWigFile : extraWigFileValues.keySet()) {
+            extraWigValueSums.put(extraWigFile, (double) 0);
+        }
 
         while (idx < filteredVals.length) {
             long pos = idx * resolution;
@@ -217,18 +221,21 @@ public class WigFileHelper {
                 if (!inPositivePeak) {
                     peakStart = pos;
                     inPositivePeak = true;
-                    extraWigValueSum = 0;
+                    for (String extraWigFile : extraWigFileValues.keySet()) {
+                        extraWigValueSums.put(extraWigFile, (double) 0);
+                    }
                 }
                 peakMax = Math.max(peakMax, filteredVals[idx]);
-                if (extraWigFileValues != null) {
-                    extraWigValueSum += extraWigFileValues[idx];
+                for (String extraWigFile : extraWigFileValues.keySet()) {
+                    extraWigValueSums.put(extraWigFile, extraWigValueSums.get(extraWigFile) + extraWigFileValues.get(extraWigFile)[idx]);
                 }
+
             } else {
                 if (inPositivePeak) {
                     long endPosition = pos - 1;
                     bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
-                    if (extraWigFileValues != null) {
-                        bedFileWriter.write("\t" + extraWigValueSum * resolution / ((endPosition + 1) - peakStart));
+                    for (String extraWigFile : extraWigValueSums.keySet()) {
+                        bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
                     }
                     bedFileWriter.write("\n");
                     peakNum += 1;
@@ -242,8 +249,8 @@ public class WigFileHelper {
             long endPosition = faidx.getLengthForChromName(currentChromosome) - 1;
             if (endPosition < peakStart) return peakNum;
             bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
-            if (extraWigFileValues != null) {
-                bedFileWriter.write("\t" + extraWigValueSum * resolution / ((endPosition + 1) - peakStart));
+            for (String extraWigFile : extraWigValueSums.keySet()) {
+                bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
             }
             bedFileWriter.write("\n");
             peakNum += 1;
