@@ -67,7 +67,8 @@ public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
         BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(outputBedFile)));
 
         try {
-            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow, extraWigFileReaders);
+            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow,
+                    extraWigFilesToAverage, extraWigFileReaders);
         } finally {
             wigFileReader.close();
             bedFileWriter.close();

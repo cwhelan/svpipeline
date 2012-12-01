@@ -4,7 +4,9 @@ import org.apache.hadoop.util.hash.Hash;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
@@ -90,11 +92,15 @@ public class WigFileHelperTest {
         Map<String, BufferedReader> extraWigFileReaders = new HashMap<String, BufferedReader>();
         extraWigFileReaders.put("foo", extraWigFileReader);
 
+        List<String> extraWigFiles = new ArrayList<String>();
+        extraWigFiles.add("foo");
+
         StringWriter stringWriter = new StringWriter();
         BufferedWriter bedFileWriter = new BufferedWriter(stringWriter);
         double threshold = 4.5;
 
-        WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 1, extraWigFileReaders);
+        WigFileHelper.exportRegionsOverThresholdFromWig(outputPrefix, wigFileReader, bedFileWriter, threshold, faidx, 1,
+                extraWigFiles, extraWigFileReaders);
         bedFileWriter.close();
 
         String expectedOutput =
