@@ -170,5 +170,12 @@ popd
 cp /tmp/${NAME}/${NAME}_lrHeterozygous.wig.gz .
 cp /tmp/${NAME}/${NAME}_mu2.wig.gz .
 
+cat <<EOF
+
+python ../build/svpipeline/src/main/scripts/evalWigFile.py \
+    ${NAME}_lrHeterozygous.wig.gz $TRUTH $LOCAL_FAI $MEDIAN_FILTER_WINDOW 0.5 ${NAME}_mu2.wig.gz > ${NAME}_lrHeterozygous.perf.txt
+
+EOF
+
 python ../build/svpipeline/src/main/scripts/evalWigFile.py \
     ${NAME}_lrHeterozygous.wig.gz $TRUTH $LOCAL_FAI $MEDIAN_FILTER_WINDOW 0.5 ${NAME}_mu2.wig.gz > ${NAME}_lrHeterozygous.perf.txt
