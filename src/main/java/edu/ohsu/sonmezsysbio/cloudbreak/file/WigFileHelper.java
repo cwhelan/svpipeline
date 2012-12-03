@@ -214,6 +214,8 @@ public class WigFileHelper {
         double peakMax = 0;
 
         Map<String, Double> extraWigValueSums = new HashMap<String, Double>();
+        Map<String, Double> extraWigValueMins = new HashMap<String, Double>();
+        Map<String, Double> extraWigValueMaxes = new HashMap<String, Double>();
         for (String extraWigFile : extraWigFileValues.keySet()) {
             extraWigValueSums.put(extraWigFile, (double) 0);
         }
@@ -227,11 +229,23 @@ public class WigFileHelper {
                     inPositivePeak = true;
                     for (String extraWigFile : extraWigFileValues.keySet()) {
                         extraWigValueSums.put(extraWigFile, (double) 0);
+                        extraWigValueMins.clear();
+                        extraWigValueMaxes.clear();
                     }
                 }
                 peakMax = Math.max(peakMax, filteredVals[idx]);
                 for (String extraWigFile : extraWigFileValues.keySet()) {
                     extraWigValueSums.put(extraWigFile, extraWigValueSums.get(extraWigFile) + extraWigFileValues.get(extraWigFile)[idx]);
+                    if (extraWigValueMins.containsKey(extraWigFile)) {
+                        extraWigValueMins.put(extraWigFile, Math.min(extraWigValueMins.get(extraWigFile), extraWigFileValues.get(extraWigFile)[idx]));
+                    } else {
+                        extraWigValueMins.put(extraWigFile, extraWigFileValues.get(extraWigFile)[idx]);
+                    }
+                    if (extraWigValueMaxes.containsKey(extraWigFile)) {
+                        extraWigValueMaxes.put(extraWigFile, Math.max(extraWigValueMaxes.get(extraWigFile), extraWigFileValues.get(extraWigFile)[idx]));
+                    } else {
+                        extraWigValueMaxes.put(extraWigFile, extraWigFileValues.get(extraWigFile)[idx]);
+                    }
                 }
 
             } else {
@@ -241,6 +255,14 @@ public class WigFileHelper {
                     for (String extraWigFile : extraFileNames) {
                         bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
                     }
+                    for (String extraWigFile : extraFileNames) {
+                        bedFileWriter.write("\t" + extraWigValueMins.get(extraWigFile));
+                    }
+                    for (String extraWigFile : extraFileNames) {
+                        bedFileWriter.write("\t" + extraWigValueMaxes.get(extraWigFile));
+                    }
+
+
                     bedFileWriter.write("\n");
                     peakNum += 1;
                     inPositivePeak = false;
@@ -256,6 +278,13 @@ public class WigFileHelper {
             for (String extraWigFile : extraFileNames) {
                 bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
             }
+            for (String extraWigFile : extraFileNames) {
+                bedFileWriter.write("\t" + extraWigValueMins.get(extraWigFile));
+            }
+            for (String extraWigFile : extraFileNames) {
+                bedFileWriter.write("\t" + extraWigValueMaxes.get(extraWigFile));
+            }
+
             bedFileWriter.write("\n");
             peakNum += 1;
         }
