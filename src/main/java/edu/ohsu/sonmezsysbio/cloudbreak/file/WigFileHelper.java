@@ -238,7 +238,7 @@ public class WigFileHelper {
                 if (inPositivePeak) {
                     long endPosition = pos - 1;
                     bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
-                    for (String extraWigFile : extraWigValueSums.keySet()) {
+                    for (String extraWigFile : extraFileNames) {
                         bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
                     }
                     bedFileWriter.write("\n");

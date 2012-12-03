@@ -80,6 +80,8 @@ public class WigFileHelperTest {
                 "3000\t3.0\n";
         BufferedReader wigFileReader = new BufferedReader(new StringReader(wigFile));
 
+        Map<String, BufferedReader> extraWigFileReaders = new HashMap<String, BufferedReader>();
+
         String extraWigFile = "variableStep chrom=chr1 span=1000\n" +
                 "1000\t1.0\n" +
                 "2000\t2.0\n" +
@@ -89,10 +91,21 @@ public class WigFileHelperTest {
                 "2000\t3.0\n" +
                 "3000\t2.0\n";
         BufferedReader extraWigFileReader = new BufferedReader(new StringReader(extraWigFile));
-        Map<String, BufferedReader> extraWigFileReaders = new HashMap<String, BufferedReader>();
         extraWigFileReaders.put("foo", extraWigFileReader);
 
+        String extraWigFile2 = "variableStep chrom=chr1 span=1000\n" +
+                "1000\t1.0\n" +
+                "2000\t1.0\n" +
+                "3000\t1.0\n" +
+                "variableStep chrom=chr2 span=1000\n" +
+                "1000\t2.0\n" +
+                "2000\t2.0\n" +
+                "3000\t2.0\n";
+        BufferedReader extraWigFileReader2 = new BufferedReader(new StringReader(extraWigFile2));
+        extraWigFileReaders.put("bar", extraWigFileReader2);
+
         List<String> extraWigFiles = new ArrayList<String>();
+        extraWigFiles.add("bar");
         extraWigFiles.add("foo");
 
         StringWriter stringWriter = new StringWriter();
@@ -105,8 +118,8 @@ public class WigFileHelperTest {
 
         String expectedOutput =
                 "track name = \"test peaks over " + threshold + "\"\n" +
-                        "chr1\t3000\t3999\t1\t5.0\t3.0\n" +
-                        "chr2\t1000\t2999\t2\t7.0\t4.0\n";
+                        "chr1\t3000\t3999\t1\t5.0\t1.0\t3.0\n" +
+                        "chr2\t1000\t2999\t2\t7.0\t2.0\t4.0\n";
         assertEquals(expectedOutput, stringWriter.getBuffer().toString());
     }
 
