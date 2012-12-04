@@ -4,6 +4,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import edu.ohsu.sonmezsysbio.cloudbreak.Cloudbreak;
 import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
+import edu.ohsu.sonmezsysbio.cloudbreak.combiner.DifferentialScoreCutoffCombiner;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
@@ -140,6 +141,7 @@ public class CommandGMMFitSingleEndInsertSizes extends BaseCloudbreakCommand {
         conf.setOutputKeyComparatorClass(GenomicLocationWithQualitySortComparator.class);
         conf.setOutputValueGroupingComparator(GenomicLocationWithQualityGroupingComparator.class);
         conf.setPartitionerClass(GenomicLocationWithQualityPartitioner.class);
+        conf.setCombinerClass(DifferentialScoreCutoffCombiner.class);
 
         conf.setReducerClass(ReadPairInfoToGMMResultsReducer.class);
 
