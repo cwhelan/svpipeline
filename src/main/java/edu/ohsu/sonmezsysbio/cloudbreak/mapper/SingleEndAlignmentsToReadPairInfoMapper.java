@@ -283,11 +283,13 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             return;
         }
 
-        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % resolution;
+        int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
+        int genomeOffset = leftReadEnd - leftReadEnd % resolution;
 
 
-        int genomicWindow = insertSize +
-                leftRead.getPosition() % resolution +
+        int internalIsize = rightRead.getPosition() - leftReadEnd;
+        int genomicWindow = internalIsize +
+                leftReadEnd % resolution +
                 (resolution - rightRead.getPosition() % resolution);
 
 
@@ -297,9 +299,8 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             if (insertSize > targetIsize + 6 * targetIsizeSD) {
                 String chrom = record1.getChromosomeName();
                 int leftReadStart = leftRead.getPosition();
-                int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
                 double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
-                logger.debug("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequenceLength()) + " = " + leftReadMapability);
+                logger.debug("left read mapability from " + leftRead.getPosition() + " to " + leftReadEnd + " = " + leftReadMapability);
 
                 int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
                 int rightReadEnd = rightRead.getPosition();
@@ -314,7 +315,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
         ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, readGroupId);
 
-        for (int i = 0; i <= genomicWindow; i = i + resolution) {
+        for (int i = 0; i <= genomicWindow; i += resolution) {
             Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
             if (chromosome == null) {
                 throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());

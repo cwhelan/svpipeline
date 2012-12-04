@@ -207,7 +207,7 @@ public class SingleEndAlignmentsToReadPairInfoMapperTest {
         mapper.setTargetIsizeSD(30);
         mapper.map(new Text(key), new Text(val), mockOutputCollector, null);
 
-        assertEquals(11, mockOutputCollector.keys.size());
+        assertEquals(9, mockOutputCollector.keys.size());
         assertEquals(new HashSet(mockOutputCollector.keys).size(), mockOutputCollector.keys.size());
     }
 
