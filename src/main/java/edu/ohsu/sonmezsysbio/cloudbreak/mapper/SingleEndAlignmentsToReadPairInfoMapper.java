@@ -249,95 +249,100 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                                          OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
                                          Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
 
-        // todo: not handling translocations for now
-        if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("translocation: r1 = " + record1 + "; r2 = " + record2);
-            }
-            return;
-        }
-
-        if (getChromosomeFilter() != null) {
-            if (! record1.getChromosomeName().equals(getChromosomeFilter())) {
+        try {
+            // todo: not handling translocations for now
+            if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("translocation: r1 = " + record1 + "; r2 = " + record2);
+                }
                 return;
             }
-        }
-
-        int insertSize;
-        AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
-                record1 : record2;
-        AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
-                record2 : record1;
-
-        // todo: not handling inversions for now
-        if (!scorer.validateMappingOrientations(record1, record2, matePairs)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + matePairs);
-            }
-            return;
-        }
-
-        insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
-
-        if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) {
-            return;
-        }
-
-        int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
-        int genomeOffset = leftReadEnd - leftReadEnd % resolution;
-
-
-        int internalIsize = rightRead.getPosition() - leftReadEnd;
-        int genomicWindow = internalIsize +
-                leftReadEnd % resolution +
-                (resolution - rightRead.getPosition() % resolution);
-
-
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
-
-        if (mapabilityWeighting != null) {
-            if (insertSize > targetIsize + 6 * targetIsizeSD) {
-                String chrom = record1.getChromosomeName();
-                int leftReadStart = leftRead.getPosition();
-                double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
-                logger.debug("left read mapability from " + leftRead.getPosition() + " to " + leftReadEnd + " = " + leftReadMapability);
-
-                int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
-                int rightReadEnd = rightRead.getPosition();
-                double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
-                logger.debug("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
-
-                logger.debug("old pmc: " + pMappingCorrect);
-                pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
-                logger.debug("new pmc: " + pMappingCorrect);
-            }
-        }
-
-        ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, readGroupId);
-
-        for (int i = 0; i <= genomicWindow; i += resolution) {
-            Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
-            if (chromosome == null) {
-                throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
-            }
-
-            int pos = genomeOffset + i;
 
             if (getChromosomeFilter() != null) {
-                if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
-                    pos < getStartFilter() || pos > getEndFilter()) {
-                    continue;
+                if (! record1.getChromosomeName().equals(getChromosomeFilter())) {
+                    return;
                 }
             }
 
-            logger.debug("Emitting insert size " + insertSize);
-            GenomicLocationWithQuality genomicLocationWithQuality = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
-            GenomicLocation genomicLocation = new GenomicLocation(genomicLocationWithQuality.chromosome, genomicLocationWithQuality.pos);
-            if (bestScoresForGL.containsKey(genomicLocation) && bestScoresForGL.get(genomicLocation).pMappingCorrect >= readPairInfo.pMappingCorrect) {
-                continue;
-            } else {
-                bestScoresForGL.put(genomicLocation, readPairInfo);
+            int insertSize;
+            AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
+                    record1 : record2;
+            AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
+                    record2 : record1;
+
+            // todo: not handling inversions for now
+            if (!scorer.validateMappingOrientations(record1, record2, matePairs)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + matePairs);
+                }
+                return;
             }
+
+            insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
+
+            if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) {
+                return;
+            }
+
+            int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
+            int genomeOffset = leftReadEnd - leftReadEnd % resolution;
+
+
+            int internalIsize = rightRead.getPosition() - leftReadEnd;
+            int genomicWindow = internalIsize +
+                    leftReadEnd % resolution +
+                    (resolution - rightRead.getPosition() % resolution);
+
+
+            double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
+
+            if (mapabilityWeighting != null) {
+                if (insertSize > targetIsize + 6 * targetIsizeSD) {
+                    String chrom = record1.getChromosomeName();
+                    int leftReadStart = leftRead.getPosition();
+                    double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
+                    logger.debug("left read mapability from " + leftRead.getPosition() + " to " + leftReadEnd + " = " + leftReadMapability);
+
+                    int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
+                    int rightReadEnd = rightRead.getPosition();
+                    double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
+                    logger.debug("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
+
+                    logger.debug("old pmc: " + pMappingCorrect);
+                    pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
+                    logger.debug("new pmc: " + pMappingCorrect);
+                }
+            }
+
+            ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, readGroupId);
+
+            for (int i = 0; i <= genomicWindow; i += resolution) {
+                Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
+                if (chromosome == null) {
+                    throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
+                }
+
+                int pos = genomeOffset + i;
+
+                if (getChromosomeFilter() != null) {
+                    if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
+                        pos < getStartFilter() || pos > getEndFilter()) {
+                        continue;
+                    }
+                }
+
+                logger.debug("Emitting insert size " + insertSize);
+                GenomicLocationWithQuality genomicLocationWithQuality = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
+                GenomicLocation genomicLocation = new GenomicLocation(genomicLocationWithQuality.chromosome, genomicLocationWithQuality.pos);
+                if (bestScoresForGL.containsKey(genomicLocation) && bestScoresForGL.get(genomicLocation).pMappingCorrect >= readPairInfo.pMappingCorrect) {
+                    continue;
+                } else {
+                    bestScoresForGL.put(genomicLocation, readPairInfo);
+                }
+            }
+        } catch (BadAlignmentRecordException e) {
+            logger.error(e);
+            logger.error("skipping bad record pair: "+ record1 + ", " + record2);
         }
 
     }

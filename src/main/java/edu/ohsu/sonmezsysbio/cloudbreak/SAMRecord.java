@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak;
 
 import net.sf.samtools.Cigar;
 import net.sf.samtools.TextCigarCodec;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.Map;
  * Time: 10:44 AM
  */
 public class SAMRecord implements AlignmentRecord {
+
+    private static org.apache.log4j.Logger log = Logger.getLogger(SAMRecord.class);
 
     int flag;
     Map<String,String> tags = new HashMap<String, String>();
@@ -147,10 +150,21 @@ public class SAMRecord implements AlignmentRecord {
                 ", insertSize=" + insertSize +
                 ", readPairId='" + readPairId + '\'' +
                 ", sequence='" + sequence + '\'' +
+                ", cigar='" + cigar + '\'' +
                 '}';
     }
 
     public int getMismatches() {
-        return Integer.parseInt(tags.get("NM"));
+        int nm = 0;
+        try {
+            nm = Integer.parseInt(tags.get("NM"));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            log.error(e);
+            log.error("sam record " + toString());
+            throw new BadAlignmentRecordException(e);
+        }
+        return nm;
     }
+
 }
