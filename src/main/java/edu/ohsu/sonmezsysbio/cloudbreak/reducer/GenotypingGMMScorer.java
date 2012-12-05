@@ -308,10 +308,11 @@ public class GenotypingGMMScorer {
         List<Double> mappingScores = new ArrayList<Double>();
         double maxSD = 0;
         int targetIsize = 0;
-        if (readGroupInfos.values().size() > 1) {
-            targetIsize = readGroupInfos.get(0).isize;
-            for (int i = 1; i < readGroupInfos.size(); i++) {
-                if (readGroupInfos.get(i).isize != targetIsize) {
+        List<ReadGroupInfo> readgroups = new ArrayList<ReadGroupInfo>(readGroupInfos.values());
+        if (readgroups.size() > 1) {
+            targetIsize = readgroups.get(0).isize;
+            for (int i = 1; i < readgroups.size(); i++) {
+                if (readgroups.get(i).isize != targetIsize) {
                     throw new UnsupportedOperationException("GMM Reducer can't work with libraries with different insert sizes right now");
                 }
             }
