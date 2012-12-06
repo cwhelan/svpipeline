@@ -203,20 +203,25 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         Map<GenomicLocation, ReadPairInfo> bestScoresForGL = new HashMap<GenomicLocation, ReadPairInfo>();
         if (!emitConcordantAlignmentIfFound(readPairAlignments, output, bestScoresForGL)) {
 
-            for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
-                if (getMinScore() != -1) {
-                    if (record1.getAlignmentScore() < getMinScore()) {
-                        continue;
-                    }
-                }
-                for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
+            for (String chrom : readPairAlignments.getRead1AlignmentsByChromosome().keySet()) {
+                if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chrom))
+                    continue;
+
+                for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chrom)) {
                     if (getMinScore() != -1) {
-                        if (record2.getAlignmentScore() < getMinScore()) {
+                        if (record1.getAlignmentScore() < getMinScore()) {
                             continue;
                         }
                     }
-                    if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) continue;
-                    emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
+                    for (AlignmentRecord record2 : readPairAlignments.getRead2AlignmentsByChromosome().get(chrom)) {
+                        if (getMinScore() != -1) {
+                            if (record2.getAlignmentScore() < getMinScore()) {
+                                continue;
+                            }
+                        }
+                        if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) continue;
+                        emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
+                    }
                 }
             }
         }
@@ -227,18 +232,23 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                                                    OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
                                                    Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
         boolean foundConcordant = false;
-        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
-            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) continue;
-                AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
-                        record1 : record2;
-                AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
-                        record2 : record1;
+        for (String chrom : readPairAlignments.getRead1AlignmentsByChromosome().keySet()) {
+            if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chrom))
+                continue;
 
-                int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
-                if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
-                    emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
-                    foundConcordant = true;
+            for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chrom)) {
+                for (AlignmentRecord record2 : readPairAlignments.getRead2AlignmentsByChromosome().get(chrom)) {
+                    if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) continue;
+                    AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
+                            record1 : record2;
+                    AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
+                            record2 : record1;
+
+                    int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
+                    if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
+                        emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
+                        foundConcordant = true;
+                    }
                 }
             }
         }
