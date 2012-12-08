@@ -207,6 +207,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chrom))
                     continue;
 
+                if (getChromosomeFilter() != null && ! chrom.equals(getChromosomeFilter()))
+                    continue;
+
                 for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chrom)) {
                     if (getMinScore() != -1) {
                         if (record1.getAlignmentScore() < getMinScore()) {
@@ -233,6 +236,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                                                    Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
         boolean foundConcordant = false;
         for (String chrom : readPairAlignments.getRead1AlignmentsByChromosome().keySet()) {
+            if (getChromosomeFilter() != null && ! chrom.equals(getChromosomeFilter()))
+                continue;
+
             if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chrom))
                 continue;
 
