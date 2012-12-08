@@ -251,19 +251,8 @@ public class WigFileHelper {
             } else {
                 if (inPositivePeak) {
                     long endPosition = pos - 1;
-                    bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
-                    for (String extraWigFile : extraFileNames) {
-                        bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
-                    }
-                    for (String extraWigFile : extraFileNames) {
-                        bedFileWriter.write("\t" + extraWigValueMins.get(extraWigFile));
-                    }
-                    for (String extraWigFile : extraFileNames) {
-                        bedFileWriter.write("\t" + extraWigValueMaxes.get(extraWigFile));
-                    }
-
-
-                    bedFileWriter.write("\n");
+                    writeLine(bedFileWriter, currentChromosome, resolution, peakNum, extraFileNames, peakStart, peakMax,
+                            extraWigValueSums, extraWigValueMins, extraWigValueMaxes, endPosition);
                     peakNum += 1;
                     inPositivePeak = false;
                     peakMax = 0;
@@ -274,21 +263,27 @@ public class WigFileHelper {
         if (inPositivePeak) {
             long endPosition = faidx.getLengthForChromName(currentChromosome) - 1;
             if (endPosition < peakStart) return peakNum;
-            bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
-            for (String extraWigFile : extraFileNames) {
-                bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
-            }
-            for (String extraWigFile : extraFileNames) {
-                bedFileWriter.write("\t" + extraWigValueMins.get(extraWigFile));
-            }
-            for (String extraWigFile : extraFileNames) {
-                bedFileWriter.write("\t" + extraWigValueMaxes.get(extraWigFile));
-            }
-
-            bedFileWriter.write("\n");
+            writeLine(bedFileWriter, currentChromosome, resolution, peakNum, extraFileNames, peakStart, peakMax,
+                    extraWigValueSums, extraWigValueMins, extraWigValueMaxes, endPosition);
             peakNum += 1;
         }
         return peakNum;
+    }
+
+    private static void writeLine(BufferedWriter bedFileWriter, String currentChromosome, int resolution, int peakNum, List<String> extraFileNames, long peakStart, double peakMax, Map<String, Double> extraWigValueSums, Map<String, Double> extraWigValueMins, Map<String, Double> extraWigValueMaxes, long endPosition) throws IOException {
+        bedFileWriter.write(currentChromosome + "\t" + peakStart + "\t" + endPosition + "\t" + peakNum + "\t" + peakMax);
+        for (String extraWigFile : extraFileNames) {
+            bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
+        }
+        for (String extraWigFile : extraFileNames) {
+            bedFileWriter.write("\t" + extraWigValueMins.get(extraWigFile));
+        }
+        for (String extraWigFile : extraFileNames) {
+            bedFileWriter.write("\t" + extraWigValueMaxes.get(extraWigFile));
+        }
+
+
+        bedFileWriter.write("\n");
     }
 
 
