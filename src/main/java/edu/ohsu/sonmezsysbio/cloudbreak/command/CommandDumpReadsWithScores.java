@@ -8,6 +8,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToBedSpansMapper;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
@@ -87,6 +88,7 @@ public class CommandDumpReadsWithScores extends BaseCloudbreakCommand {
         conf.setInputFormat(SequenceFileInputFormat.class);
 
         addDistributedCacheFile(conf, inputFileDescriptor, "read.group.info.file");
+        DistributedCache.createSymlink(conf);
 
         conf.set("cloudbreak.aligner", aligner);
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
