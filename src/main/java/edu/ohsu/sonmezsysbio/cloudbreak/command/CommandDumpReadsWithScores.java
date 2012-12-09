@@ -63,7 +63,7 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
     private void runHadoopJob(Configuration configuration) throws IOException {
         JobConf conf = new JobConf(configuration);
 
-        conf.setJobName("Pileup Deletion Score");
+        conf.setJobName("Debug alignment spans");
         conf.setJarByClass(Cloudbreak.class);
 
         ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
