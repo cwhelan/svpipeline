@@ -29,7 +29,7 @@ public class SingleEndAlignmentSummaryMapper extends CloudbreakMapReduceBase imp
     }
 
     private void summarizeAlignments(OutputCollector output, List<AlignmentRecord> aligments) throws IOException {
-        String vals = "1\t" + (aligments.size()) + "\t";
+        String vals = "1\t" + (aligments.size());
         if (aligments.size() > 0) {
             int bestMismatches = Integer.MAX_VALUE;
             if (Cloudbreak.ALIGNER_GENERIC_SAM.equals(getAlignerName())) {
