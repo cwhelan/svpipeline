@@ -112,8 +112,8 @@ public class SingleEndAlignmentsToBedSpansMapper extends SingleEndAlignmentsMapp
     private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
         if (!emitConcordantAlignmentIfFound(readPairAlignments, output)) {
 
-            if ( ! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome)
-                    || ! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome))
+            if (! (readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome) &&
+                    readPairAlignments.getRead1AlignmentsByChromosome().containsKey(chromosome)))
                 return;
 
             for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chromosome)) {
@@ -137,8 +137,8 @@ public class SingleEndAlignmentsToBedSpansMapper extends SingleEndAlignmentsMapp
 
     private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
         boolean foundConcordant = false;
-        if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome) ||
-                readPairAlignments.getRead1AlignmentsByChromosome().containsKey(chromosome))
+        if (! (readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome) &&
+                 readPairAlignments.getRead1AlignmentsByChromosome().containsKey(chromosome)))
             return false;
 
         for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chromosome)) {
