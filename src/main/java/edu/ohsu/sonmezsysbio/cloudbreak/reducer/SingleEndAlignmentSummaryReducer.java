@@ -1,5 +1,6 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.reducer;
 
+import com.google.common.base.Joiner;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
@@ -14,18 +15,23 @@ import java.util.Iterator;
  */
 public class SingleEndAlignmentSummaryReducer extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
     public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-        Long[] totals = new Long[2];
-        for (int i = 0; i < totals.length; i++) {
-            totals[i] = 0l;
-        }
+        Long[] totals = null;
         while (values.hasNext()) {
             Text val = values.next();
             String[] fields = val.toString().split("\t");
+            if (totals == null) {
+                totals = new Long[fields.length];
+                for (int i = 0; i < totals.length; i++) {
+                    totals[i] = 0l;
+                }
+            }
             for (int i = 0; i < fields.length; i++) {
                 totals[i] += Long.parseLong(fields[i]);
             }
         }
-        output.collect(key, new Text(totals[0] + "\t" + totals[1]));
+
+        String outvals = Joiner.on("\t").join(totals);
+        output.collect(key, new Text(outvals));
     }
 
 }

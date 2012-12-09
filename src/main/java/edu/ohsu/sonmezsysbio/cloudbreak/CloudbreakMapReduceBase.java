@@ -16,6 +16,7 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
 
     protected int resolution = Cloudbreak.DEFAULT_RESOLUTION;
     protected AlignmentReader alignmentReader;
+    private String alignerName;
 
     public int getResolution() {
         return resolution;
@@ -25,13 +26,22 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
         this.resolution = resolution;
     }
 
+    public String getAlignerName() {
+        return alignerName;
+    }
+
+    public void setAlignerName(String alignerName) {
+        this.alignerName = alignerName;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
         if (job.get("cloudbreak.resolution") != null) {
             resolution = Integer.parseInt(job.get("cloudbreak.resolution"));
         }
-        alignmentReader = AlignmentReader.AlignmentReaderFactory.getInstance(job.get("cloudbreak.aligner"));
+        alignerName = job.get("cloudbreak.aligner");
+        alignmentReader = AlignmentReader.AlignmentReaderFactory.getInstance(alignerName);
     }
 
     public AlignmentReader getAlignmentReader() {
