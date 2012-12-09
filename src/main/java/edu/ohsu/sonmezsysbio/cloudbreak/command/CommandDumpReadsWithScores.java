@@ -18,6 +18,7 @@ import org.apache.hadoop.mapred.lib.IdentityReducer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Map;
  * Time: 10:02 AM
  */
 @Parameters(separators = "=", commandDescription = "Dump all spanning read pairs with their deletion scores to BED format (debugging)")
-public class CommandDumpReadsWithScores implements CloudbreakCommand {
+public class CommandDumpReadsWithScores extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--inputFileDescriptor"}, required = true)
     String inputFileDescriptor;
@@ -56,11 +57,11 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
     @Parameter(names = {"--targetIsizeSD"}, required = true)
     int targetIsizeSD;
 
-    public void run(Configuration configuration) throws IOException {
+    public void run(Configuration configuration) throws IOException, URISyntaxException {
         runHadoopJob(configuration);
     }
 
-    private void runHadoopJob(Configuration configuration) throws IOException {
+    private void runHadoopJob(Configuration configuration) throws IOException, URISyntaxException {
         JobConf conf = new JobConf(configuration);
 
         conf.setJobName("Debug alignment spans");
@@ -84,6 +85,8 @@ public class CommandDumpReadsWithScores implements CloudbreakCommand {
         FileOutputFormat.setOutputPath(conf, outputDir);
 
         conf.setInputFormat(SequenceFileInputFormat.class);
+
+        addDistributedCacheFile(conf, inputFileDescriptor, "read.group.info.file");
 
         conf.set("cloudbreak.aligner", aligner);
         conf.set("pileupDeletionScore.isMatePairs", String.valueOf(matePairs));
