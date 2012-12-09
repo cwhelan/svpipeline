@@ -15,7 +15,7 @@ import java.io.IOException;
  * Date: 5/23/11
  * Time: 10:12 AM
  */
-public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase implements Mapper<Text, Text, Text, Text> {
+public class SingleEndAlignmentsToBedSpansMapper extends SingleEndAlignmentsMapper implements Mapper<Text, Text, Text, Text> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
@@ -27,23 +27,12 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     private PairedAlignmentScorer scorer;
     private int minScore = -1;
 
-    private double targetIsize;
-    private double targetIsizeSD;
-
     public Integer getMaxInsertSize() {
         return maxInsertSize;
     }
 
     public void setMaxInsertSize(Integer maxInsertSize) {
         this.maxInsertSize = maxInsertSize;
-    }
-
-    public boolean isMatePairs() {
-        return matePairs;
-    }
-
-    public void setMatePairs(boolean matePairs) {
-        this.matePairs = matePairs;
     }
 
     public String getChromosome() {
@@ -78,22 +67,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         this.minScore = minScore;
     }
 
-    public double getTargetIsize() {
-        return targetIsize;
-    }
-
-    public void setTargetIsize(double targetIsize) {
-        this.targetIsize = targetIsize;
-    }
-
-    public double getTargetIsizeSD() {
-        return targetIsizeSD;
-    }
-
-    public void setTargetIsizeSD(double targetIsizeSD) {
-        this.targetIsizeSD = targetIsizeSD;
-    }
-
     public PairedAlignmentScorer getScorer() {
         return scorer;
     }
@@ -105,15 +78,12 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
     @Override
     public void configure(JobConf job) {
         super.configure(job);
+        configureReadGroups(job);
 
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
-        matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         parseRegion(job.get("pileupDeletionScore.region"));
 
         minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
-
-        targetIsize = Integer.parseInt(job.get("pileupDeletionScore.targetIsize"));
-        targetIsizeSD = Integer.parseInt(job.get("pileupDeletionScore.targetIsizeSD"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
     }

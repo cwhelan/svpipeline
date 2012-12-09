@@ -4,11 +4,9 @@ import edu.ohsu.sonmezsysbio.cloudbreak.*;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
@@ -29,15 +27,13 @@ import java.util.Set;
  * Date: 4/6/12
  * Time: 1:03 PM
  */
-public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase
+public class SingleEndAlignmentsToReadPairInfoMapper extends SingleEndAlignmentsMapper
         implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo> {
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentsToReadPairInfoMapper.class);
 
     { logger.setLevel(Level.INFO); }
 
-    private boolean matePairs;
-    private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
     private PairedAlignmentScorer scorer;
     private String faidxFileName;
     FaidxFileHelper faix;
@@ -48,9 +44,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
     private Long endFilter;
     private GFFFileHelper exclusionRegions;
     private BigWigFileHelper mapabilityWeighting;
-    private double targetIsize;
-    private double targetIsizeSD;
-    private Short readGroupId;
 
     private int minScore = -1;
 
@@ -94,14 +87,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         this.endFilter = endFilter;
     }
 
-    public boolean isMatePairs() {
-        return matePairs;
-    }
-
-    public void setMatePairs(boolean matePairs) {
-        this.matePairs = matePairs;
-    }
-
     public Integer getMaxInsertSize() {
         return maxInsertSize;
     }
@@ -124,30 +109,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void setExclusionRegions(GFFFileHelper exclusionRegions) {
         this.exclusionRegions = exclusionRegions;
-    }
-
-    public Short getReadGroupId() {
-        return readGroupId;
-    }
-
-    public void setReadGroupId(Short readGroupId) {
-        this.readGroupId = readGroupId;
-    }
-
-    public double getTargetIsize() {
-        return targetIsize;
-    }
-
-    public void setTargetIsize(double targetIsize) {
-        this.targetIsize = targetIsize;
-    }
-
-    public double getTargetIsizeSD() {
-        return targetIsizeSD;
-    }
-
-    public void setTargetIsizeSD(double targetIsizeSD) {
-        this.targetIsizeSD = targetIsizeSD;
     }
 
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
@@ -251,7 +212,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                             record2 : record1;
 
                     int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
-                    if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
+                    if (Math.abs(insertSize - getTargetIsize()) < 3 * getTargetIsizeSD()) {
                         emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
                         foundConcordant = true;
                     }
@@ -287,9 +248,9 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                     record2 : record1;
 
             // todo: not handling inversions for now
-            if (!scorer.validateMappingOrientations(record1, record2, matePairs)) {
+            if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + matePairs);
+                    logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + isMatePairs());
                 }
                 return;
             }
@@ -313,7 +274,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
             if (mapabilityWeighting != null) {
-                if (insertSize > targetIsize + 6 * targetIsizeSD) {
+                if (insertSize > getTargetIsize() + 6 * getTargetIsizeSD()) {
                     String chrom = record1.getChromosomeName();
                     int leftReadStart = leftRead.getPosition();
                     double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
@@ -330,7 +291,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
                 }
             }
 
-            ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, readGroupId);
+            ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, getReadGroupId());
 
             for (int i = 0; i <= genomicWindow; i += resolution) {
                 Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
@@ -366,36 +327,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void configure(JobConf job) {
         super.configure(job);
-
-        // todo: if we change to the non-deprecated API, need to update this as described here
-        // todo: https://issues.apache.org/jira/browse/MAPREDUCE-2166
-        String inputFile = getInputPath(job.get("map.input.file"));
-
-        String readGroupInfoFile = job.get("read.group.info.file");
-        ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
-        Map<Short, ReadGroupInfo> readGroupInfos = null;
-        try {
-            readGroupInfos = readGroupInfoFileHelper.readReadGroupsById(readGroupInfoFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        logger.debug("Looking up the read group for input file: " + inputFile);
-        boolean configuredReadGroup = false;
-        for (Short readGroupInfoId : readGroupInfos.keySet()) {
-            logger.debug("comparing to: " + readGroupInfos.get(readGroupInfoId).hdfsPath);
-            if (inputFile.startsWith(readGroupInfos.get(readGroupInfoId).hdfsPath)) {
-                logger.debug("got it!");
-                this.readGroupId = readGroupInfoId;
-                ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupInfoId);
-                matePairs = readGroupInfo.matePair;
-                targetIsize = readGroupInfo.isize;
-                targetIsizeSD = readGroupInfo.isizeSD;
-                configuredReadGroup = true;
-                break;
-            }
-        }
-        if (! configuredReadGroup) throw new RuntimeException("Unable to configure read group for " + inputFile);
+        configureReadGroups(job);
 
         scorer = new ProbabilisticPairedAlignmentScorer();
 
@@ -442,8 +374,4 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         logger.debug("done with configuration");
     }
 
-    protected static String getInputPath(String mapInputProperty) {
-        String path = new Path(mapInputProperty).toUri().getPath();
-        return path;
-    }
 }
