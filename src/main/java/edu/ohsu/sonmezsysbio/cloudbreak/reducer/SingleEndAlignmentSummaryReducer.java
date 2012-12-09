@@ -26,7 +26,9 @@ public class SingleEndAlignmentSummaryReducer extends MapReduceBase implements R
                 }
             }
             for (int i = 0; i < fields.length; i++) {
-                totals[i] += Long.parseLong(fields[i]);
+                if (! "".equals(fields[i])) {
+                    totals[i] += Long.parseLong(fields[i]);
+                }
             }
         }
 
