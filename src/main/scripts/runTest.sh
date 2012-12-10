@@ -17,8 +17,9 @@ then
 	echo SAMPLE_NAME: overall name of the experiment
 	echo HDFS_SAMPLE_DIR: HDFS dir to store the score pileup in
 	echo BUILD_DIR: location on the local filesystem to build cloudbreak in
+	echo GENOME_NAME: genome name for igv (eg hg18, hg19)
 	echo LOCAL_FAI: location of the genome .fai on the local filesystem
-	echo HDFS_FAI: location of the genome .fai on the HDFS filesystem    
+	echo HDFS_FAI: location of the genome .fai on the HDFS filesystem
 fi
 
 READ_GROUP_FILE=$1
@@ -148,25 +149,25 @@ gzip *.wig
 
 ~/software/IGVTools/igvtools tile ${NAME}_mu2.wig.gz ${NAME}_mu2.wig.gz.tdf hg18 || true
 
-~/software/IGVTools/igvtools tile ${NAME}_nodelOneComponentLikelihood.wig.gz ${NAME}_nodelOneComponentLikelihood.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_nodelOneComponentLikelihood.wig.gz ${NAME}_nodelOneComponentLikelihood.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_twoComponentLikelihood.wig.gz ${NAME}_twoComponentLikelihood.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_twoComponentLikelihood.wig.gz ${NAME}_twoComponentLikelihood.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_oneFreeComponentLikelihood.wig.gz ${NAME}_oneFreeComponentLikelihood.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_oneFreeComponentLikelihood.wig.gz ${NAME}_oneFreeComponentLikelihood.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHeterozygous.wig.gz ${NAME}_lrHeterozygous.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_lrHeterozygous.wig.gz ${NAME}_lrHeterozygous.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_lrHomozygous.wig.gz ${NAME}_lrHomozygous.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_lrHomozygous.wig.gz ${NAME}_lrHomozygous.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_cleanCoverage.wig.gz ${NAME}_cleanCoverage.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_cleanCoverage.wig.gz ${NAME}_cleanCoverage.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_c1membership.wig.gz ${NAME}_c1membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_c1membership.wig.gz ${NAME}_c1membership.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_c2membership.wig.gz ${NAME}_c2membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_c2membership.wig.gz ${NAME}_c2membership.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_weightedC1membership.wig.gz ${NAME}_weightedC1membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_weightedC1membership.wig.gz ${NAME}_weightedC1membership.wig.gz.tdf $GENOME_NAME || true
 
-~/software/IGVTools/igvtools tile ${NAME}_weightedC2membership.wig.gz ${NAME}_weightedC2membership.wig.gz.tdf hg18 || true
+~/software/IGVTools/igvtools tile ${NAME}_weightedC2membership.wig.gz ${NAME}_weightedC2membership.wig.gz.tdf $GENOME_NAME || true
 
 popd
 
