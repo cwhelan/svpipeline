@@ -156,6 +156,9 @@ public class SAMRecord implements AlignmentRecord {
 
     public int getMismatches() {
         int nm = 0;
+        if (! tags.containsKey("NM")) {
+            return 0;
+        }
         try {
             nm = Integer.parseInt(tags.get("NM"));
         } catch (NumberFormatException e) {
