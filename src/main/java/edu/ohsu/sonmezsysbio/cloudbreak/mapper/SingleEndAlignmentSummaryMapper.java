@@ -41,9 +41,8 @@ public class SingleEndAlignmentSummaryMapper extends CloudbreakMapReduceBase imp
                 }
                 vals = vals + "\t" + bestMismatches;
             }
-
+            output.collect(outKey, new Text(vals));
         }
-        output.collect(outKey, new Text(vals));
     }
 
 }
