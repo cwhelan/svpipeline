@@ -124,7 +124,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SingleEndAlignments
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
 
-        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line, this);
 
         // ignoring OEA for now
         if (readPairAlignments.getRead1Alignments().size() == 0 || readPairAlignments.getRead2Alignments().size() == 0) {

@@ -33,6 +33,7 @@ THRESHOLD_MIN=$9
 SHORT_NAME=${10}
 MAX_MAPQ_DIFF=${11}
 MIN_ALIGNMENT_SCORE=${12}
+MAX_MISMATCH_FILTER=${13}
 
 pushd $BUILD_DIR
 git pull
@@ -41,7 +42,7 @@ mvn assembly:assembly
 SHORT_GIT_TAG=`git rev-parse --short HEAD`
 popd
 
-NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}_${MIN_ALIGNMENT_SCORE}
+NAME=${SHORT_NAME}_`basename $READ_GROUP_FILE | awk -F'.' '{print $1}'`_`basename $MAPABILITY | awk -F'.' '{print $1}'`_`basename $FILTER | awk -F'.' '{print $1}'`_${MAX_INSERT}_${RESOLUTION}_${ALIGNER}_${MAX_MAPQ_DIFF}_${SHORT_GIT_TAG}_${MIN_ALIGNMENT_SCORE}_${MAX_MISMATCH_FILTER}
 
 echo Experiment name: $NAME
 
@@ -109,6 +110,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
    --aligner $ALIGNER
    --maxLogMapqDiff $MAX_MAPQ_DIFF
    $MIN_ALIGN_SCORE_PARAM
+   --maxMismatchFilter $MAX_MISMATCH_FILTER
 
 EOF
 
@@ -122,7 +124,8 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --resolution $RESOLUTION \
     --aligner $ALIGNER \
     --maxLogMapqDiff $MAX_MAPQ_DIFF \
-     --minScore $MIN_ALIGNMENT_SCORE
+    --minScore $MIN_ALIGNMENT_SCORE \
+    --maxMismatchFilter $MAX_MISMATCH_FILTER
 
 cat <<EOF
 
