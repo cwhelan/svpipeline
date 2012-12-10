@@ -4,6 +4,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.*;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.AlignmentRecordFilter;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
@@ -28,7 +29,7 @@ import java.util.Set;
  * Time: 1:03 PM
  */
 public class SingleEndAlignmentsToReadPairInfoMapper extends SingleEndAlignmentsMapper
-        implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo> {
+        implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo>, AlignmentRecordFilter {
 
     private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentsToReadPairInfoMapper.class);
 
@@ -46,6 +47,15 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SingleEndAlignments
     private BigWigFileHelper mapabilityWeighting;
 
     private int minScore = -1;
+    private int maxMismatches = -1;
+
+    public int getMaxMismatches() {
+        return maxMismatches;
+    }
+
+    public void setMaxMismatches(int maxMismatches) {
+        this.maxMismatches = maxMismatches;
+    }
 
     public int getMinScore() {
         return minScore;
@@ -370,8 +380,15 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends SingleEndAlignments
         }
         minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
 
+        maxMismatches = Integer.parseInt(job.get("pileupDeletionScore.maxMismatches"));
 
         logger.debug("done with configuration");
     }
 
+    public boolean passes(AlignmentRecord record) {
+        if (maxMismatches != -1 && getAlignerName().equals(Cloudbreak.ALIGNER_GENERIC_SAM)) {
+            return ((SAMRecord) record).getMismatches() < maxMismatches;
+        }
+        return true;
+    }
 }

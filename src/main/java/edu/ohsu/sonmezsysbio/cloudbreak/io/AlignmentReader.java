@@ -15,11 +15,11 @@ import java.util.List;
 public interface AlignmentReader {
     AlignmentRecord parseRecord(String alignmentRecord);
 
-    List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments);
-
     double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments);
 
     ReadPairAlignments parsePairAlignmentLine(String line);
+
+    ReadPairAlignments parsePairAlignmentLine(String line, AlignmentRecordFilter filter);
 
     public static class AlignmentReaderFactory {
         public static AlignmentReader getInstance(String aligner) {
