@@ -125,7 +125,7 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
     --aligner $ALIGNER \
     --maxLogMapqDiff $MAX_MAPQ_DIFF \
     --minScore $MIN_ALIGNMENT_SCORE \
-    --maxMismatchFilter $MAX_MISMATCH_FILTER
+    --maxMismatches $MAX_MISMATCH_FILTER
 
 cat <<EOF
 
