@@ -17,7 +17,7 @@ then
 	echo SAMPLE_NAME: overall name of the experiment
 	echo HDFS_SAMPLE_DIR: HDFS dir to store the score pileup in
 	echo BUILD_DIR: location on the local filesystem to build cloudbreak in
-	echo GENOME_NAME: genome name for igv (eg hg18, hg19)
+	echo GENOME_NAME: genome name for igv: hg18, hg19
 	echo LOCAL_FAI: location of the genome .fai on the local filesystem
 	echo HDFS_FAI: location of the genome .fai on the HDFS filesystem
 fi

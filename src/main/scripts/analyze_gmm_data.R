@@ -88,3 +88,42 @@ trainset <- features[-testindex,]
 svm.model <- svm(genotype ~ l1 + w + mu + lrHet + lrHom, data = trainset, cost = 100, gamma = 1)
 
 gc()
+
+
+cb.predictions.file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/new3_readGroupsRazerS3_new3_i94_s99_m1000_None_None_25000_25_sam_3_b0b0757_-1_gt_114714_filt.bed'
+
+cb.predictions <- read.table(cb.predictions.file, skip=1)
+names(cb.predictions) <- c("chr", "start", "end", "num", "maxLrHet", "avgMu1", "avgLrHom", "avgW0", "avgCleanCov", 
+                           "avgC1Mem", "avgC2Mem", "avgWeightedC1", "avgWeightedC2")
+
+cbRanges <- GRanges(seqnames=cb.predictions$chr, ranges=IRanges(start=cb.predictions$start, end=cb.predictions$end))
+
+hap1file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/HuRef.homozygous_indels_inversion.061109.chr2.Deletions.sim_hap1.bed.gz'
+hap2file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/HuRef.homozygous_indels_inversion.061109.chr2.Deletions.sim_hap2.bed.gz'
+
+hap1 <- import(hap1file, asRangedData=FALSE)
+hap2 <- import(hap2file, asRangedData=FALSE)
+
+mcols(hap1)$hap <- 1
+mcols(hap2)$hap <- 2
+
+hap1 <- hap1[-1 * as.matrix(findOverlaps(hap1,hap2))[,1],]
+
+trueDels <- c(hap1,hap2)
+
+trueDelsGt20 <- trueDels[end(trueDels) - start(trueDels) >= 20]
+
+mcols(cbRanges)$geno <- 0
+
+trueOverlaps <- as.matrix(findOverlaps(cbRanges, trueDelsGt20))
+                                          
+genos <- lapply(split(data.frame(trueOverlaps), trueOverlaps[,1]), 
+       function (x) {          
+          trueDelsGt20[x$subjectHits,][order(end(trueDelsGt20[x$subjectHits]) - 
+                                          start(trueDelsGt20[x$subjectHits]), decreasing=TRUE)][1]$hap})
+
+mcols(cbRanges[as.numeric(names(genos))])$geno <- unlist(genos)
+
+cb.predictions$geno <- mcols(cbRanges)$geno
+
+

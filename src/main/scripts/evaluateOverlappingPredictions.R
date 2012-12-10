@@ -1,9 +1,9 @@
 library(rtracklayer)
 library(ggplot2)
 
-truth.file <- '/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_sim/HuRef.homozygous_indels_inversion.061109.chr2.Deletions.gt50bp.gff'
+truth.file <- '/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_sim/HuRef.homozygous_indels_inversion.061109.chr2.Deletions.gff'
 
-cb.predictions.file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/c7ls_fdr20.bed'
+cb.predictions.file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/new3_readGroupsRazerS3_new3_i94_s99_m1000_None_None_25000_25_sam_3_b0b0757_-1_gt_114714_filt.bed'
 #bd.predictions.file <- '~/Documents/gene_rearrange/sv/jcvi_sim/chr2/novoalign_tier1_sort_clean_rmdup_35_2_4.bd_out.txt'
 
 cb.predictions.file <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_100bp_dip/maxins_25000_sdseqfilter_fdr20.bed'
@@ -24,6 +24,7 @@ agreement <- function(true.region, calls.1, calls.2, predictor.1, predictor.2) {
 }
 
 true.df <- read.table(truth.file)
+
 true.intervals <- GRanges(seqnames=true.df$V1, ranges=IRanges(start=true.df$V4, end=true.df$V5), strand=true.df$V7)
 
 cb.predictions <- import.bed(cb.predictions.file, asRangedData=FALSE)
