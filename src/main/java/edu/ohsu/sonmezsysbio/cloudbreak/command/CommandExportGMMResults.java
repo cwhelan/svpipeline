@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,13 +53,13 @@ public class CommandExportGMMResults implements CloudbreakCommand {
                 "oneFreeComponentLikelihood", "lrHeterozygous", "lrHomozygous", "cleanCoverage", "c1membership",
                 "c2membership", "weightedC1membership", "weightedC2membership");
 
-        Map<String, BufferedWriter> writers = createWritersForOutputs(outputs);
+        Map<String, Writer> writers = createWritersForOutputs(outputs);
 
         try {
             writeGMMResultWigFiles(conf, writers,
                     inputHDFSDir, faidx);
         } finally {
-            for (BufferedWriter writer : writers.values()) {
+            for (Writer writer : writers.values()) {
                 writer.close();
             }
         }
@@ -66,18 +67,18 @@ public class CommandExportGMMResults implements CloudbreakCommand {
 
     }
 
-    private Map<String, BufferedWriter> createWritersForOutputs(List<String> outputs) throws IOException {
-        Map<String, BufferedWriter> writers = new HashMap<String, BufferedWriter>();
+    private Map<String, Writer> createWritersForOutputs(List<String> outputs) throws IOException {
+        Map<String, Writer> writers = new HashMap<String, Writer>();
         for (String outputName : outputs) {
-            String filename = outputPrefix + "_" + outputName + ".wig";
-            BufferedWriter writer = createWriter(filename);
+            String filename = outputPrefix + "_" + outputName + ".wig.gz";
+            Writer writer = createWriter(filename);
             if (writer == null) throw new RuntimeException("Failed to create file");
             writers.put(outputName, writer);
         }
         return writers;
     }
 
-    private BufferedWriter createWriter(String fileName) throws IOException {
+    private Writer createWriter(String fileName) throws IOException {
         File outputFile = new File(fileName);
         if (! outputFile.createNewFile()) {
             logger.error("Failed to create file " + outputFile);
@@ -85,14 +86,14 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         }
 
         logger.info("Writing file " + fileName);
-        return new BufferedWriter(new FileWriter(outputFile));
+        return new OutputStreamWriter(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile))));
     }
 
-    private void writeGMMResultWigFiles(Configuration conf, Map<String, BufferedWriter> writers, String inputHDFSDir1,
+    private void writeGMMResultWigFiles(Configuration conf, Map<String, Writer> writers, String inputHDFSDir1,
                                         FaidxFileHelper faix
     ) throws IOException, NoSuchFieldException, IllegalAccessException {
         for (String name : writers.keySet()) {
-            BufferedWriter writer = writers.get(name);
+            Writer writer = writers.get(name);
             writer.write("track type=wiggle_0 name=\"" + outputPrefix + " " + name + "\"\n");
         }
 
@@ -117,7 +118,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
                 faix, inputStreams);
     }
 
-    public void mergeSortedInputStreams(DFSFacade dfsFacade, Map<String, BufferedWriter> writers, FaidxFileHelper faix,
+    public void mergeSortedInputStreams(DFSFacade dfsFacade, Map<String, Writer> writers, FaidxFileHelper faix,
                                         List<Path> paths) throws IOException, NoSuchFieldException, IllegalAccessException {
         short currentChromosome = -1;
         PriorityQueue<GMMResultsReaderAndLine> fileReaders = new PriorityQueue<GMMResultsReaderAndLine>();
@@ -132,7 +133,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         while (! fileReaders.isEmpty()) {
             GMMResultsReaderAndLine minNextLine = fileReaders.poll();
             if (currentChromosome != minNextLine.getGenomicLocation().chromosome) {
-                for (BufferedWriter writer : writers.values()) {
+                for (Writer writer : writers.values()) {
                     writeChromHeader(writer, faix, minNextLine);
                 }
 
@@ -141,7 +142,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
 
             for (String name : writers.keySet()) {
                 Field f = GMMScorerResults.class.getField(name);
-                BufferedWriter writer = writers.get(name);
+                Writer writer = writers.get(name);
                 writer.write(minNextLine.getGenomicLocation().pos + "\t" + f.getDouble(minNextLine.getNextValue()) + "\n");
             }
 

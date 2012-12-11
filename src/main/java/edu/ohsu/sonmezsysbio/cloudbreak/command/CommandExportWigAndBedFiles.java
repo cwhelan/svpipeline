@@ -22,6 +22,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,7 +65,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
 
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
-        String pileupFileName = outputPrefix + "_piledup_deletion_scores.wig";
+        String pileupFileName = outputPrefix + "_piledup_deletion_scores.wig.gz";
         String pileupBedFileName = outputPrefix + "_piledup_positive_score_regions.bed";
         String averagedFileName = outputPrefix + "_windowed_average_deletion_scores.wig";
         String averagedBedFileName = outputPrefix + "_averaged_positive_score_regions.bed";
@@ -76,7 +77,7 @@ public class CommandExportWigAndBedFiles implements CloudbreakCommand {
         }
 
         System.err.println("Writing file " + pileupFileName);
-        BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(outputFile));
+        Writer outputFileWriter = new OutputStreamWriter(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile))));
         writePiledUpDeletionScores(conf, outputFileWriter, inputHDFSDir, faidx, text);
         outputFileWriter.close();
 
