@@ -42,7 +42,7 @@ for line in open_file(temp_file_name):
     length = int(fields[2]) - int(fields[1])
     avg_mu = float(fields[5])
     # todo fix this hardcoded tolerance
-    if (abs(avg_mu - length) > 300):
+    if (avg_mu < 300 or abs(avg_mu - length) > 300):
         continue
     num_predictions += 1
     bed_line = line.strip()
