@@ -133,15 +133,27 @@ hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar -Dmapred.reduce.tas
 
 cat <<EOF
 
-hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar sortGMMResults \
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME_mergesort
+
+EOF
+
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar sortGMMResults \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME_mergesort
+
+cat <<EOF
+
+hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME_mergesort \
     --faidx $LOCAL_FAI \
     --resolution $RESOLUTION --outputPrefix $NAME
 
 EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar exportGMMResults \
-    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
+    --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME_mergesort \
     --faidx $LOCAL_FAI \
     --resolution $RESOLUTION --outputPrefix $NAME
 
