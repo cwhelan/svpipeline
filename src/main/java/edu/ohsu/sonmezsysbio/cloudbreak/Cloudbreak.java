@@ -125,6 +125,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandExportAlignmentsFromHDFS commandExportAlignmentsFromHDFS = new CommandExportAlignmentsFromHDFS();
         jc.addCommand("exportAlignmentsFromHDFS", commandExportAlignmentsFromHDFS);
 
+        CommandSortGMMResults commandSortGMMResults = new CommandSortGMMResults();
+        jc.addCommand("sortGMMResults", commandSortGMMResults);
+
         jc.setProgramName("Cloudbreak");
         return jc;
     }
