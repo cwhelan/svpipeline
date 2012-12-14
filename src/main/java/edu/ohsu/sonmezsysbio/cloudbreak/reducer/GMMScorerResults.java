@@ -17,9 +17,7 @@ public class GMMScorerResults implements Writable {
     public double mu2;
     public double nodelOneComponentLikelihood;
     public double twoComponentLikelihood;
-    public double oneFreeComponentLikelihood = Double.NEGATIVE_INFINITY;
     public double lrHeterozygous;
-    public double lrHomozygous;
 
     public int cleanCoverage;
     public double c1membership;
@@ -34,9 +32,7 @@ public class GMMScorerResults implements Writable {
                 ", mu2=" + mu2 +
                 ", nodelOneComponentLikelihood=" + nodelOneComponentLikelihood +
                 ", twoComponentLikelihood=" + twoComponentLikelihood +
-                ", oneFreeComponentLikelihood=" + oneFreeComponentLikelihood +
                 ", lrHeterozygous=" + lrHeterozygous +
-                ", lrHomozygous=" + lrHomozygous +
                 ", cleanCoverage=" + cleanCoverage +
                 ", c1membership=" + c1membership +
                 ", c2membership=" + c2membership +
@@ -50,9 +46,7 @@ public class GMMScorerResults implements Writable {
         dataOutput.writeDouble(mu2);
         dataOutput.writeDouble(nodelOneComponentLikelihood);
         dataOutput.writeDouble(twoComponentLikelihood);
-        dataOutput.writeDouble(oneFreeComponentLikelihood);
         dataOutput.writeDouble(lrHeterozygous);
-        dataOutput.writeDouble(lrHomozygous);
         dataOutput.writeInt(cleanCoverage);
         dataOutput.writeDouble(c1membership);
         dataOutput.writeDouble(c2membership);
@@ -65,9 +59,7 @@ public class GMMScorerResults implements Writable {
         mu2 = dataInput.readDouble();
         nodelOneComponentLikelihood = dataInput.readDouble();
         twoComponentLikelihood = dataInput.readDouble();
-        oneFreeComponentLikelihood = dataInput.readDouble();
         lrHeterozygous = dataInput.readDouble();
-        lrHomozygous = dataInput.readDouble();
         cleanCoverage = dataInput.readInt();
         c1membership = dataInput.readDouble();
         c2membership = dataInput.readDouble();

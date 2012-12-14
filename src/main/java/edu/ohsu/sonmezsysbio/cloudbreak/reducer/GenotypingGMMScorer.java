@@ -274,32 +274,6 @@ public class GenotypingGMMScorer {
         results.weightedC1membership = Math.exp(weightByMappingScore(updates.gamma, cleanMappingScores, 0));
         results.weightedC2membership = Math.exp(weightByMappingScore(updates.gamma, cleanMappingScores, 1));
 
-        log.debug("estimating with one free component");
-        initialMu = new double[]{mean(yclean)};
-        i = 1;
-        w = new double[] { 0 };
-        mu = initialMu;
-        l = likelihood(yclean, w, mu, sigma);
-        log.debug("initial likelihood: " + l);
-
-        while(true) {
-            updates = emStep(yclean, w, mu, sigma, new int[]{0});
-            if (log.isDebugEnabled()) {
-                log.debug("updates: " + updates.toString());
-            }
-            w = updates.w;
-            mu = updates.mu;
-            double lprime = likelihood(yclean, w, mu, sigma);
-            log.debug("new likelihood: " + l);
-            i += 1;
-            if (Math.abs(l - lprime) < 0.0001 || i > maxIterations) {
-                break;
-            }
-            l = lprime;
-        }
-        results.oneFreeComponentLikelihood = l;
-        results.lrHomozygous = l - results.nodelOneComponentLikelihood;
-
         return results;
     }
 

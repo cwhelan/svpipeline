@@ -50,7 +50,7 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
         List<String> outputs = Arrays.asList("w0", "mu2", "nodelOneComponentLikelihood", "twoComponentLikelihood",
-                "oneFreeComponentLikelihood", "lrHeterozygous", "lrHomozygous", "cleanCoverage", "c1membership",
+                "lrHeterozygous", "cleanCoverage", "c1membership",
                 "c2membership", "weightedC1membership", "weightedC2membership");
 
         Map<String, Writer> writers = createWritersForOutputs(outputs);
