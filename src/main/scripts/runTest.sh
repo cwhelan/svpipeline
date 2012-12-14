@@ -135,13 +135,13 @@ cat <<EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar sortGMMResults \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME
-    --inputHDFSDir $HDFS_SAMPLE_DIR/${NAME}_mergesort
+    --outputHDFSDir $HDFS_SAMPLE_DIR/${NAME}_mergesort
 
 EOF
 
 hadoop jar $BUILD_DIR/target/cloudbreak-1.0-SNAPSHOT-exe.jar sortGMMResults \
     --inputHDFSDir $HDFS_SAMPLE_DIR/$NAME \
-    --inputHDFSDir $HDFS_SAMPLE_DIR/${NAME}_mergesort
+    --outputHDFSDir $HDFS_SAMPLE_DIR/${NAME}_mergesort
 
 cat <<EOF
 
