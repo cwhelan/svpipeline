@@ -65,6 +65,7 @@ public class ReadPairInfoToGMMResultsReducer extends MapReduceBase implements Re
         }
 
         readPairInfoScorer.setMaxLogMapqDiff(Double.parseDouble(job.get("max.log.mapq.diff")));
+        readPairInfoScorer.setMinCoverage(Integer.parseInt(job.get("min.clean.coverage")));
     }
 }
 

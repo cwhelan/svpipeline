@@ -173,6 +173,7 @@ public class GenotypingGMMScorerTest {
         }
 
         scorer.setMaxLogMapqDiff(5);
+        scorer.setMinCoverage(3);
 
         Map<Short, ReadGroupInfo>  rgis = new HashMap<Short, ReadGroupInfo>();
         rgis.put((short) 0, readGroupInfo);

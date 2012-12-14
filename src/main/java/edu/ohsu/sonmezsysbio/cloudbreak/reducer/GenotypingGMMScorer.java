@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import java.util.*;
 
 import static org.apache.commons.math3.stat.StatUtils.mean;
-import static org.apache.commons.math3.stat.StatUtils.sum;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,8 +19,10 @@ import static org.apache.commons.math3.stat.StatUtils.sum;
 public class GenotypingGMMScorer {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(GenotypingGMMScorer.class);
+
     public static final int MAX_COVERAGE = 200;
-    public static final int MIN_COVERAGE = 5;
+
+    private int minCoverage;
     private double maxLogMapqDiff;
 
     public void setMaxLogMapqDiff(double maxLogMapqDiff) {
@@ -30,6 +31,14 @@ public class GenotypingGMMScorer {
 
     public double getMaxLogMapqDiff() {
         return maxLogMapqDiff;
+    }
+
+    public int getMinCoverage() {
+        return minCoverage;
+    }
+
+    public void setMinCoverage(int minCoverage) {
+        this.minCoverage = minCoverage;
     }
 
     { log.setLevel(Level.INFO); }
@@ -221,7 +230,7 @@ public class GenotypingGMMScorer {
             }
         }
 
-        if (yclean.length <= MIN_COVERAGE) {
+        if (yclean.length <= minCoverage) {
             log.debug("not enough ycleans, returning 1");
             results.w0 = -1;
             return results;
