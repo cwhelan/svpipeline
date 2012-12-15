@@ -225,7 +225,7 @@ public class WigFileHelper {
         while (idx < filteredVals.length) {
             long pos = idx * resolution;
 
-            if (filteredVals[idx] > 0 && (firstExtraWigFileValues == null || (Math.abs(firstExtraWigFileValues[idx] - firstExtraWigFileValues[idx - 1]) < 50))) {
+            if (filteredVals[idx] > 0 && (firstExtraWigFileValues == null || (Math.abs(firstExtraWigFileValues[idx] - firstExtraWigFileValues[idx - 2]) < 50))) {
                 if (!inPositivePeak) {
                     peakStart = pos;
                     inPositivePeak = true;
