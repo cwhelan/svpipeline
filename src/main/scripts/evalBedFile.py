@@ -47,13 +47,13 @@ def eval_bed(truth_filename, calls):
         if (fields[len(fields) - 3] != "."):
             found_feature = "\t".join(fields[(len(fields) - 3):len(fields)])
             if not found_feature in found_features:
-                found_features.add(found_feature)
                 found_feature_length = int(fields[(len(fields) - 1)]) - int(fields[(len(fields) - 2)])
-                if found_feature_length <= size_threshold:
-                    short_hit_for_current_call = True
-                else:
-                    hit_for_current_call = True
-
+                if abs(current_call_length - found_feature_length) < 300:
+                    found_features.add(found_feature)
+                    if found_feature_length <= size_threshold:
+                        short_hit_for_current_call = True
+                    else:
+                        hit_for_current_call = True
 
     if hit_for_current_call:
         matches = matches + 1

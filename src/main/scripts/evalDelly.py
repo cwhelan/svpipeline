@@ -29,11 +29,10 @@ delly_file.close()
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "WrongType", "Short", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "WrongType", "Short", "TPR"])
 for v in unique_score_values:
     calls_gte_threshold = []
     delly_file = open(delly_filename, "r")
-    long_calls = 0
     non_del_calls = 0
     for line in delly_file:
         if line.startswith("#"):
@@ -43,17 +42,13 @@ for v in unique_score_values:
             chrom = fields[0]
             ostart = fields[1]
             oend = fields[2]
-            sv_len = int(oend) - int(ostart)
-            if sv_len > 25000:
-                long_calls += 1
-                continue
             bed_line = "\t".join([chrom, ostart, oend])
             #print bed_line.strip()
             calls_gte_threshold.append(bed_line)
 
 
     (qualified_calls, matches, short_calls) = evalBedFile.eval_bed(truth_filename, calls_gte_threshold)
-    tpr = float(matches) / (long_calls + qualified_calls)
-    print "\t".join(map(str, [v, long_calls + qualified_calls, matches, long_calls, non_del_calls, short_calls, tpr]))
+    tpr = float(matches) / (qualified_calls)
+    print "\t".join(map(str, [v, qualified_calls, matches, non_del_calls, short_calls, tpr]))
 
     

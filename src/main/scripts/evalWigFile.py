@@ -78,13 +78,13 @@ def process_quantile(q):
     tpr = float(result_fields[6])
     if num_predictions == 0:
         print "Warning: zero predictions in line: " + result
-        return (q, 0, 0, 0, 0, 0, 0)
+        return (q, 0, 0, 0, 0, 0)
     else:
-        return (q, num_predictions, num_matches, 0, 0, num_short_calls,tpr)
+        return (q, num_predictions, num_matches, 0, num_short_calls,tpr)
     
 p=Pool(50)
 results = p.map(process_quantile, quantiles)
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "Wrong Type", "Short", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "Wrong Type", "Short", "TPR"])
 for q in results:
     print "\t".join(map(str, q))

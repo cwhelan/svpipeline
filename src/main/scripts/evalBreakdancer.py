@@ -27,11 +27,10 @@ breakdancer_file.close()
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "WrongType", "Short", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "WrongType", "Short", "TPR"])
 for v in unique_score_values:
     calls_gte_threshold = []
     breakdancer_file = open(breakdancer_filename, "r")
-    long_calls = 0
     non_del_calls = 0
     for line in breakdancer_file:
 #        print line
@@ -46,10 +45,6 @@ for v in unique_score_values:
                 continue
             sv_len = int(fields[7])
             # sys.stderr.write("len: " + str(sv_len) + "\n")
-            if sv_len > 25000:
-#                print "too long"
-                long_calls += 1
-                continue
             calls_gte_threshold.append(line)
             #    sys.stderr.write(str(calls_gte_threshold))
 
@@ -60,7 +55,7 @@ for v in unique_score_values:
         bed_lines.append(bed_line)
 
     (qualified_calls, matches, short_calls) = evalBedFile.eval_bed(truth_filename, bed_lines)
-    tpr = float(matches) / (long_calls + qualified_calls)
-    print "\t".join(map(str, [v, long_calls + qualified_calls, matches, long_calls, non_del_calls, short_calls, tpr]))
+    tpr = float(matches) / (qualified_calls)
+    print "\t".join(map(str, [v, qualified_calls, matches, non_del_calls, short_calls, tpr]))
     
     
