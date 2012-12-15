@@ -60,8 +60,6 @@ public class CommandSortGMMResults extends BaseCloudbreakCommand {
         jobConf.setOutputValueClass(GMMScorerResults.class);
         jobConf.setOutputFormat(SequenceFileOutputFormat.class);
 
-        jobConf.setCompressMapOutput(true);
-
         jobConf.set("mapred.output.compress", "true");
         jobConf.set("mapred.output.compression", "org.apache.hadoop.io.compress.SnappyCodec");
 
