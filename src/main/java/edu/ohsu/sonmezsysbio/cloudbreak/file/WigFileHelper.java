@@ -220,10 +220,12 @@ public class WigFileHelper {
             extraWigValueSums.put(extraWigFile, (double) 0);
         }
 
+        double[] firstExtraWigFileValues = extraWigFileValues.values().size() > 0 ? extraWigFileValues.values().iterator().next() : null;
+
         while (idx < filteredVals.length) {
             long pos = idx * resolution;
 
-            if (filteredVals[idx] > 0) {
+            if (filteredVals[idx] > 0 && (firstExtraWigFileValues == null || (Math.abs(firstExtraWigFileValues[idx] - firstExtraWigFileValues[idx - 1]) < 50))) {
                 if (!inPositivePeak) {
                     peakStart = pos;
                     inPositivePeak = true;
