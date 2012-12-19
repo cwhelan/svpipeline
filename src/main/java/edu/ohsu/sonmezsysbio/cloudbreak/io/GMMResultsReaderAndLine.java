@@ -39,10 +39,6 @@ public class GMMResultsReaderAndLine implements Comparable<GMMResultsReaderAndLi
         this.results = nextValue;
     }
 
-    public int compareTo(ReaderAndLine o) {
-        return this.gl.compareTo(o.getGenomicLocation());
-    }
-
     public SequenceFile.Reader getReader() {
         return reader;
     }

@@ -161,18 +161,6 @@ public class CommandExportGMMResults implements CloudbreakCommand {
         w0outputFileWriter.write("variableStep chrom=" + faix.getNameForChromKey(minNextLine.getGenomicLocation().chromosome) + " span=" + resolution + "\n");
     }
 
-    private boolean readNextTextLine(FaidxFileHelper faix, TextReaderAndLine minNextLine) throws IOException {
-        String line = minNextLine.getDataInput().readLine();
-        boolean gotLine = false;
-        if (line != null) {
-            String[] fields = line.split("\t");
-            minNextLine.setGenomicLocation(new GenomicLocation(faix.getKeyForChromName(fields[0]), new Integer(fields[1])));
-            minNextLine.setNextValue(new Double(fields[2]));
-            gotLine = true;
-        }
-        return gotLine;
-    }
-
     private boolean readNextDataLine(GMMResultsReaderAndLine minNextLine) throws IOException {
         GenomicLocation gl = new GenomicLocation();
         GMMScorerResults results = new GMMScorerResults();
