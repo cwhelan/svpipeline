@@ -3,7 +3,7 @@
 import sys
 import subprocess
 
-def eval_bed(truth_filename, calls):
+def eval_bed(truth_filename, calls, printhits=False):
     size_threshold = 25
     max_short_hit_length = 75
     bedtools_process = subprocess.Popen(["intersectBed", "-a", "stdin", "-b", truth_filename, "-loj"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -54,6 +54,8 @@ def eval_bed(truth_filename, calls):
                         short_hit_for_current_call = True
                     else:
                         hit_for_current_call = True
+                        if printhits:
+                            print current_call + "\t" + found_feature
 
     if hit_for_current_call:
         matches = matches + 1
@@ -72,8 +74,11 @@ def eval_bed(truth_filename, calls):
 if __name__ == "__main__":
     import sys
 
+    printHits = False
     truth_file = sys.argv[1]
     calls_file = sys.argv[2]
+    if (len(sys.argv) > 3) and sys.argv[3] == "--printHits":
+        printHits = True
 
     # slurp all the bed lines into memory
 
@@ -81,4 +86,4 @@ if __name__ == "__main__":
     for line in open(calls_file, 'r'):
         calls.append(line)
 
-    print eval_bed(sys.argv[1], calls)
+    print eval_bed(sys.argv[1], calls, printHits)

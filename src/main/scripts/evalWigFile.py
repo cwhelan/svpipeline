@@ -68,7 +68,7 @@ sys.stderr.write(str(quantiles))
 sys.stderr.write("\n")
 
 def process_quantile(q):
-    eval_at_q_cmd = ['condor_run', 'python', '/l2/users/whelanch/gene_rearrange/svpipeline/build/svpipeline/src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow, mu_filename]
+    eval_at_q_cmd = ['condor_run', 'python', '/l2/users/whelanch/gene_rearrange/svpipeline/build/svpipeline/src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow, mu_filename, '/l2/users/whelanch/gene_rearrange/svpipeline/build/svpipeline/target/']
     #print eval_at_q_cmd
     result = subprocess.Popen(eval_at_q_cmd, stdout=subprocess.PIPE).communicate()[0]
     result_fields = result.split()

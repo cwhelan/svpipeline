@@ -24,12 +24,14 @@ truth_filename = sys.argv[3]
 faidx_filename = sys.argv[4]
 median_filter_window = sys.argv[5]
 mu_file = sys.argv[6]
+cloudbreak_home = sys.argv[7]
 
 #sys.stderr.write("quantile " + str(q) + "\n")
 #temp_file_name = "tmp/tmp_" + str(q) + ".bed"
 temp_file = tempfile.NamedTemporaryFile()
 temp_file_name = temp_file.name
-extract_regions_cmd = ['hadoop', 'jar', '/l2/users/whelanch/gene_rearrange/svpipeline/build/svpipeline/target/cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window, "--extraWigFilesToAverage", mu_file]
+
+extract_regions_cmd = ['hadoop', 'jar', cloudbreak_home + 'cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window, "--extraWigFilesToAverage", mu_file]
 subprocess.call(extract_regions_cmd)
 
 num_predictions = 0
