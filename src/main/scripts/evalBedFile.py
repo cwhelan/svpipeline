@@ -86,4 +86,7 @@ if __name__ == "__main__":
     for line in open(calls_file, 'r'):
         calls.append(line)
 
-    print eval_bed(sys.argv[1], calls, printHits)
+    if printHits:
+        eval_bed(sys.argv[1], calls, printHits)
+    else:
+        print eval_bed(sys.argv[1], calls, printHits)
