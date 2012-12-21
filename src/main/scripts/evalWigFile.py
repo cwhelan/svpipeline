@@ -23,7 +23,7 @@ cbhome = sys.argv[7]
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
         sys.stderr.write("opening with subprocess\n")
-        p = subprocess.Popen(["zcat",wig_filename], 
+        p = subprocess.Popen(["gzcat",wig_filename],
                              stdout = subprocess.PIPE)
         wig_file = p.stdout
     else:

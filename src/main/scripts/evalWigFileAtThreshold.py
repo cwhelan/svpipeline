@@ -11,7 +11,7 @@ import evalBedFile
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
-        p = subprocess.Popen(["zcat",wig_filename],
+        p = subprocess.Popen(["gzcat",wig_filename],
                              stdout = subprocess.PIPE)
         wig_file = p.stdout
     else:
