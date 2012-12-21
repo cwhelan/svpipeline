@@ -18,6 +18,8 @@ medianFilterWindow = sys.argv[4]
 lower_threshold = float(sys.argv[5])
 mu_filename = sys.argv[6]
 
+cbhome = sys.argv[7]
+
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
         sys.stderr.write("opening with subprocess\n")
@@ -49,7 +51,7 @@ sys.stderr.write("values above threshold: " + str(len(values_above_threshold)) +
 values_above_threshold = list(set(values_above_threshold))
 values_above_threshold.sort()
 
-num_quantiles = 200
+num_quantiles = 50
 quantiles = [0] * (num_quantiles + 1)
 q_num = 0
 
@@ -68,7 +70,7 @@ sys.stderr.write(str(quantiles))
 sys.stderr.write("\n")
 
 def process_quantile(q):
-    eval_at_q_cmd = ['condor_run', 'python', '/l2/users/whelanch/gene_rearrange/svpipeline/build/svpipeline/src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow, mu_filename, '/l2/users/whelanch/gene_rearrange/svpipeline/build/svpipeline/target/']
+    eval_at_q_cmd = ['python', cbhome + 'src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow, mu_filename, cbhome + 'target/']
     #print eval_at_q_cmd
     result = subprocess.Popen(eval_at_q_cmd, stdout=subprocess.PIPE).communicate()[0]
     result_fields = result.split()
@@ -82,7 +84,7 @@ def process_quantile(q):
     else:
         return (q, num_predictions, num_matches, 0, num_short_calls,tpr)
     
-p=Pool(50)
+p=Pool(3)
 results = p.map(process_quantile, quantiles)
 
 print "\t".join(["Thresh", "Calls", "TP", "Wrong Type", "Short", "TPR"])
