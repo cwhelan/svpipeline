@@ -31,7 +31,7 @@ cloudbreak_home = sys.argv[7]
 temp_file = tempfile.NamedTemporaryFile()
 temp_file_name = temp_file.name
 
-extract_regions_cmd = ['hadoop', 'jar', cloudbreak_home + 'cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window, "--extraWigFilesToAverage", mu_file]
+extract_regions_cmd = ['hadoop', 'jar', cloudbreak_home + 'cloudbreak-1.0-SNAPSHOT-exe.jar', 'extractPositiveRegionsFromWig', '--inputWigFile', wig_filename, '--outputBedFile', temp_file_name, '--name', "tmp_" + str(q), "--faidx", faidx_filename, "--threshold", str(q), "--medianFilterWindow", median_filter_window, "--muFile", mu_file]
 subprocess.call(extract_regions_cmd)
 
 num_predictions = 0
