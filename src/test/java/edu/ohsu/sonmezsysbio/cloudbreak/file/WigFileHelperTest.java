@@ -1,6 +1,5 @@
 package edu.ohsu.sonmezsysbio.cloudbreak.file;
 
-import org.apache.hadoop.util.hash.Hash;
 import org.junit.Test;
 
 import java.io.*;
