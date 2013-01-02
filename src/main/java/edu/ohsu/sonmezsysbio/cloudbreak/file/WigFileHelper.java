@@ -332,14 +332,9 @@ public class WigFileHelper {
         }
         for (String extraWigFile : extraFileNames) {
             bedFileWriter.write("\t" + extraWigValueSums.get(extraWigFile) * resolution / ((endPosition + 1) - peakStart));
-        }
-        for (String extraWigFile : extraFileNames) {
             bedFileWriter.write("\t" + extraWigValueMins.get(extraWigFile));
-        }
-        for (String extraWigFile : extraFileNames) {
             bedFileWriter.write("\t" + extraWigValueMaxes.get(extraWigFile));
         }
-
 
         bedFileWriter.write("\n");
     }
