@@ -2,11 +2,13 @@
 
 \usepackage[margin=1in]{geometry}
 \usepackage{amsfonts}
+\usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{url}
 \usepackage{multirow}
+\usepackage{authblk}
 
 \usepackage[style=authoryear,maxbibnames=5,mincitenames=1,maxcitenames=1]{biblatex}
 \renewbibmacro{in:}{%
@@ -18,7 +20,13 @@
 
 \title{Cloudbreak: A MapReduce Algorithm for Detecting Genomic Structural Variation from Complete Paired-End Sequence Data Sets}
 
-\author{Christopher W. Whelan \and Kemal S\"onmez}
+\author[1,2,4]{Christopher W. Whelan \thanks{whelanch@ohsu.edu}}
+\author[1,2,3,4]{Kemal S\"onmez \thanks{sonmezk@ohsu.edu}}
+\affil[1]{Institute on Development and Disability}
+\affil[2]{Center for Spoken Language Understanding}
+\affil[3]{Department of Medical Informatics \& Clinical Epidemiology}
+
+\affil[4]{Oregon Health \& Science University, Portland, OR, USA}
 
 \maketitle
 
@@ -40,9 +48,7 @@ Google's MapReduce \autocite{Dean:2008p277} and its open-source implementation H
 
 In this paper, we describe a framework for solving SV detection problems in Hadoop and MapReduce based on the computation of local features along the genome from paired end mappings. We then demonstrate an implementation of an SV algorithm, Cloudbreak, for discovering genomic deletions, which computes local features based on the insert sizes of spanning mapping. Cloudbreak computes features that build on the ideas of \autocite{Lee:2009da}, who modeled the distribution of insert sizes at each genomic location as a Gaussian Mixture Model (GMM). We then characterize our algorithm's performance on simulated and real data sets.
 
-\section{Results}\label{results}
-
-\subsection{A MapReduce Framework for SV Detection Algorithms}
+\section{A MapReduce Framework for SV Detection Algorithms}
 
 The MapReduce programming model \autocite{Dean:2008p277} divides computation across a cluster into three phases. In the first phase, \emph{mappers} developed by the application programmer examine small blocks of data and emit a set of $\langle key, value \rangle$ pairs for each block examined. The MapReduce framework then sorts the output of the mappers by key, and aggregates all values that are associated with each key. Finally, the framework executes \emph{reducers}, also created by the application developer, which process all of the values for a particular key and produce one or more outputs that summarize or aggregate those values. Hadoop is an open source project of the Apache Foundation which provides an implementation of the MapReduce programming framework as well as a distributed file system for storing large data sets across a cluster. In addition to a MapReduce programming framework, Hadoop also provides a distributed file system (HDFS), which facilitates storing large data sets redundantly across a cluster. MapReduce and Hadoop allow efficient processing of large data sets by scheduling tasks for execution as close as possible to the nodes which hold the required data, minimizing network traffic and I/O contention.
 
@@ -59,17 +65,17 @@ Our formulation divides processing into two distinct MapReduce jobs. The first j
     \EndFor
     \EndFunction
     \Function{Reduce}{$\textrm{ReadPairId }rid, \textrm{Alignments }a_{1,2,\ldots}$}
-    \State $\textrm{AlignmentPairList }ap \gets \textrm{ValidAlignmentPairs}(a_{1,2,\ldots}$
-    \State $\textsc{Emit}(\textrm{ReadPairId }rp, \textrm{AlignmentPairList} ap)$
+    \State $\textrm{AlignmentPairList }ap \gets \textrm{ValidAlignmentPairs}(a_{1,2,\ldots})$
+    \State $\textsc{Emit}(\textrm{ReadPairId }rp, \textrm{AlignmentPairList } ap)$
     \EndFunction
     \EndProcedure
 
     \Procedure{Compute SV Features}{}
     \Function{Map}{$\textrm{ReadPairId }rp, \textrm{AlignmentPairList }ap$}
     \ForAll{$ \textrm{AlignmentPairs }<a_1,a_2> \in ap$}
-    \State $ \textrm{ReadPairInfo }spi \gets <\textrm{InsertSize}(a_1,a_2), \textrm{AlignmentScore}(a_1,a_2)>$
     \ForAll{$ \textrm{GenomicLocations }l \in \textsc{Loci }(a_1,a_2)$}
-    \State $\textsc{Emit}(\textrm{GenomicLocation }l, \textrm{SpanningPairInfo }spi)$
+    \State $ \textrm{ReadPairInfo }spi \gets <\textrm{InsertSize}(a_1,a_2), \textrm{AlignmentScore}(a_1,a_2)>$
+    \State $\textsc{Emit}(\textrm{GenomicLocation }l, \textrm{ReadPairInfo }spi)$
     \EndFor
     \EndFor
     \EndFunction
@@ -81,9 +87,16 @@ Our formulation divides processing into two distinct MapReduce jobs. The first j
     \State $\textrm{StructuralVariationCalls } sv \gets \textsc{PostProcess }(\Phi)$ 
   \end{algorithmic}
 
-The alignment job uses sensitive alignment tools and settings to discover as many mapping locations for each read pair as possible. In the mapping phase, mappers align reads in single-end mode to the reference genome in parallel, outputting each possible mapping location as a value under a key identifying the read pair. In the reduce phase, Cloudbreak combines pairs of mapping locations for the two ends of a read pair to produce all possible combinations of mapping locations found. Our algorithm could use any aligner that is capable of reporting multiple alignments for reads. We report results generated with alignments from RazerS 3 \autocite{Weese:2012by}, which in our tests displayed the best combination of sensitivity, performance, and memory usage suitable for parallelization in Hadoop. Our implementation also contains wrappers to execute the aligners Novoalign\footnote{\url{http://wwww.novocraft.com}}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
+The alignment job uses sensitive alignment tools and settings to discover as many mapping locations for each read pair as possible. In the mapping phase, mappers align reads in single-end mode to the reference genome in parallel, outputting each possible mapping location as a value under a key identifying the read pair. In the reduce phase, the framework combines pairs of mapping locations for the two ends of a read pair to produce all possible combinations of mapping locations found. Our framework could use any aligner that is capable of reporting multiple alignments for reads. We report results below generated with alignments from RazerS 3 \autocite{Weese:2012by}, which in our tests displayed the best combination of sensitivity, performance, and memory usage suitable for parallelization in Hadoop. Our implementation also contains wrappers to execute the aligners Novoalign\footnote{\url{http://wwww.novocraft.com}}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
 
-In the second job, we compute a set of features for each location in the genome. To begin, we tile the genome with small fixed-width, non-overlapping intervals. For the experiments reported in this paper we use an interval size of 25bp. Let $L = \left\{l_1,l_2,\ldots,l_N\right\}$ be the set of intervals covering the entire genome. Let $R_1 = \left\{r_{1,1},r_{1,2},\ldots,r_{1,M}\right\}$ and $R_2 = \left\{r_{2,1},r_{2,2},\ldots,r_{2,M}\right\}$ be the input set of paired reads. Let $A^1 = \left\{a^{1}_{m,1},a^{1}_{m,2},\ldots,a^{1}_{m,K}\right\}$ and $A^2 = \left\{a^{2}_{m,1},a^{2}_{m,2},\ldots,a^{2}_{m,K}\right\}$ be the set of alignments for the left and right reads from read pair $m$. For any given pair of alignments of the two reads in a read pair $a^{1}_{m,i}$ and $a^{2}_{m,j}$, let the $\textrm{ SpanningPairInfo} spi_{m,i,j}$ be information about the pair relevant to detecting SVs, e.g. the fragment size implied by the alignments and the likelihood the alignments are correct. We define three functions, $\textsc{Loci } : \langle a^{1}_{m,i},a^{2}_{m,j} \rangle \rightarrow L_m \subseteq L$, $\Phi : \left\{\textrm{SpanningPairInfo }spi_{m,i,j}\right\} \rightarrow \mathbb{R}^N$, and $\textsc{PostProcess}$, which maps features across the genome into a set of SV calls. The first maps an alignment to a set of genomic locations to which it is relevant for SV detection; for example, the set of locations overlapped by the internal insert implied by the read alignments. We optimize this step by assuming that if there exist concordant mappings for a read pair, defined as those where the two alignments are in the proper orientation and with an insert size within three standard deviations of the expected library insert size, one of them is likely to be correct and therefore we do not consider any discordant alignments of the pair. The second function maps a set of SpanningPairInfos relevant to a given location to a real-valued vector of features useful for SV detection. 
+In the second job, we compute a set of features for each location in the genome. To begin, we tile the genome with small fixed-width, non-overlapping intervals. For the experiments reported in this paper we use an interval size of 25bp. Let $L = \left\{l_1,l_2,\ldots,l_N\right\}$ be the set of intervals covering the entire genome. Let $R_1 = \left\{r_{1,1},r_{1,2},\ldots,r_{1,M}\right\}$ and $R_2 = \left\{r_{2,1},r_{2,2},\ldots,r_{2,M}\right\}$ be the input set of paired reads. Let $A^1 = \left\{a^{1}_{m,1},a^{1}_{m,2},\ldots,a^{1}_{m,K}\right\}$ and $A^2 = \left\{a^{2}_{m,1},a^{2}_{m,2},\ldots,a^{2}_{m,K}\right\}$ be the set of alignments for the left and right reads from read pair $m$. For any given pair of alignments of the two reads in a read pair $a^{1}_{m,i}$ and $a^{2}_{m,j}$, let the $\textrm{ReadPairInfo } spi_{m,i,j}$ be information about the pair relevant to detecting SVs, e.g. the fragment size implied by the alignments and the likelihood the alignments are correct. We leave three functions to be implemented depending on the application:
+\begin{flalign*}
+ \textsc{Loci } :& \langle a^{1}_{m,i},a^{2}_{m,j} \rangle \rightarrow L_m \subseteq L \\
+ \Phi :& \left\{\textrm{SpanningPairInfo }spi_{m,i,j}\right\} \rightarrow \mathbb{R}^N \\
+ \textsc{PostProcess} :& \left\{\phi_1,\phi_2,\ldots,\phi_N\right\} \rightarrow \left\{\langle  \textrm{SVType } s, l_{start}, l_{end} \rangle\right\} 
+\end{flalign*}
+
+The first function, \textsc{Loci}, maps an alignment to a set of genomic locations to which it is relevant for SV detection; for example, the set of locations overlapped by the internal insert implied by the read alignments. We optimize this step by assuming that if there exist concordant mappings for a read pair, defined as those where the two alignments are in the proper orientation and with an insert size within three standard deviations of the expected library insert size, one of them is likely to be correct and therefore we do not consider any discordant alignments of the pair. The second function, $\Phi$, maps a set of SpanningPairInfos relevant to a given location to a set of real-valued vectors of features useful for SV detection. Finally, the \textsc{PostProcess} function maps the complete set of features for each locus across the genome into a set of SV calls characterized by their type $s$ (i.e Deletion, Insertion, etc.) and their breakpoint locations $l_{start}$ and $l_{end}$.
 
 We describe one possible set of functions below; however, we believe that there are many possible mappings that would be useful for different types of SV detection problems that vary in event type sought, depth of coverage, heterogeneity of the sample, etc.
 
@@ -116,7 +129,7 @@ As has been observed elsewhere, there is no available test set of real Illumina 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.6\textwidth]{CHR2SIM_ROC_NEW.pdf}
+\includegraphics[width=0.75\textwidth]{CHR2SIM_ROC_NEW.pdf}
 \caption{ROC curve of deletion prediction performance on a simulated set of reads giving diploid coverage of 30X on human chromosome 2 with deletions from the Venter genome added to one or both haplotypes. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer - score; DELLY, GASVPro, and Pindel - number of supporting read pairs.}
 \label{chr2roc}
 \end{figure}
@@ -184,7 +197,7 @@ Breakdancer & 0.118 & 0.094 & 337 (31) & 137 (4) & 169 (0) & 93 (0) & 293 (2) \\
 
 We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{repmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes highly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible.
 
-\begin{table}
+\begin{table}[b]
 \begin{center}
 \begin{tabular}{rrr|rr}
  & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
@@ -230,7 +243,7 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 
 Cloudbreak is a native Java Hadoop application. We deployed Cloudbreak on a 56-node cluster running the Cloudera CDH3 Hadoop distribution, version 0.20.2-cdh3u4, with snappy compression enabled.
 
-For each evaluated SV detection program we attempt to follow the recommended alignment pipeline. Simulated reads were aligned to hg18 chromosome 2. Cloudbreak alignments were executed in parallel using Hadoop tasks which wrap RazerS 3 version 3.1, with parameters \verb|-rr 99 -i 94 -m 1000|, requesting 99\% sensitivity, a maximum edit distance between read and reference of 6\%, and up to 1000 possible alignments reported for each read. Alignments for the other programs were first aligned using BWA \autocite{Li:2009p836} version 0.6.2-r126, with parameter \verb|-e 5| to allow for longer gaps in alignments due to the number of small indels near the ends of larger indels in the Venter data set. GASVPro also accepts ambiguous mappings; we extracted read pairs that did not align concordantly with BWA and re-aligned them with Novoalign V2.08.01, with parameters \verb|-a -r -Ex 1100 -t 250|. 
+For each evaluated SV detection program we attempt to follow the recommended alignment pipeline. Simulated reads were aligned to hg18 chromosome 2. Cloudbreak alignments were executed in parallel using Hadoop tasks which wrap RazerS 3 version 3.1, with parameters \\ \verb|-rr 99 -i 94 -m 1000|, requesting 99\% sensitivity, a maximum edit distance between read and reference of 6\%, and up to 1000 possible alignments reported for each read. Alignments for the other programs were first aligned using BWA \autocite{Li:2009p836} version 0.6.2-r126, with parameter \verb|-e 5| to allow for longer gaps in alignments due to the number of small indels near the ends of larger indels in the Venter data set. GASVPro also accepts ambiguous mappings; we extracted read pairs that did not align concordantly with BWA and re-aligned them with Novoalign V2.08.01, with parameters \verb|-a -r -Ex 1100 -t 250|. 
 
 We ran Breakdancer version 1.1\_2011\_02\_21 by first executing \verb|bam2cfg.pl| and then running \verb|breakdancer_max| with the default parameter values. We ran DELLY version 0.0.9 with the \verb|-p| parameter and default values for other parameters. We ran GASVPro version 1.2 using the GASVPro.sh script and default parameters. Finally, we ran Pindel 0.2.4t with default parameters.
 
