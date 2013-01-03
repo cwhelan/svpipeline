@@ -31,7 +31,7 @@
 \maketitle
 
 \begin{abstract}
-The detection of genomic structural variations remains one of the the most difficult challenges in analyzing high-throughput sequencing data. Recent approaches have demonstrated that considering multiple mappings of all reads, rather than only uniquely mapped discordant fragments, can improve the performance of read-pair based methods. However, the computational requirements for storing and processing data sets with multiple mappings can be formidable. Meanwhile, the growing size and number of sequencing data sets has led to intense interest in distributing computations to cloud or commodity servers. MapReduce is becoming a standard framework for distributing computation across such compute clusters. We describe a conceptual framework for structural variation detection algorithms in MapReduce based on computing local features along the genome. We demonstrate an implementation of a deletion-finding algorithm in this framework based on fitting a Gaussian mixture model to the distribution of mapped insert sizes spanning each location in the genome. On simulated and real data sets, our approach achieves performance equal to or better than a variety of popular structural variation detection algorithms, including read-pair, split-read, and hybrid approaches, and performs well across a wide range of deletion sizes. In particular, our algorithm excels at discovering deletions of size 40bp-100bp in repetitive regions of the genome. Our implementation is available at \url{http://github.com/cwhelan/cloudbreak}.
+The detection of genomic structural variations remains one of the the most difficult challenges in analyzing high-throughput sequencing data. Recent approaches have demonstrated that considering multiple mappings of all reads, rather than only uniquely mapped discordant fragments, can improve the performance of read-pair based methods. However, the computational requirements for storing and processing data sets with multiple mappings can be formidable. Meanwhile, the growing size and number of sequencing data sets have led to intense interest in distributing computations to cloud or commodity servers. MapReduce is becoming a standard framework for distributing computation across such compute clusters. We describe a novel conceptual framework for structural variation detection algorithms in MapReduce based on computing local features along the genome. In this framework, we develop and evaluate a distributed deletion-finding algorithm based on fitting a Gaussian mixture model to the distribution of mapped insert sizes spanning each location in the genome. On simulated and real data sets, our approach achieves performance equal to or better than a variety of popular structural variation detection algorithms, including read-pair, split-read, and hybrid approaches, and performs well across a wide range of deletion sizes. In particular, our algorithm excels at discovering deletions of size 40bp-100bp in repetitive regions of the genome. Our implementation is available at \url{http://github.com/cwhelan/cloudbreak}.
 \end{abstract}
 
 \newpage
@@ -46,7 +46,7 @@ RP methods have begun to consider larger and larger data sets. Although the firs
 
 Google's MapReduce \autocite{Dean:2008p277} and its open-source implementation Hadoop\footnote{\url{http://hadoop.apache.org/}}, are designed to manage the storage and efficient processing of very large scale data sets across clusters of commodity servers. Use of the Hadoop framework has been demonstrated for sequencing-related bioinformatic tasks including short read mapping, \autocite{Schatz:2009p278} querying variant databases, \autocite{Oconnor:2010p1835} SNP calling, \autocite{Langmead:2009p1225} RNA-seq differential expression analysis, \autocite{Langmead:2010p1268} ChIP-seq peak calling, \autocite{Feng:2011p1228} and computing genome mappability \autocite{Lee:2012bk}. MapReduce requires a specific programming model, however, which can make it difficult to design general-purpose algorithms for arbitrary sequencing analysis problems like SV detection.
 
-In this paper, we describe a framework for solving SV detection problems in Hadoop and MapReduce based on the computation of local features along the genome from paired end mappings. We then demonstrate an implementation of an SV algorithm, Cloudbreak, for discovering genomic deletions, which computes local features based on the insert sizes of spanning mapping. Cloudbreak computes features that build on the ideas of \autocite{Lee:2009da}, who modeled the distribution of insert sizes at each genomic location as a Gaussian Mixture Model (GMM). We then characterize our algorithm's performance on simulated and real data sets.
+In this paper, we describe a framework for solving SV detection problems in Hadoop and MapReduce based on the computation of local features along the genome from paired end mappings. We then demonstrate the development of an SV algorithm, Cloudbreak, for discovering genomic deletions, which computes local features based on the insert sizes of spanning mapping. Cloudbreak computes features that build on the ideas of \autocite{Lee:2009da}, who modeled the distribution of insert sizes at each genomic location as a Gaussian Mixture Model (GMM). We then characterize our algorithm's performance on simulated and real data sets and compare it with those of recently published methods.
 
 \section{A MapReduce Framework for SV Detection Algorithms}
 
@@ -100,7 +100,7 @@ The first function, \textsc{Loci}, maps an alignment to a set of genomic locatio
 
 We describe one possible set of functions below; however, we believe that there are many possible mappings that would be useful for different types of SV detection problems that vary in event type sought, depth of coverage, heterogeneity of the sample, etc.
 
-\subsection{Cloudbreak: A Hadoop Deletion Detection Implementation}
+\subsection{Cloudbreak: A Hadoop Deletion Detection Algorithm}
 
 We have implemented a deletion detection algorithm for medium-to-high coverage diploid samples in this framework called Cloudbreak. 
 \begin{description}
@@ -252,6 +252,8 @@ For each evaluated SV detection program we attempt to follow the recommended ali
 We ran Breakdancer version 1.1\_2011\_02\_21 by first executing \verb|bam2cfg.pl| and then running \verb|breakdancer_max| with the default parameter values. We ran DELLY version 0.0.9 with the \verb|-p| parameter and default values for other parameters. We ran GASVPro version 1.2 using the GASVPro.sh script and default parameters. Finally, we ran Pindel 0.2.4t with default parameters.
 
 \section{Discussion}\label{conclusions}
+
+
 
 \section{Acknowledgements}
 
