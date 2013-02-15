@@ -68,11 +68,11 @@ gasv <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_
 delly <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_del.perf.txt', header=TRUE)
 pindel <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_pindel_D.perf.txt', header=TRUE)
 
-perfsList <- list(breakdancer=breakdancer, gasv=gasv, delly=delly, pindel=pindel, cloudbreak=cloudbreak)
+perfsList <- list(cloudbreak=cloudbreak, breakdancer=breakdancer, pindel=pindel, gasv=gasv, delly=delly, )
 pdf('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_DELS_ROC.pdf', width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsList, 
-        c("Breakdancer","GASVPro", "DELLY", "Pindel", "Cloudbreak"), 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY"), 
         totalDels, "Deletions in Venter diploid chr2 simulation",legendLoc=xy.coords(425,200), maxTP=350)
 dev.off()
 
@@ -82,11 +82,11 @@ cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_alli
 breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/breakdancer_insertions.perf.txt', header=TRUE)
 pindel <- read.table('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.perf.txt', header=TRUE)
 
-perfsList <- list(breakdancer=breakdancer, pindel=pindel, cloudbreak=cloudbreak)
+perfsList <- list(cloudbreak=cloudbreak, breakdancer=breakdancer, pindel=pindel)
 pdf('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf', width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsList, 
-        c("Breakdancer", "Pindel", "Cloudbreak"), 
+        c("Cloudbreak", "Breakdancer","Pindel"), 
         totalInsertions, "Insertions in Venter diploid chr2 simulation",legendLoc=xy.coords(85,50), maxTP=80)
 dev.off()
 
@@ -197,29 +197,29 @@ mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(
 
 # ROC curve
 totalDels <- 10000
-cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/na18507final_readGroupsRazerS3_i94_s99_m1000_None_None_25000_25_sam_6_67eedd7_-1_-1_3_lrHeterozygous.allsvs.short40.perf.txt', header=TRUE, sep="\t")
-breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/breakdancer/NA18507_35_2_3.bd_out.short40.pairthresh.perf.txt', header=TRUE)
-gasv <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/GASVPro/GASVPro.short40.MillsDIP1KG_merged.perf.txt', header=TRUE)
-delly <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/delly/NA18507.delly_q0_c5_del.short40.perf.txt', header=TRUE)
-pindel <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/pindel/bwa_pindel_D.noshort.perf.txt', header=TRUE)
+cloudbreak <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/new_gold_na18507final_readGroupsRazerS3_i94_s99_m1000_None_None_25000_25_sam_6_67eedd7_-1_-1_3_lrHeterozygous.allsvs.short40.perf.txt', header=TRUE, sep="\t")
+breakdancer <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_perf.txt', header=TRUE)
+gasv <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.perf.txt', header=TRUE)
+delly <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del.perf.txt', header=TRUE)
+pindel <- read.table('~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D.perf.txt', header=TRUE)
 
-perfsList <- list(breakdancer=breakdancer, gasv=gasv, pindel=pindel, delly=delly, cloudbreak=cloudbreak)
+perfsList <- list(cloudbreak=cloudbreak, breakdancer=breakdancer, pindel=pindel, gasv=gasv, delly=delly)
 pdf('~/Documents/svpipeline/manuscript/NA18507_ROC.pdf', width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
-plotROC(perfsList, c("Breakdancer","GASVPro", "Pindel", "DELLY", "Cloudbreak"), totalDels, "NA18507", legendLoc=xy.coords(10750,700), maxTP=1300, sim=FALSE)
+plotROC(perfsList, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", "DELLY", "Cloudbreak"), totalDels, "NA18507", legendLoc=xy.coords(10750,700), maxTP=1300, sim=FALSE)
 dev.off()
 
 # break down predictons
 
 cbHitsNA18507 <- processPredictions("Cloudbreak", '~/Documents/gene_rearrange/svpipeline/NA18507/na18507final_readGroupsRazerS3_i94_s99_m1000_None_None_25000_25_sam_6_67eedd7_-1_-1_3_deletions_260.hits.txt', trueDelsNA18507)
 
-bdHitsNA18507 <- processPredictions('Breakdancer', '~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/breakdancer/NA18507_35_2_3.bd_out.dels.pairgte4pt9.hits.txt', trueDelsNA18507)
+bdHitsNA18507 <- processPredictions('Breakdancer', '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3.bd_out.dels.pairgte4pt9.hits.txt', trueDelsNA18507)
 
-gasvHitsNA18507 <- processPredictions('GASVPro', '~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/GASVPro/BAMToGASV.gasvpro.in.ALL.MCMCThreshold.clusters.pruned.clusters.gte14pt8.hits.txt', trueDelsNA18507)
+gasvHitsNA18507 <- processPredictions('GASVPro', '~/Documents/gene_rearrange/svpipeline/NA18507/BAMToGASV.gasvpro.in.ALL.MCMCThreshold.clusters.pruned.clusters.gte14pt8.hits.txt', trueDelsNA18507)
 
-dellyHitsNA18507 <- processPredictions('DELLY', '~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/delly/NA18507.delly_q0_c5_del.gte8pt6.hits.txt', trueDelsNA18507)
+dellyHitsNA18507 <- processPredictions('DELLY', '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del.gte8pt6.hits.txt', trueDelsNA18507)
 
-pindelHitsNA18507 <- processPredictions('Pindel', '~/Documents/gene_rearrange/svpipeline/NA18507/final_predictions/pindel/bwa_pindel.noshort.gte40pt7.hits.txt', trueDelsNA18507)
+pindelHitsNA18507 <- processPredictions('Pindel', '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel.noshort.gte40pt7.hits.txt', trueDelsNA18507)
 
 allpredsNA18507 <- rbind(as.data.frame(cbHitsNA18507),as.data.frame(bdHitsNA18507),as.data.frame(gasvHitsNA18507),as.data.frame(dellyHitsNA18507),as.data.frame(pindelHitsNA18507))
 allpredsNA18507 <- ddply(allpredsNA18507, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
