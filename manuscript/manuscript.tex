@@ -187,13 +187,13 @@ We then tested the predictions made by each algorithm using the same cutoffs tha
 \begin{tabular}{rrr|rrrrr}
   \hline
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
-Total Number & & & 9,980 & 242 & 218 & 110 & 375 \\
+Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
   \hline
-Cloudbreak & 0.100 & \textbf{0.090} & \textbf{436} (174) & 128 (\textbf{9}) & 158 (\textbf{8}) &  70 (\textbf{4}) & 186 (12) \\ 
-Breakdancer & 0.120 & 0.086 & 260 (43) & \textbf{132} (8) & \textbf{167} (2) & \textbf{92} (1) & \textbf{288} (\textbf{14}) \\
-  GASVPro & \textbf{0.127} & 0.048 & 102 (11) &  37 (2) & 77 (0) &  26 (0) & 93 (0) \\ 
-  DELLY & 0.081 & 0.070 & 144 (10) & 125 (8) & 158 (1) &  83 (1) & 256 (3) \\ 
-  Pindel & 0.013 & 0.061 & 414 (\textbf{297}) & 40 (0) & 90 (0) &  37 (0) & 88 (0) \\ 
+Cloudbreak & 0.098 & \textbf{0.115} & \textbf{423} (163) & 128 (\textbf{9}) & 158 (\textbf{8}) &  70 (\textbf{4}) & 186 (12) \\ 
+Breakdancer & 0.097 & 0.111 & 258 (42) & \textbf{132} (8) & \textbf{167} (2) & \textbf{92} (1) & \textbf{288} (\textbf{14}) \\
+  GASVPro & \textbf{0.132} & 0.040 & 102 (11) &  37 (2) & 77 (0) &  26 (0) & 93 (0) \\ 
+  DELLY & 0.081 & 0.091 & 143 (10) & 125 (8) & 158 (1) &  83 (1) & 256 (3) \\ 
+  Pindel & 0.013 & 0.079 & 406 (\textbf{290}) & 40 (0) & 90 (0) &  37 (0) & 88 (0) \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -203,7 +203,7 @@ Breakdancer & 0.120 & 0.086 & 260 (43) & \textbf{132} (8) & \textbf{167} (2) & \
 
 \subsection{Performance in Repetitive Areas}
 
-We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{repmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. In the simulated data set, Cloudbreak correctly identifies 9\% more repeat-overlapping deletions than the nearest competitor. Cloudbreak identifies more deletions in repeats than any other methods, and finds almost four times more exclusive hits than the other RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible.
+We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{repmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. In the simulated data set, Cloudbreak correctly identifies 9\% more repeat-overlapping deletions than the nearest competitor. Cloudbreak identifies more deletions in repeats than any other method, and in the NA18507 data set finds 3.75 times more exclusive hits than the other RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible.
 
 \begin{table}[b]
 \begin{center}
@@ -213,11 +213,11 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 122 & 317 & 604 & 10,321 \\ 
   \hline
-Cloudbreak & \textbf{29} (4) & \textbf{155} (\textbf{19}) & \textbf{204} (\textbf{38}) & \textbf{774} (169) \\ 
-  Breakdancer &  \textbf{29} (\textbf{6}) & 142 (10) & 186 (25) & 753 (43) \\ 
+Cloudbreak & \textbf{29} (4) & \textbf{155} (\textbf{19}) & \textbf{204} (\textbf{38}) & \textbf{761} (158) \\ 
+  Breakdancer &  \textbf{29} (\textbf{6}) & 142 (10) & 186 (25) & 751 (42) \\ 
   GASVPro & 15 (2) & 72 (2) & 71 (5) & 264 (8) \\ 
-  DELLY & 21 (2) & 116 (2) & 147 (12) & 619 (11) \\ 
-  Pindel & 8 (4) & 62 (12) & 98 (26) & 571 (\textbf{271}) \\ 
+  DELLY & 21 (2) & 116 (2) & 147 (12) & 618 (11) \\ 
+  Pindel & 8 (4) & 62 (12) & 98 (26) & 563 (\textbf{264}) \\ 
    \hline
 \end{tabular}
 \end{center}
