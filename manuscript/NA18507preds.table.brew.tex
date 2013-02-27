@@ -1,0 +1,20 @@
+% latex table generated in R 2.15.2 by xtable 1.7-0 package
+% Tue Jan  1 22:36:02 2013
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{rrr|rrrrr}
+  \hline
+ & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+Total Number & & & <%= format(totals['40-100bp'], big.mark=",") %> & <%= format(totals['101-250bp'], big.mark=",") %> & <%= format(totals['251-500bp'], big.mark=",") %> & <%= format(totals['501-1000bp'], big.mark=",") %> & <%= format(totals['> 1000bp'], big.mark=",") %> \\
+  \hline
+Cloudbreak & <%= printPredTableValueFromList('Cloudbreak', precision) %> & <%= printPredTableValueFromList('Cloudbreak', recall) %> & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '> 1000bp') %> \\ 
+Breakdancer & <%= printPredTableValueFromList('Breakdancer', precision) %> & <%= printPredTableValueFromList('Breakdancer', recall) %> & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'Breakdancer', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '> 1000bp') %> \\  
+  GASVPro & <%= printPredTableValueFromList('GASVPro', precision) %> & <%= printPredTableValueFromList('GASVPro',recall) %> & <%= printPredTableCell(preds, exPreds, 'GASVPro', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'GASVPro', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'GASVPro', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'GASVPro', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'GASVPro', '> 1000bp') %> \\ 
+  DELLY & <%= printPredTableValueFromList('DELLY', precision) %> & <%= printPredTableValueFromList('DELLY', recall) %> & <%= printPredTableCell(preds, exPreds, 'DELLY', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'DELLY', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'DELLY', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'DELLY', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'DELLY', '> 1000bp') %> \\ 
+  Pindel & <%= printPredTableValueFromList('Pindel', precision) %> & <%= printPredTableValueFromList('Pindel', recall) %> & <%= printPredTableCell(preds, exPreds, 'Pindel', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'Pindel', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'Pindel', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'Pindel', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'Pindel', '> 1000bp') %> \\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{The precision and recall with respect to the gold standard set of each tool on the NA18507 data, as well as the number of deletions in each size class found. The same cutoffs were used as for the simulated data as in Table \ref{chr2preds}, adjusted for the difference in coverage from 30X to 37X.}
+\label{NA18507preds}
+\end{table}
