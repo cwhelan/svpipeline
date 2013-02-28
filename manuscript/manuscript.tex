@@ -142,7 +142,7 @@ As has been observed elsewhere, there is no available test set of real Illumina 
 \label{chr2roc}
 \end{figure}
 
-Figure \ref{chr2roc} shows an ROC plot of the performance of each algorithm on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. Table \ref{chr2preds} shows the total number of simulated deletions found by each tool when using a threshold that gives an FDR of 0.1 based on the ROC curve, representing cutoffs of 2.1 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 12 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and 33 supporting read pairs for Pindel. Cloudbreak shows excellent sensitivity at detecting deletions from each size class, and contributes a number of exclusive true predictions in both small and medium size classes.
+Figure \ref{chr2roc} shows an ROC plot of the performance of each algorithm on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. Table \ref{chr2DeletionPreds} shows the total number of simulated deletions found by each tool when using a threshold that gives an FDR of 0.1 based on the ROC curve, representing cutoffs of 2.1 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 12 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and 33 supporting read pairs for Pindel. Cloudbreak shows excellent sensitivity at detecting deletions from each size class, and contributes a number of exclusive true predictions in both small and medium size classes.
 
 \begin{table}[t]
 \begin{center}
@@ -151,16 +151,16 @@ Figure \ref{chr2roc} shows an ROC plot of the performance of each algorithm on t
  & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-  Cloudbreak  & 51 (10)  & 51 (\textbf{3}) &  \textbf{55} (\textbf{5}) & \textbf{12} (\textbf{4}) & \textbf{15} (\textbf{1}) \\ 
-  Breakdancer & \textbf{52} (14)  & 49 (2) &  49 (0) & 7 (0) & 14 (0) \\ 
-  GASVPro     & 31 (4)  & 25 (0) &  23 (0) & 2 (0) & 6 (0) \\ 
-  DELLY       & 22 (2)  & \textbf{55} (2) &  40 (0) & 8 (0) & 12 (0) \\ 
-  Pindel      & 29 (\textbf{16})  & 11 (0) &  21 (0) & 1 (0) & 8 (0)\\ 
+  Cloudbreak  &   51 (  10)  &   51 (\textbf{   3}) &  \textbf{  55} (\textbf{   5}) & \textbf{  12} (\textbf{   4}) & \textbf{  15} (\textbf{   1}) \\ 
+  Breakdancer & \textbf{  52} (  14)  &   49 (   2) &    49 (0) &    7 (0) &   14 (0) \\ 
+  GASVPro     &   31 (   4)  &   25 (0) &    23 (0) &    2 (0) &    6 (0) \\ 
+  DELLY       &   22 (   2)  & \textbf{  55} (   2) &    40 (0) &    8 (0) &   12 (0) \\ 
+  Pindel      &   29 (\textbf{  16})  &   11 (0) &    21 (0) &    1 (0) &    8 (0)\\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter deletions found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
-\label{chr2preds}
+\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
+\label{chr2DeletionPreds}
 \end{table}
 
 \subsection{Tests with Biological Data}
@@ -171,17 +171,15 @@ To create a gold standard set of deletions to test against, we pooled annotated 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.75\textwidth]{NA18507_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{NA18507_DELS_ROC.pdf}
 \caption{ROC curve of deletion prediction performance on the 37X NA18507 sample, tested against the combined gold standard deletion set taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}.}
 \label{NA18507roc}
 \end{figure}
 
 Figure \ref{NA18507roc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard deletion set, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at more stringent thresholds, and remains near the top at higher sensitivity levels.
 
-We then tested the predictions made by each algorithm using the same cutoffs that yielded a 10\% FDR on the simulated chromosome 2 data set, adjusted proportionally for the difference in coverage from 30X to 37X. The precision and recall with respect to the gold standard deletion set, as well as the performance of each algorithm at predicting each size class at those cutoffs, is shown in Table \ref{NA18507preds}. Cloudbreak scores well in every category: it identifies more small deletions than any tool except for Pindel, which has low specificity at this cutoff, and contributes more exclusive true positives in larger size classes than any other tool.
+We then tested the predictions made by each algorithm using the same cutoffs that yielded a 10\% FDR on the simulated chromosome 2 data set, adjusted proportionally for the difference in coverage from 30X to 37X. The precision and recall with respect to the gold standard deletion set, as well as the performance of each algorithm at predicting each size class at those cutoffs, is shown in Table \ref{NA18507DeletionPreds}. Cloudbreak scores well in every category: it identifies more small deletions than any tool except for Pindel, which has low specificity at this cutoff, and contributes more exclusive true positives in larger size classes than any other tool.
 
-% latex table generated in R 2.15.2 by xtable 1.7-0 package
-% Tue Jan  1 22:36:02 2013
 \begin{table}[t]
 \begin{center}
 \begin{tabular}{rrr|rrrrr}
@@ -189,21 +187,21 @@ We then tested the predictions made by each algorithm using the same cutoffs tha
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
 Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
   \hline
-Cloudbreak & 0.098 & \textbf{0.115} & \textbf{423} (163) & 128 (\textbf{9}) & 158 (\textbf{8}) &  70 (\textbf{4}) & 186 (12) \\ 
-Breakdancer & 0.097 & 0.111 & 258 (42) & \textbf{132} (8) & \textbf{167} (2) & \textbf{92} (1) & \textbf{288} (\textbf{14}) \\
-  GASVPro & \textbf{0.132} & 0.040 & 102 (11) &  37 (2) & 77 (0) &  26 (0) & 93 (0) \\ 
-  DELLY & 0.081 & 0.091 & 143 (10) & 125 (8) & 158 (1) &  83 (1) & 256 (3) \\ 
-  Pindel & 0.013 & 0.079 & 406 (\textbf{290}) & 40 (0) & 90 (0) &  37 (0) & 88 (0) \\ 
+Cloudbreak & 0.0978 & \textbf{0.115} & \textbf{ 423} ( 163)  &  128 (\textbf{   9}) &   158 (\textbf{   8}) &   70 (\textbf{   4}) &  186 (  12) \\ 
+Breakdancer & 0.119 & 0.111 &  258 (  42)  & \textbf{ 132} (   8) &  \textbf{ 167} (   2) & \textbf{  92} (   1) & \textbf{ 288} (\textbf{  14}) \\  
+  GASVPro & \textbf{0.132} & 0.0399 &  102 (  11)  &   37 (   2) &    77 (0) &   26 (0) &   93 (0) \\ 
+  DELLY & 0.0813 & 0.091 &  143 (  10)  &  125 (   8) &   158 (   1) &   83 (   1) &  256 (   3) \\ 
+  Pindel & 0.0134 & 0.0787 &  406 (\textbf{ 290})  &   40 (0) &    90 (0) &   37 (0) &   88 (0) \\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{The precision and recall with respect to the gold standard set of each tool on the NA18507 data, as well as the number of deletions in each size class found. The same cutoffs were used as for the simulated data as in Table \ref{chr2preds}, adjusted for the difference in coverage from 30X to 37X.}
-\label{NA18507preds}
+\caption{The precision and recall with respect to the gold standard set of each tool on the NA18507 data, as well as the number of deletions in each size class found. The same cutoffs were used as for the simulated data as in Table \ref{chr2DeletionPreds}, adjusted for the difference in coverage from 30X to 37X.}
+\label{NA18507DeletionPreds}
 \end{table}
 
 \subsection{Performance in Repetitive Areas}
 
-We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{repmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. In the simulated data set, Cloudbreak correctly identifies 9\% more repeat-overlapping deletions than the nearest competitor. Cloudbreak identifies more deletions in repeats than any other method, and in the NA18507 data set finds 3.75 times more exclusive hits than the other RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible.
+We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{deletionRepmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. In the simulated data set, Cloudbreak correctly identifies 9\% more repeat-overlapping deletions than the nearest competitor. Cloudbreak identifies more deletions in repeats than any other method, and in the NA18507 data set finds 3.75 times more exclusive hits than the other RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible.
 
 \begin{table}[b]
 \begin{center}
@@ -213,16 +211,16 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 120 & 327 & 553 & 7851 \\ 
   \hline
-  Cloudbreak  & \textbf{29} (4) & \textbf{155} (\textbf{19}) & \textbf{204} (\textbf{38}) & \textbf{761} (158) \\ 
-  Breakdancer & \textbf{29} (\textbf{6}) & 142 (10) & 186 (25) & 751 (42) \\
-  GASVPro     & 15 (2) & 72 (2) & 71 (5) & 264 (8) \\
-  DELLY       & 21 (2) & 116 (2) & 147 (12) & 618 (11) \\
-  Pindel      & 8 (4) & 62 (12) & 98 (26) & 563 (\textbf{264}) \\ 
+  Cloudbreak  & \textbf{  29} (   4) & \textbf{ 155} (\textbf{  19}) & \textbf{ 204} (\textbf{  38}) & \textbf{ 761} ( 158) \\ 
+  Breakdancer & \textbf{  29} (\textbf{   6}) &  142 (  10) &  186 (  25) &  751 (  42) \\
+  GASVPro     &   15 (   2) &   72 (   2) &   71 (   5) &  264 (   8) \\
+  DELLY       &   21 (   2) &  116 (   2) &  147 (  12) &  618 (  11) \\
+  Pindel      &    8 (   4) &   62 (  12) &   98 (  26) &  563 (\textbf{ 264}) \\ 
    \hline
 \end{tabular}
 \end{center}
 \caption{Detected deletions on the simulated and NA18507 data sets identified by each tool, broken down by whether the deletion overlaps with a RepeatMasker-annotated element.}
-\label{repmaskpreds}
+\label{deletionRepmaskpreds}
 \end{table}
 
 \subsection{Genotyping Deletions}
@@ -237,15 +235,14 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 \cline{3-6}
 \multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
 \cline{2-6}
-\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 91 & 3 & 70 & 11 \\
- & Heterozygous & 19 & 71 & 4 & 209 \\
+\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 91 & 3 &  70 & 11 \\
+ & Heterozygous & 19 & 71 &  4 & 209 \\
 \cline{2-6}
 \end{tabular}
 \end{center}
 \caption{Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
 \label{genotypeaccuracy}
 \end{table}
-
 
 \section{Methods}\label{discussion}
 
