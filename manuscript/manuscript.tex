@@ -50,7 +50,7 @@ The first RP methods used only unambiguously discordantly mapped read pairs in t
 
 Google's MapReduce \autocite{Dean:2008p277} and its open-source implementation Hadoop\footnote{\url{http://hadoop.apache.org/}}, are designed to manage the storage and efficient processing of very large scale data sets across clusters of commodity servers. Use of the Hadoop framework has been demonstrated for sequencing-related bioinformatic tasks including short read mapping \autocite{Schatz:2009p278}, querying variant databases \autocite{Oconnor:2010p1835}, SNP calling \autocite{Langmead:2009p1225}, RNA-seq differential expression analysis \autocite{Langmead:2010p1268}, ChIP-seq peak calling \autocite{Feng:2011p1228}, and computing genome mappability \autocite{Lee:2012bk}. MapReduce requires a specific programming model, however, which can make it difficult to design general-purpose algorithms for arbitrary sequencing analysis problems like SV detection.
 
-In this paper, we describe a framework for solving SV detection problems in Hadoop and MapReduce based on the computation of local features along the genome from paired end mappings. We then demonstrate the development in this framework of an algorithm, Cloudbreak, for discovering genomic deletions. Cloudbreak computes local features that build on the ideas of \autocite{Lee:2009da}, who modeled the distribution of insert sizes at each genomic location as a Gaussian Mixture Model (GMM). Use of the Hadoop/MapReduce framework enables scalable implementations of this class of algorithm. We then characterize our algorithm's performance on simulated and real data sets and compare it with those of recently published methods.
+In this paper, we describe a framework for solving SV detection problems in Hadoop and MapReduce based on the computation of local features along the genome from paired end mappings. We then demonstrate the development in this framework of an algorithm, Cloudbreak, for discovering genomic deletions and short insertions. Cloudbreak computes local features that build on the ideas of \autocite{Lee:2009da}, who modeled the distribution of insert sizes at each genomic location as a Gaussian Mixture Model (GMM). Use of the Hadoop/MapReduce framework enables scalable implementations of this class of algorithm. We then characterize our algorithm's performance on simulated and real data sets and compare it with those of recently published methods.
 
 \section{A MapReduce Framework for SV Detection Algorithms}
 
@@ -104,11 +104,11 @@ The first function, \textsc{Loci}, maps an alignment pair to a set of genomic lo
 
 We describe one possible set of functions below; however, we believe that there are many possible definitions that would be useful for different types of SV detection problems that vary in event type sought, depth of coverage of the experiment, heterogeneity of the sample, etc.
 
-\subsection{Cloudbreak: A Hadoop Deletion Detection Algorithm}
+\subsection{Cloudbreak: A Hadoop Indel Detection Algorithm}
 
-We have implemented a deletion detection algorithm for medium-to-high coverage diploid samples in this framework called Cloudbreak. Our implementation defines the three application-specific functions described above as:
+We have implemented an indel detection algorithm for medium-to-high coverage diploid samples in this framework called Cloudbreak. Our implementation defines the three application-specific functions described above as:
 \begin{description}
-\item[\sc{Loci}] Because we are detecting deletions, we map ReadPairInfos from each possible alignment to the genomic locations overlapped by the implied internal insert between the reads. For efficiency, we define a maximum detectable deletion size of 25,000bp, and therefore alignment pairs in which the ends are more than 25kb apart, or in the incorrect orientation, map to no genomic locations.
+\item[\sc{Loci}] Because we are detecting deletions and short insertions, we map ReadPairInfos from each possible alignment to the genomic locations overlapped by the implied internal insert between the reads. For efficiency, we define a maximum detectable deletion size of 25,000bp, and therefore alignment pairs in which the ends are more than 25kb apart, or in the incorrect orientation, map to no genomic locations.
 \item[$\Phi$] To compute features for each genomic location, we follow \textcite{Lee:2009da}, who observed that if all mappings are correct, the insert sizes implied by mappings which span a given genomic location should follow a Gaussian mixture model (GMM) whose parameters depend on whether a deletion or insertion is present at that locus. Briefly: if there is no indel, the insert sizes implied by spanning alignment pairs should follow the distribution of actual fragment sizes in the sample, which is typically modeled as normally distributed with mean $\mu$ and standard deviation $\sigma$. If there is a homozygous deletion or insertion of length $l$ at the location, $\mu$ should be shifted to $\mu + l$, while $\sigma$ will remain constant. Finally, in the case of a heterozygous event, the distribution of insert sizes will follow a mixture of two normal distributions, one with mean $\mu$, and the other with mean $\mu + l$, both with an unchanged standard deviation of $\sigma$, and mixing parameter $\alpha$ that describes the relative weights of the two components. Because the mean and standard deviation of the fragment sizes are selected by the experimenter and therefore known \emph{a priori} (or at least easily estimated based on a sample of alignments), we only need to estimate the mean of the second component at each locus, and the mixing parameter $\alpha$.
 
 To handle incorrect and ambiguous mappings, we assume that in general they will not form normally distributed clusters in the same way that correct mappings will, and therefore use an outlier detection technique to filter the observed insert sizes for each location. We sort the observed insert sizes and define as an outlier an observation whose $k$th nearest neighbor is more than $n\sigma$ distant, where $k = 3$ and $n = 5$. In addition, we rank all observations by the estimated probability that the mapping is correct and use an \emph{adaptive quality cutoff} to filter observations: we discard all observations where the estimated probability the mapping is correct is less than the score of the maximum quality observation minus a constant $c$. This allows the use of more uncertain mappings in repetitive regions of the genome while restricting the use of low-quality mappings in unique regions. We approximate the probability $p^{k}_c$ of each end alignment being correct by:
@@ -121,15 +121,15 @@ We fit the parameters of the GMM using the Expectation-Maximization algorithm. L
 
 The features generated for each location $l$ include the log-likelihood ratio of the filtered observed data points under the fit GMM to their likelihood under the distribution $N(\mu,\sigma)$, the final value of the mixing parameter $\alpha$, and $\mu'$, the estimated mean of the second GMM component.
 
-\item[\sc{PostProcess}] We convert our features along the genome to deletion calls by first extracting contiguous genomic loci where the log-likelihood ratio of the two models is greater than a given threshold. To eliminate noise we apply a median filter with window size 5. We end regions when $\mu'$ changes by more than 60bp ($2\sigma$), and discard regions where the average value of $\mu'$ is less than $\mu$ or where the length of the region differs from $\mu'$ by more than $\mu$.
+\item[\sc{PostProcess}] We convert our features along the genome to insertion and deletion calls by first extracting contiguous genomic loci where the log-likelihood ratio of the two models is greater than a given threshold. To eliminate noise we apply a median filter with window size 5. We end regions when $\mu'$ changes by more than 60bp ($2\sigma$), and discard regions where the average value of $\mu'$ is less than $\mu$ or where the length of the region differs from $\mu'$ by more than $\mu$.
 \end{description}
 
 
 \section{Results}\label{results}
 
-We compared the performance of Cloudbreak for detecting deletions to a selection of popular tools: the RP method Breakdancer \autocite{Chen:2009p3}, GASVPro, an RP method that integrates RD signals and ambiguous mappings to increase sensitivity and specificity \autocite{Sindi:2012kk}, the SR method Pindel \autocite{Ye:2009p2}, and the hybrid RP-SR method DELLY \autocite{Rausch:2012he}. In each case we use default parameters and attempt to follow the recommend pipelines for alignment for each tool (See Methods for details).
+We compared the performance of Cloudbreak for detecting deletions and insertions to a selection of popular tools: the RP method Breakdancer \autocite{Chen:2009p3}, GASVPro, an RP method that integrates RD signals and ambiguous mappings to increase sensitivity and specificity \autocite{Sindi:2012kk}, the SR method Pindel \autocite{Ye:2009p2}, and the hybrid RP-SR method DELLY \autocite{Rausch:2012he}. All of these methods detect deletions; in addition Breakdancer and Pindel are capable of detecting insertions. In each case we use default parameters and attempt to follow the recommend pipelines for alignment for each tool (See Methods for details).
 
-We use the following criteria to define a true prediction given a gold standard set of deletions to test against: A predicted deletion is counted as a true positive if a) it overlaps with a deletion from the gold standard set, b) the length of the predicted call is within 300bp (the library fragment size in both our real and simulated libraries) of the length of the true deletion, and c) the true deletion has not been already been discovered by another prediction from the same method. Furthermore, we find that Pindel is very accurate at discovering deletions less than or equal to 40bp in length, so we exclude from consideration calls that match a true deletion of less than 40bp where the call is less than or equal to 75bp in length. We also discard all Pindel calls of less than or equal to 20bp. It should be noted that the methods tested here vary in their breakpoint resolution: SR methods have higher resolution than RP methods. Cloudbreak sacrifices additional resolution (by dividing the genome into 25bp windows); we strive however to increase sensitivity and specificity in the hopes that such calls could still be useful even if their resolution is limited. This seems reasonable to us given the possibility of pipelines in which RP calls are refined by SR mappings or local assembly methods.
+We use the following criteria to define a true prediction given a gold standard set of deletion and insertion variants to test against: A predicted deletion is counted as a true positive if a) it overlaps with a deletion from the gold standard set, b) the length of the predicted call is within 300bp (the library fragment size in both our real and simulated libraries) of the length of the true deletion, and c) the true deletion has not been already been discovered by another prediction from the same method. For evaluating insertions, each algorithm produces insertion predictions that define an interval in which the insertion is predicted to have occurred with start and end coordinates $s$ and $e$ as well as the predicted length of the insertion, $l$. The true insertions are defined in terms of their actual insertion coordinate $i$ and their actual length $l_a$. Given this information, we modify the overlap criteria in a) to include overlaps of the intervals $\langle s,\max{\left(e,s+l\right)} \rangle$ and $\langle i,i+l_a \rangle$. Furthermore, we find that Pindel is very accurate at discovering deletions less than or equal to 40bp in length, so we exclude from consideration calls that match a true deletion of less than 40bp where the call is less than or equal to 75bp in length. We also discard all Pindel calls of less than or equal to 20bp. It should be noted that the methods tested here vary in their breakpoint resolution: SR methods have higher resolution than RP methods. Cloudbreak sacrifices additional resolution (by dividing the genome into 25bp windows); we strive however to increase sensitivity and specificity in the hopes that such calls could still be useful even if their resolution is limited. This seems reasonable to us given the possibility of pipelines in which RP calls are refined by SR mappings or local assembly methods.
 
 \subsection{Tests with Simulated Data}
 
@@ -139,10 +139,10 @@ As has been observed elsewhere, there is no available test set of real Illumina 
 \centering
 \includegraphics[width=0.75\textwidth]{CHR2SIM_DELS_ROC.pdf}
 \caption{ROC curve of deletion prediction performance on a simulated set of reads giving diploid coverage of 30X on human chromosome 2 with insertions and deletions from the Venter genome added to one or both haplotypes. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer, DELLY, GASVPro, and Pindel - number of supporting read pairs.}
-\label{chr2roc}
+\label{chr2DeletionsRoc}
 \end{figure}
 
-Figure \ref{chr2roc} shows an ROC plot of the performance of each algorithm on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. Table \ref{chr2DeletionPreds} shows the total number of simulated deletions found by each tool when using a threshold that gives an FDR of 0.1 based on the ROC curve, representing cutoffs of 2.1 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 12 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and 33 supporting read pairs for Pindel. Cloudbreak shows excellent sensitivity at detecting deletions from each size class, and contributes a number of exclusive true predictions in both small and medium size classes.
+Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algorithm for detecting deletions on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. Table \ref{chr2DeletionPreds} shows the total number of simulated deletions found by each tool when using a threshold that gives an FDR of 10\% based on the ROC curve, representing cutoffs of 2.1 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 12 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and 33 supporting read pairs for Pindel. Cloudbreak shows excellent sensitivity at detecting deletions from each size class, and contributes a number of exclusive true predictions in both small and medium size classes.
 
 \begin{table}[t]
 \begin{center}
@@ -163,20 +163,46 @@ Figure \ref{chr2roc} shows an ROC plot of the performance of each algorithm on t
 \label{chr2DeletionPreds}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\textwidth]{CHR2SIM_INS_ROC.pdf}
+\caption{ROC curve of insertion prediction performance on the chromosome 2 simulated data set.}
+\label{chr2InsertionsRoc}
+\end{figure}
+
+An ROC curve for insertion prediction performance is shown in Figure \ref{chr2InsertionsRoc}. Cloudbreak shows excellent specificity and greater sensitivity than Breakdancer, the other read-pair based method that predicts insertions. The number of insertions identified by each algorithm at maximum sensitivity, again broken down by size, is shown in Table \ref{chr2InsertionPreds}.
+
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{rrrrrr}
+  \hline
+ & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+ Total Number & 199 &  83 & 79 &  21 & 21\\ 
+  \hline
+  Cloudbreak  & \textbf{  49} (  25)  &    5 (   3) &     2 (   1) & 0 (0) & 0 (0) \\ 
+  Breakdancer &   23 (  10)  & \textbf{  14} (\textbf{  11}) &     2 (   1) & 0 (0) & 0 (0) \\ 
+  Pindel      &   47 (\textbf{  30})  &    7 (   4) &  \textbf{  10} (\textbf{  10}) & \textbf{   3} (\textbf{   3}) & \textbf{   9} (\textbf{   9})\\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{The number of simulated insertions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those insertions that were discovered exclusively by each tool (in parentheses). The total number of insertions in each size class in the true set of insertions is shown in the second row of the header.}
+\label{chr2InsertionPreds}
+\end{table}
+
 \subsection{Tests with Biological Data}
 
 We downloaded a data set of reads taken from a DNA sample of Yoruban individual NA18507, experiment ERX009609 from the Sequence Read Archive.\footnote{\url{http://sra.dnanexus.com/experiments/ERX009609}} This sample was sequenced on the Illumina Genome Analyzer II platform with 100bp paired end reads and a mean fragment size (minus adapters) of 300bp, with a standard deviation of 15bp. The sample was sequenced to a depth of approximately 37X coverage.
 
-To create a gold standard set of deletions to test against, we pooled annotated deletions discovered by three previous studies on the same sample. These included data from the Human Genome Structural Variation Project\footnote{\url{http://hgsv.washington.edu/general/download/SNPs_DIPs/}} reported by \textcite{Kidd:2008p926}, a survey of small indels conducted by \textcite{Mills:2011fi}, and deletions from the merged call set of the phase 1 release of the 1000 Genomes Project \autocite{GenomesProjectConsortium:2012co} which were genotyped as present in NA18507. We merged any overlapping calls into the region spanned by their unions. It should be noted that the 1000 Genomes call set was partially produced using DELLY and Breakdancer, and therefore those calls are ones that those tools are sensitive to, biasing this test in their favor.
+To create a gold standard set of insertions and deletions to test against, we pooled annotated variants discovered by three previous studies on the same sample. These included data from the Human Genome Structural Variation Project\footnote{\url{http://hgsv.washington.edu/general/download/SNPs_DIPs/}} reported by \textcite{Kidd:2008p926}, a survey of small indels conducted by \textcite{Mills:2011fi}, and insertions and deletions from the merged call set of the phase 1 release of the 1000 Genomes Project \autocite{GenomesProjectConsortium:2012co} which were genotyped as present in NA18507. We merged any overlapping calls of the same type into the region spanned by their unions. It should be noted that the 1000 Genomes call set was partially produced using DELLY and Breakdancer, and therefore those calls are ones that those tools are sensitive to, biasing this test in their favor.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.75\textwidth]{NA18507_DELS_ROC.pdf}
 \caption{ROC curve of deletion prediction performance on the 37X NA18507 sample, tested against the combined gold standard deletion set taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}.}
-\label{NA18507roc}
+\label{NA18507DeletionsRoc}
 \end{figure}
 
-Figure \ref{NA18507roc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard deletion set, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at more stringent thresholds, and remains near the top at higher sensitivity levels.
+Figure \ref{NA18507DeletionsRoc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard deletion set, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at more stringent thresholds, and remains near the top at higher sensitivity levels.
 
 We then tested the predictions made by each algorithm using the same cutoffs that yielded a 10\% FDR on the simulated chromosome 2 data set, adjusted proportionally for the difference in coverage from 30X to 37X. The precision and recall with respect to the gold standard deletion set, as well as the performance of each algorithm at predicting each size class at those cutoffs, is shown in Table \ref{NA18507DeletionPreds}. Cloudbreak scores well in every category: it identifies more small deletions than any tool except for Pindel, which has low specificity at this cutoff, and contributes more exclusive true positives in larger size classes than any other tool.
 
@@ -199,9 +225,35 @@ Breakdancer & 0.119 & 0.111 &  258 (  42)  & \textbf{ 132} (   8) &  \textbf{ 16
 \label{NA18507DeletionPreds}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\textwidth]{NA18507_INS_ROC.pdf}
+\caption{ROC curve of insertion prediction performance on the 37X NA18507 sample.}
+\label{NA18507InsertionsRoc}
+\end{figure}
+
+A similar ROC-like curve for insertions on the NA18507 data set is shown in Figure \ref{NA18507InsertionsRoc}. Breakdancer and Cloudbreak show similar performance at higher thresholds near the lower left corner of the plot; however, Cloudbreak is able to detect more variants at lower thresholds. The number of insertions detected at maximum sensitivity for the three algorithms is shown in Table \ref{NA18507InsertionPreds}, along with their precision and recall at that threshold.
+
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{rrr|rrrrr}
+  \hline
+ & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp \\ 
+Total Number & & & 536 & 114 & 45 & 1 \\
+  \hline
+Cloudbreak & 0.000626 & \textbf{0.412} & \textbf{ 265} (\textbf{  95})  &   20 (   8) &     2 (   1) & 0 (0) \\ 
+Breakdancer & \textbf{0.0267} & 0.181 &   97 (  16)  & \textbf{  27} (\textbf{  13}) &     2 (   1) & 0 (0) \\  
+  Pindel & 0.00793 & 0.239 &  144 (  29)  &   14 (  12) &  \textbf{   7} (\textbf{   7}) & \textbf{   1} (\textbf{   1})  \\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{The precision and recall with respect to the gold standard set of insertions for each tool on the NA18507 data, as well as the number of insertions in each size class found, at maximum sensitivity.}
+\label{NA18507InsertionPreds}
+\end{table}
+
 \subsection{Performance in Repetitive Areas}
 
-We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{deletionRepmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. In the simulated data set, Cloudbreak correctly identifies 9\% more repeat-overlapping deletions than the nearest competitor. Cloudbreak identifies more deletions in repeats than any other method, and in the NA18507 data set finds 3.75 times more exclusive hits than the other RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible.
+We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements (Table \ref{deletionRepmaskpreds}) in both the simulated and NA18507 data sets, especially compared to the RP-based methods. In the simulated data set, Cloudbreak correctly identifies 9\% more repeat-overlapping deletions than the nearest competitor. Cloudbreak identifies more deletions in repeats than any other method, and in the NA18507 data set finds 3.75 times more exclusive hits than the other RP-based methods. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible. Performance on insertions is displayed in Table \ref{insertionRepmaskpreds}.
 
 \begin{table}[b]
 \begin{center}
@@ -223,9 +275,27 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
 \label{deletionRepmaskpreds}
 \end{table}
 
-\subsection{Genotyping Deletions}
+\begin{table}[b]
+\begin{center}
+\begin{tabular}{rrr|rr}
+ & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
+\hline
+ &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
+ Total Number & 133 & 270 & 341 & 355 \\ 
+  \hline
+  Cloudbreak  &   16 (   4) &   40 (  25) & \textbf{ 146} (\textbf{  44}) & \textbf{ 141} (\textbf{  60}) \\ 
+  Breakdancer &   17 (   9) &   22 (  13) &   82 (  17) &   44 (  13) \\
+  Pindel      & \textbf{  26} (\textbf{  20}) & \textbf{  50} (\textbf{  36}) &   84 (  29) &   82 (  20) \\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{Detected insertions in the simulated and NA18507 data sets identified by each tool, broken down by whether the insertion occurs in a RepeatMasker-annotated element.}
+\label{insertionRepmaskpreds}
+\end{table}
 
-Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing a deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak deletion predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .2 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 88.0\% and 94.9\% accuracy in predicting the genotype of the true positive deletions we detected in the simulated and real data sets, respectively. Table \ref{genotypeaccuracy} shows confusion matrices for the two samples using this classifier.
+\subsection{Genotyping Variants}
+
+Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing an insertion or deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For benchmarking genotyyping of deletions in the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .2 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 88.0\% and 94.9\% accuracy in predicting the genotype of the true positive deletions we detected in the simulated and real data sets, respectively. Table \ref{deletionGenotypeaccuracy} shows confusion matrices for the two samples using this classifier. For insertions, none of the three input sets that made up the gold standard for NA18507 contained a sufficient number of insertion rates that meet our size threshold that also had genotyping information. Of the 56 insertions detected by Cloudbreak on the simulated data set, only 4 were heterozygous. Using another simple cutoff on $\alpha$, this time with a value of .3, Cloudbreak correctly classified 50 of the 52 homozygous insertions and 3 of the four heterozygous insertions discovered.
 
 \begin{table}
 \begin{center}
@@ -241,7 +311,7 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 \end{tabular}
 \end{center}
 \caption{Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
-\label{genotypeaccuracy}
+\label{deletionGenotypeaccuracy}
 \end{table}
 
 \section{Methods}\label{discussion}

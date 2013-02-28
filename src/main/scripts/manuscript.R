@@ -172,7 +172,7 @@ gasvChr2DeletionPerf <- read.table(gasvProChr2DeletionPerfFile, header=TRUE)
 dellyChr2DeletionPerf <- read.table(dellyChr2DeletionPerfFile, header=TRUE)
 pindelChr2DeletionPerf <- read.table(pindelChr2DeletionPerfFile, header=TRUE)
 
-perfsList <- list(cloudbreak=cloudbreakChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, pindel=pindelChr2DeletionPerf)
+perfsList <- list(cloudbreak=cloudbreakChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf)
 pdf('~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_DELS_ROC.pdf', width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsList, 
@@ -360,7 +360,7 @@ NA18507dellyDelsPerf <- read.table(dellyNA18507DeletionPerfFile, header=TRUE)
 NA18507pindelDelsPerf <- read.table(pindelNA18507DeletionPerfFile, header=TRUE)
 
 perfsList <- list(cloudbreak=NA18507cloudbreakDelsPerf, breakdancer=NA18507breakdancerDelsPerf, pindel=NA18507pindelDelsPerf, gasv=NA18507gasvDelsPerf, delly=NA18507dellyDelsPerf)
-pdf('~/Documents/svpipeline/manuscript/NA18507_ROC.pdf', width=10)
+pdf('~/Documents/svpipeline/manuscript/NA18507_DELS_ROC.pdf', width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsList, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", "DELLY", "Cloudbreak"), totalDels, "NA18507", legendLoc=xy.coords(10750,700), maxTP=1300, sim=FALSE)
 dev.off()
@@ -451,7 +451,6 @@ mcols(trueInsertionsNA18507)$sizeclasses <- factor(as.character(sizeclasses(mcol
 mcols(trueInsertionsNA18507)$repMask <- 0
 mcols(trueInsertionsNA18507[as.matrix(findOverlaps(repMaskHg19,trueInsertionsNA18507))[,2]])$repMask <- 1
 
-trueInsertionsNA18507Gte40 <- trueInsertionsNA18507[mcols(trueInsertionsNA18507)$length >= 40]
 trueInsertionsNA18507Sizes <- table(trueInsertionsNA18507Gte40$sizeclasses)
 
 trueInsertionsNA18507Repmask <- table(trueInsertionsNA18507Gte40$repMask)
@@ -490,7 +489,7 @@ totalNA18507InsertionPredictions <- list(Cloudbreak=totalCloudbreakNA18507Insert
 totalNumNA18507InsertionHits <- list(list(Cloudbreak=dim(cbInsertionsNA18507)[1], Breakdancer=dim(bdInsertionsNA18507)[1], Pindel=dim(pindelInsertionsNA18507)[1]))
 
 # tabulate against true insertion data
-trueInsertionsNA18507Gte40 <- trueInsertionsNA18507[end(trueInsertions) - start(trueInsertions) >= 40]
+trueInsertionsNA18507Gte40 <- trueInsertionsNA18507[mcols(trueInsertionsNA18507)$length >= 40]
 trueInsertionsNA18507Sizes <- table(trueInsertionsNA18507Gte40$sizeclasses)
 trueInsertionsNA18507Haps <- table(trueInsertionsNA18507Gte40$haps)
 trueInsertionsNA18507Repmask <- table(trueInsertionsNA18507Gte40$repMask)
@@ -554,7 +553,7 @@ assign("preds", NA18507insertionPredsBySize, envir=tableEnv)
 assign("exPreds", NA18507insertionExPredsBySize, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/NA18507InsertionPredsBySize.table.brew.tex', env=tableEnv)
 
-# repetitive regions
+# deletions in repetitive regions
 tableEnv = new.env()
 assign("chr2Totals", trueDelRepmask, envir=tableEnv)
 assign("chr2Preds", predsByRepMask, envir=tableEnv)
@@ -562,11 +561,21 @@ assign("chr2ExPreds", exPredsByRepMask, envir=tableEnv)
 assign("NA18507Totals", trueDelRepmaskNA18507, envir=tableEnv)
 assign("NA18507Preds", predsByRepMaskNA18507, envir=tableEnv)
 assign("NA18507ExPreds", exByRepMaskNA18507, envir=tableEnv)
-brew('~/Documents/svpipeline/manuscript/repmask.table.brew.tex', env=tableEnv)
+brew('~/Documents/svpipeline/manuscript/deletionRepmask.table.brew.tex', env=tableEnv)
+
+# insertions in repetitive regions
+tableEnv = new.env()
+assign("chr2Totals", trueInsertionsRepmask, envir=tableEnv)
+assign("chr2Preds", insertionPredsByRepMask, envir=tableEnv)
+assign("chr2ExPreds", insertionExPredsByRepMask, envir=tableEnv)
+assign("NA18507Totals", trueInsertionsNA18507Repmask, envir=tableEnv)
+assign("NA18507Preds", NA18507insertionPredsByRepMask, envir=tableEnv)
+assign("NA18507ExPreds", NA18507insertionExPredsByRepMask, envir=tableEnv)
+brew('~/Documents/svpipeline/manuscript/insertionRepmask.table.brew.tex', env=tableEnv)
 
 # genotyping
 tableEnv = new.env()
 assign("chr2HapCM", chr2HapCM, envir=tableEnv)
 assign("NA18507HapCM", NA18507HapCM, envir=tableEnv)
-brew('~/Documents/svpipeline/manuscript/genotypeaccuracy.table.brew.tex', env=tableEnv)
+brew('~/Documents/svpipeline/manuscript/deletionGenotypeAccuracy.table.brew.tex', env=tableEnv)
 

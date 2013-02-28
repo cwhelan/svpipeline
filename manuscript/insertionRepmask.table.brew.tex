@@ -1,0 +1,17 @@
+\begin{table}[b]
+\begin{center}
+\begin{tabular}{rrr|rr}
+ & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
+\hline
+ &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
+ Total Number & <%= chr2Totals['0'] %> & <%= chr2Totals['1'] %> & <%= NA18507Totals['0'] %> & <%= NA18507Totals['1'] %> \\ 
+  \hline
+  Cloudbreak  & <%= printPredTableCell(chr2Preds, chr2ExPreds, 'Cloudbreak', '0') %> & <%= printPredTableCell(chr2Preds, chr2ExPreds, 'Cloudbreak', '1') %> & <%= printPredTableCell(NA18507Preds, NA18507ExPreds, 'Cloudbreak', '0') %> & <%= printPredTableCell(NA18507Preds, NA18507ExPreds, 'Cloudbreak', '1') %> \\ 
+  Breakdancer & <%= printPredTableCell(chr2Preds, chr2ExPreds, 'Breakdancer', '0') %> & <%= printPredTableCell(chr2Preds, chr2ExPreds, 'Breakdancer', '1') %> & <%= printPredTableCell(NA18507Preds, NA18507ExPreds, 'Breakdancer', '0') %> & <%= printPredTableCell(NA18507Preds, NA18507ExPreds, 'Breakdancer', '1') %> \\
+  Pindel      & <%= printPredTableCell(chr2Preds, chr2ExPreds, 'Pindel', '0') %> & <%= printPredTableCell(chr2Preds, chr2ExPreds, 'Pindel', '1') %> & <%= printPredTableCell(NA18507Preds, NA18507ExPreds, 'Pindel', '0') %> & <%= printPredTableCell(NA18507Preds, NA18507ExPreds, 'Pindel', '1') %> \\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{Detected insertions in the simulated and NA18507 data sets identified by each tool, broken down by whether the insertion occurs in a RepeatMasker-annotated element.}
+\label{insertionRepmaskpreds}
+\end{table}
