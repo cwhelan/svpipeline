@@ -127,7 +127,7 @@ The features generated for each location $l$ include the log-likelihood ratio of
 
 \section{Results}\label{results}
 
-We compared the performance of Cloudbreak for detecting deletions and insertions to a selection of popular tools: the RP method Breakdancer \autocite{Chen:2009p3}, GASVPro, an RP method that integrates RD signals and ambiguous mappings to increase sensitivity and specificity \autocite{Sindi:2012kk}, the SR method Pindel \autocite{Ye:2009p2}, and the hybrid RP-SR method DELLY \autocite{Rausch:2012he}. All of these methods detect deletions; in addition Breakdancer and Pindel are capable of detecting insertions. In each case we use default parameters and attempt to follow the recommend pipelines for alignment for each tool (See Methods for details).
+We compared the performance of Cloudbreak for detecting deletions and insertions to a selection of popular tools: the RP method Breakdancer \autocite{Chen:2009p3}, GASVPro, an RP method that integrates RD signals and ambiguous mappings to increase sensitivity and specificity \autocite{Sindi:2012kk}, the SR method Pindel \autocite{Ye:2009p2}, and the hybrid RP-SR method DELLY \autocite{Rausch:2012he}. We also attempted to evaluate MoDIL on the same data. All of these methods detect deletions; in addition Breakdancer, Pindel, and MoDIL are capable of detecting insertions. In each case we use default parameters and attempt to follow the recommend pipelines for alignment for each tool (See Methods for details).
 
 We use the following criteria to define a true prediction given a gold standard set of deletion and insertion variants to test against: A predicted deletion is counted as a true positive if a) it overlaps with a deletion from the gold standard set, b) the length of the predicted call is within 300bp (the library fragment size in both our real and simulated libraries) of the length of the true deletion, and c) the true deletion has not been already been discovered by another prediction from the same method. For evaluating insertions, each algorithm produces insertion predictions that define an interval in which the insertion is predicted to have occurred with start and end coordinates $s$ and $e$ as well as the predicted length of the insertion, $l$. The true insertions are defined in terms of their actual insertion coordinate $i$ and their actual length $l_a$. Given this information, we modify the overlap criteria in a) to include overlaps of the intervals $\langle s,\max{\left(e,s+l\right)} \rangle$ and $\langle i,i+l_a \rangle$. Furthermore, we find that Pindel is very accurate at discovering deletions less than or equal to 40bp in length, so we exclude from consideration calls that match a true deletion of less than 40bp where the call is less than or equal to 75bp in length. We also discard all Pindel calls of less than or equal to 20bp. It should be noted that the methods tested here vary in their breakpoint resolution: SR methods have higher resolution than RP methods. Cloudbreak sacrifices additional resolution (by dividing the genome into 25bp windows); we strive however to increase sensitivity and specificity in the hopes that such calls could still be useful even if their resolution is limited. This seems reasonable to us given the possibility of pipelines in which RP calls are refined by SR mappings or local assembly methods.
 
@@ -137,12 +137,14 @@ As has been observed elsewhere, there is no available test set of real Illumina 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.75\textwidth]{CHR2SIM_DELS_ROC.pdf}
-\caption{ROC curve of deletion prediction performance on a simulated set of reads giving diploid coverage of 30X on human chromosome 2 with insertions and deletions from the Venter genome added to one or both haplotypes. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer, DELLY, GASVPro, and Pindel - number of supporting read pairs.}
+\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_DELS_ROC.pdf}
+\caption{ROC curve of deletion prediction performance on a simulated set of reads giving diploid coverage of 30X on human chromosome 2 with insertions and deletions from the Venter genome added to one or both haplotypes. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score.}
 \label{chr2DeletionsRoc}
 \end{figure}
 
-Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algorithm for detecting deletions on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. Table \ref{chr2DeletionPreds} shows the total number of simulated deletions found by each tool when using a threshold that gives an FDR of 10\% based on the ROC curve, representing cutoffs of 2.1 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 12 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and 33 supporting read pairs for Pindel. Cloudbreak shows excellent sensitivity at detecting deletions from each size class, and contributes a number of exclusive true predictions in both small and medium size classes.
+Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algorithm for detecting deletions on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY.  
+
+Choosing the correct operating point or threshold can be difficult when operating on a new data set, but the use of simulated data and ROC curves allows for some investigation of the perfomance characteristics of algorithms at varying levels. First, we used the results on simulated deletions to characterize the predictions made by each algorithm when a low false discovery rate is required. Table \ref{chr2DeletionPredsFDR10} shows the total number of simulated deletions found by each tool when using a threshold that gives an FDR of 10\% based on the ROC curve, representing cutoffs of 2.18 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 12 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and a simple score of 13 Pindel. Cloudbreak shows excellent sensitivity at detecting deletions from each size class, and contributes a number of exclusive true predictions in both small and medium size classes. The output which we obtained from MoDIL did not have a threshold or operating point that correlated with the tradeoff between precision and recall; therefore it is not included in this table.
 
 \begin{table}[t]
 \begin{center}
@@ -151,21 +153,43 @@ Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algor
  & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-  Cloudbreak  &   51 (  10)  &   51 (\textbf{   3}) &  \textbf{  55} (\textbf{   5}) & \textbf{  12} (\textbf{   4}) & \textbf{  15} (\textbf{   1}) \\ 
-  Breakdancer & \textbf{  52} (  14)  &   49 (   2) &    49 (0) &    7 (0) &   14 (0) \\ 
-  GASVPro     &   31 (   4)  &   25 (0) &    23 (0) &    2 (0) &    6 (0) \\ 
-  DELLY       &   22 (   2)  & \textbf{  55} (   2) &    40 (0) &    8 (0) &   12 (0) \\ 
-  Pindel      &   29 (\textbf{  16})  &   11 (0) &    21 (0) &    1 (0) &    8 (0)\\ 
+  Cloudbreak  &   47 (   7)  &   50 (   2) &  \textbf{  55} (\textbf{   4}) & \textbf{  12} (\textbf{   4}) & \textbf{  15} (\textbf{0}) \\ 
+  Breakdancer &   52 (  10)  &   49 (   2) &    49 (0) &    7 (0) &   14 (\textbf{0}) \\ 
+  GASVPro     &   31 (   4)  &   25 (0) &    23 (0) &    2 (0) &    6 (\textbf{0}) \\ 
+  DELLY       &   22 (   2)  & \textbf{  56} (\textbf{   3}) &    40 (0) &    8 (0) &   12 (\textbf{0}) \\ 
+  Pindel      & \textbf{  60} (\textbf{  35})  &   16 (0) &    41 (   2) &    1 (0) &   12 (\textbf{0})\\ 
    \hline
 \end{tabular}
 \end{center}
 \caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
-\label{chr2DeletionPreds}
+\label{chr2DeletionPredsFDR10}
+\end{table}
+
+We also characterized the predictions made by each algorithm at the operating point which gives them maximum sensitivity. For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low. The results are summarized in Table \ref{chr2DeletionPredsMaxSensitivity}. MoDIL has the greatest sensitivity but the precision is extremely low.
+
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{rrrrrr}
+  \hline
+ & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+ Total Number & 224 &  84 & 82 &  31 & 26\\ 
+  \hline
+  Cloudbreak  & \textbf{ 155} (\textbf{  11})  &   57 (\textbf{   3}) &    65 (   2) &   15 (0) &   15 (0) \\ 
+  Breakdancer &   89 (0)  &   54 (0) &    53 (0) &    8 (0) &   15 (0) \\ 
+  GASVPro     &   83 (   2)  &   32 (0) &    55 (0) &    8 (0) &   15 (0) \\ 
+  DELLY       &  114 (   7)  & \textbf{  68} (   2) &  \textbf{  66} (   1) &    9 (0) &   17 (   1) \\ 
+  Pindel      &   96 (  10)  &   24 (0) &    48 (0) &    5 (0) &   15 (0)\\ 
+  MoDIL      &  124 (   6)  &   66 (\textbf{   3}) &  \textbf{  66} (\textbf{   6}) & \textbf{  17} (\textbf{   4}) & \textbf{  23} (\textbf{   8})\\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header. TODO: Add precision and recall!!!!!}
+\label{chr2DeletionPredsMaxSensitivity}
 \end{table}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.75\textwidth]{CHR2SIM_INS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf}
 \caption{ROC curve of insertion prediction performance on the chromosome 2 simulated data set.}
 \label{chr2InsertionsRoc}
 \end{figure}
@@ -179,13 +203,13 @@ An ROC curve for insertion prediction performance is shown in Figure \ref{chr2In
  & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number & 199 &  83 & 79 &  21 & 21\\ 
   \hline
-  Cloudbreak  & \textbf{  49} (  25)  &    5 (   3) &     2 (   1) & 0 (0) & 0 (0) \\ 
-  Breakdancer &   23 (  10)  & \textbf{  14} (\textbf{  11}) &     2 (   1) & 0 (0) & 0 (0) \\ 
-  Pindel      &   47 (\textbf{  30})  &    7 (   4) &  \textbf{  10} (\textbf{  10}) & \textbf{   3} (\textbf{   3}) & \textbf{   9} (\textbf{   9})\\ 
+  Cloudbreak  & \textbf{  65} (\textbf{  28})  &    9 (   5) &     3 (   2) &    1 (   1) & 0 (0) \\ 
+  Breakdancer &   23 (   8)  & \textbf{  14} (\textbf{  10}) &     2 (   1) & 0 (0) & 0 (0) \\ 
+  Pindel      &   52 (  26)  &    5 (   4) &  \textbf{  10} (\textbf{  10}) & \textbf{   3} (\textbf{   3}) & \textbf{   9} (\textbf{   9})\\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{The number of simulated insertions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those insertions that were discovered exclusively by each tool (in parentheses). The total number of insertions in each size class in the true set of insertions is shown in the second row of the header.}
+\caption{The number of simulated insertions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those insertions that were discovered exclusively by each tool (in parentheses). The total number of insertions in each size class in the true set of insertions is shown in the second row of the header. TODO: Add modil!!!! TODO: Add precision and recall!!!}
 \label{chr2InsertionPreds}
 \end{table}
 
@@ -195,9 +219,11 @@ We downloaded a data set of reads taken from a DNA sample of Yoruban individual 
 
 To create a gold standard set of insertions and deletions to test against, we pooled annotated variants discovered by three previous studies on the same sample. These included data from the Human Genome Structural Variation Project\footnote{\url{http://hgsv.washington.edu/general/download/SNPs_DIPs/}} reported by \textcite{Kidd:2008p926}, a survey of small indels conducted by \textcite{Mills:2011fi}, and insertions and deletions from the merged call set of the phase 1 release of the 1000 Genomes Project \autocite{GenomesProjectConsortium:2012co} which were genotyped as present in NA18507. We merged any overlapping calls of the same type into the region spanned by their unions. It should be noted that the 1000 Genomes call set was partially produced using DELLY and Breakdancer, and therefore those calls are ones that those tools are sensitive to, biasing this test in their favor.
 
+We were unable to run MoDIL on the whole-genome data set due to the estimated runtime and storage requirements.
+
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.75\textwidth]{NA18507_DELS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/NA18507/NA18507_DELS_ROC.pdf}
 \caption{ROC curve of deletion prediction performance on the 37X NA18507 sample, tested against the combined gold standard deletion set taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}.}
 \label{NA18507DeletionsRoc}
 \end{figure}
@@ -213,21 +239,21 @@ We then tested the predictions made by each algorithm using the same cutoffs tha
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
 Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
   \hline
-Cloudbreak & 0.0978 & \textbf{0.115} & \textbf{ 423} ( 163)  &  128 (\textbf{   9}) &   158 (\textbf{   8}) &   70 (\textbf{   4}) &  186 (  12) \\ 
-Breakdancer & 0.119 & 0.111 &  258 (  42)  & \textbf{ 132} (   8) &  \textbf{ 167} (   2) & \textbf{  92} (   1) & \textbf{ 288} (\textbf{  14}) \\  
-  GASVPro & \textbf{0.132} & 0.0399 &  102 (  11)  &   37 (   2) &    77 (0) &   26 (0) &   93 (0) \\ 
-  DELLY & 0.0813 & 0.091 &  143 (  10)  &  125 (   8) &   158 (   1) &   83 (   1) &  256 (   3) \\ 
-  Pindel & 0.0134 & 0.0787 &  406 (\textbf{ 290})  &   40 (0) &    90 (0) &   37 (0) &   88 (0) \\ 
+Cloudbreak & 0.0978 & \textbf{0.115} & \textbf{ 423} (\textbf{ 179})  &  128 (\textbf{   9}) &   158 (\textbf{   8}) &   70 (\textbf{   3}) &  186 (\textbf{  12}) \\ 
+Breakdancer & 0.122 & 0.112 &  261 (  41)  & \textbf{ 132} (   8) &  \textbf{ 167} (   1) & \textbf{  92} (0) & \textbf{ 288} (  10) \\  
+  GASVPro & 0.134 & 0.0401 &  104 (  17)  &   37 (   2) &    77 (0) &   26 (0) &   93 (0) \\ 
+  DELLY & 0.0824 & 0.091 &  143 (   9)  &  125 (   7) &   158 (   1) &   83 (   1) &  256 (   3) \\ 
+  Pindel & \textbf{0.16} & 0.0685 &  149 (  12)  &   57 (0) &   140 (   1) &   58 (0) &  172 (   2) \\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{The precision and recall with respect to the gold standard set of each tool on the NA18507 data, as well as the number of deletions in each size class found. The same cutoffs were used as for the simulated data as in Table \ref{chr2DeletionPreds}, adjusted for the difference in coverage from 30X to 37X.}
+\caption{The precision and recall with respect to the gold standard set of each tool on the NA18507 data, as well as the number of deletions in each size class found. The same cutoffs were used as for the simulated data as in Table \ref{chr2DeletionPredsFDR10}, adjusted for the difference in coverage from 30X to 37X.}
 \label{NA18507DeletionPreds}
 \end{table}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.75\textwidth]{NA18507_INS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/NA18507/NA18507_INS_ROC.pdf}
 \caption{ROC curve of insertion prediction performance on the 37X NA18507 sample.}
 \label{NA18507InsertionsRoc}
 \end{figure}
@@ -241,9 +267,9 @@ A similar ROC-like curve for insertions on the NA18507 data set is shown in Figu
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp \\ 
 Total Number & & & 536 & 114 & 45 & 1 \\
   \hline
-Cloudbreak & 0.000626 & \textbf{0.412} & \textbf{ 265} (\textbf{  95})  &   20 (   8) &     2 (   1) & 0 (0) \\ 
-Breakdancer & \textbf{0.0267} & 0.181 &   97 (  16)  & \textbf{  27} (\textbf{  13}) &     2 (   1) & 0 (0) \\  
-  Pindel & 0.00793 & 0.239 &  144 (  29)  &   14 (  12) &  \textbf{   7} (\textbf{   7}) & \textbf{   1} (\textbf{   1})  \\ 
+Cloudbreak & 0.0365 & 0.198 &  127 (  28)  &   11 (   3) &  0 (0) & 0 (0) \\ 
+Breakdancer & 0.0104 & 0.181 &   97 (  36)  & \textbf{  27} (\textbf{  17}) &     2 (   2) & 0 (0) \\  
+  Pindel & \textbf{0.0387} & \textbf{0.239} & \textbf{ 144} (\textbf{  76})  &   14 (  12) &  \textbf{   7} (\textbf{   7}) & \textbf{   1} (\textbf{   1})  \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -263,11 +289,11 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 120 & 327 & 553 & 7851 \\ 
   \hline
-  Cloudbreak  & \textbf{  29} (   4) & \textbf{ 155} (\textbf{  19}) & \textbf{ 204} (\textbf{  38}) & \textbf{ 761} ( 158) \\ 
-  Breakdancer & \textbf{  29} (\textbf{   6}) &  142 (  10) &  186 (  25) &  751 (  42) \\
-  GASVPro     &   15 (   2) &   72 (   2) &   71 (   5) &  264 (   8) \\
-  DELLY       &   21 (   2) &  116 (   2) &  147 (  12) &  618 (  11) \\
-  Pindel      &    8 (   4) &   62 (  12) &   98 (  26) &  563 (\textbf{ 264}) \\ 
+  Cloudbreak  &   28 (   4) & \textbf{ 151} (  13) & \textbf{ 204} (\textbf{  46}) & \textbf{ 761} (\textbf{ 165}) \\ 
+  Breakdancer & \textbf{  29} (   5) &  142 (   7) &  186 (  21) &  754 (  39) \\
+  GASVPro     &   15 (   2) &   72 (   2) &   71 (   6) &  266 (  13) \\
+  DELLY       &   21 (   2) &  117 (   3) &  147 (  11) &  618 (  10) \\
+  Pindel      &   18 (\textbf{   9}) &  112 (\textbf{  28}) &  103 (   4) &  473 (  11) \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -283,9 +309,9 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 133 & 270 & 341 & 355 \\ 
   \hline
-  Cloudbreak  &   16 (   4) &   40 (  25) & \textbf{ 146} (\textbf{  44}) & \textbf{ 141} (\textbf{  60}) \\ 
-  Breakdancer &   17 (   9) &   22 (  13) &   82 (  17) &   44 (  13) \\
-  Pindel      & \textbf{  26} (\textbf{  20}) & \textbf{  50} (\textbf{  36}) &   84 (  29) &   82 (  20) \\ 
+  Cloudbreak  &   19 (   5) & \textbf{  59} (  31) &   73 (  12) &   65 (  19) \\ 
+  Breakdancer &   17 (   8) &   22 (  11) &   82 (  37) &   44 (  18) \\
+  Pindel      & \textbf{  25} (\textbf{  19}) &   54 (\textbf{  33}) & \textbf{  84} (\textbf{  48}) & \textbf{  82} (\textbf{  48}) \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -293,9 +319,10 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
 \label{insertionRepmaskpreds}
 \end{table}
 
+
 \subsection{Genotyping Variants}
 
-Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing an insertion or deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For benchmarking genotyyping of deletions in the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .2 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 88.0\% and 94.9\% accuracy in predicting the genotype of the true positive deletions we detected in the simulated and real data sets, respectively. Table \ref{deletionGenotypeaccuracy} shows confusion matrices for the two samples using this classifier. For insertions, none of the three input sets that made up the gold standard for NA18507 contained a sufficient number of insertion rates that meet our size threshold that also had genotyping information. Of the 56 insertions detected by Cloudbreak on the simulated data set, only 4 were heterozygous. Using another simple cutoff on $\alpha$, this time with a value of .3, Cloudbreak correctly classified 50 of the 52 homozygous insertions and 3 of the four heterozygous insertions discovered.
+Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing an insertion or deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For benchmarking genotyyping of deletions in the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .2 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 86.7\% and 94.9\% accuracy in predicting the genotype of the true positive deletions we detected in the simulated and real data sets, respectively. Table \ref{deletionGenotypeaccuracy} shows confusion matrices for the two samples using this classifier. For insertions, none of the three input sets that made up the gold standard for NA18507 contained a sufficient number of insertion rates that meet our size threshold that also had genotyping information. Of the 56 insertions detected by Cloudbreak on the simulated data set, only 4 were heterozygous. Using another simple cutoff on $\alpha$, this time with a value of .3, Cloudbreak correctly classified 50 of the 52 homozygous insertions and 3 of the four heterozygous insertions discovered.
 
 \begin{table}
 \begin{center}
@@ -305,8 +332,8 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 \cline{3-6}
 \multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
 \cline{2-6}
-\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 91 & 3 &  70 & 11 \\
- & Heterozygous & 19 & 71 &  4 & 209 \\
+\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 88 & 3 &  70 & 11 \\
+ & Heterozygous & 18 & 70 &  4 & 209 \\
 \cline{2-6}
 \end{tabular}
 \end{center}
