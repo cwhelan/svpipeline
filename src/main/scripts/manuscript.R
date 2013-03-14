@@ -123,14 +123,14 @@ pindelChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter
 chr2MaxSensitivityDelCutoffs=list(cloudbreak=0.84, breakdancer=2, GASVPro=4, DELLY=2, Pindel=4)
 
 cloudbreakChr2DeletionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_deletions_0p84.bed'
-modilChr2DeletionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_deletions.bed'
+modilChr2DeletionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_del_gt1.bed'
 
 cloudbreakChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_del_mfw5_gte40_gt0p50.hits.txt'
 breakdancerChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.gt2_gte40.hits.txt'
 gasvProChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gasvpro_gte40_gt4.hits.txt'
 dellyChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40_gt2.hits.txt'
 pindelChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40_gt4.hits.txt'
-modilChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_del_pairGte1_gt40.hits.txt'
+modilChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_del_gt1.hits.txt'
 
 # insertions
 cloudbreakChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_ins_mfw5_gt40_nosplit_mt0p25.perf.txt'
@@ -138,10 +138,12 @@ breakdancerChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/vente
 pindelChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.gte40.perf.txt'
 
 cloudbreakChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_insertions_0p27929.bed'
+modilChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.bed'
 
 cloudbreakChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_ins_mfw5_gte40_gt0p27929.hits.txt'
 breakdancerChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.ins_gte40.gt2.hits.txt'
 pindelChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.gte40.gt4.hits.txt'
+modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.hits.txt'
 
 # NA18507
 
@@ -349,19 +351,33 @@ mcols(trueInsertions[as.matrix(findOverlaps(segdups,trueInsertions))[,2]])$segdu
 mcols(trueInsertions)$repMask <- 0
 mcols(trueInsertions[as.matrix(findOverlaps(repMask,trueInsertions))[,2]])$repMask <- 1
 
-# load true positive predictions
-cbInsertionsMaxSensitivity <- processInsertionPredictions("Cloudbreak", cloudbreakChr2InsertionHitsFileMaxSensitivity, trueInsertions)
-bdInsertionsMaxSensitivity <- processInsertionPredictions('Breakdancer', breakdancerChr2InsertionHitsFileMaxSensitivity, trueInsertions)
-pindelInsertionsMaxSensitivity <- processInsertionPredictions('Pindel', pindelChr2InsertionHitsFileMaxSensitivity, trueInsertions)
-allpredsInsertionsMaxSensitivity <- rbind(as.data.frame(cbInsertionsMaxSensitivity),as.data.frame(bdInsertionsMaxSensitivity),as.data.frame(pindelInsertionsMaxSensitivity))
-allpredsInsertionsMaxSensitivity <- ddply(allpredsInsertionsMaxSensitivity, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
-
-# tabulate against true insertion data
 trueInsertionsGte40 <- trueInsertions[mcols(trueInsertions)$length >= 40]
 trueInsertionsSizes <- table(trueInsertionsGte40$sizeclasses)
 trueInsertionsHaps <- table(trueInsertionsGte40$haps)
 trueInsertionsRepmask <- table(trueInsertionsGte40$repMask)
 
+# load true positive predictions
+cbInsertionsMaxSensitivity <- processInsertionPredictions("Cloudbreak", cloudbreakChr2InsertionHitsFileMaxSensitivity, trueInsertions)
+bdInsertionsMaxSensitivity <- processInsertionPredictions('Breakdancer', breakdancerChr2InsertionHitsFileMaxSensitivity, trueInsertions)
+pindelInsertionsMaxSensitivity <- processInsertionPredictions('Pindel', pindelChr2InsertionHitsFileMaxSensitivity, trueInsertions)
+modilInsertionsMaxSensitivity <- processInsertionPredictions('MoDIL', modilChr2InsertionHitsFileMaxSensitivity, trueInsertions)
+allpredsInsertionsMaxSensitivity <- rbind(as.data.frame(cbInsertionsMaxSensitivity),as.data.frame(bdInsertionsMaxSensitivity),as.data.frame(pindelInsertionsMaxSensitivity),as.data.frame(modilInsertionsMaxSensitivity))
+allpredsInsertionsMaxSensitivity <- ddply(allpredsInsertionsMaxSensitivity, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
+modilChr2InsertionPredictionsMaxSensitivity <- read.table(modilChr2InsertionPredictionsFileMaxSensitivity)
+
+totalCloudbreakchr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(cloudbreakChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['cloudbreak'])
+totalBreakdancerchr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(breakdancerChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['breakdancer'])
+totalPindelchr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(pindelChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['Pindel'])
+totalMoDILchr2MaxSensitivityInsPredictions <- dim(modilChr2InsertionPredictionsMaxSensitivity)[1]
+
+totalchr2MaxSensitivityInsPredictions <- list(Cloudbreak=totalCloudbreakchr2MaxSensitivityInsPredictions, Breakdancer=totalBreakdancerchr2MaxSensitivityInsPredictions, Pindel=totalPindelchr2MaxSensitivityInsPredictions, MoDIL=totalMoDILchr2MaxSensitivityInsPredictions)
+totalchr2MaxSensitivityInsHits <- list(Cloudbreak=dim(cbInsertionsMaxSensitivity)[1], Breakdancer=dim(bdInsertionsMaxSensitivity)[1], Pindel=dim(pindelInsertionsMaxSensitivity)[1], MoDIL=dim(modilInsertionsMaxSensitivity)[1])
+
+chr2MaxSensitivityInsPrecision <- unlist(totalchr2MaxSensitivityInsHits) / unlist(totalchr2MaxSensitivityInsPredictions)
+chr2MaxSensitivityInsRecall <- unlist(totalchr2MaxSensitivityInsHits) / length(trueInsertionsGte40)
+
+# tabulate against true insertion data
 insertionPredsBySizeMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[,c('name','sizeclasses')])
 insertionExBySizeMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[which(allpredsInsertionsMaxSensitivity$discoveries == 1),c('name','sizeclasses')])
 
@@ -604,6 +620,8 @@ tableEnv = new.env()
 assign("totals", trueInsertionsSizes, envir=tableEnv)
 assign("preds", insertionPredsBySizeMaxSensitivity, envir=tableEnv)
 assign("exPreds", insertionExBySizeMaxSensitivity, envir=tableEnv)
+assign("precision", chr2MaxSensitivityInsPrecision, envir=tableEnv)
+assign("recall", chr2MaxSensitivityInsRecall, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/chr2InsertionPredsBySize.table.brew.tex', env=tableEnv)
 
 # NA18507 Deletions by size
