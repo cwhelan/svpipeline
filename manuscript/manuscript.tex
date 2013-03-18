@@ -153,11 +153,11 @@ Choosing the correct operating point or threshold can be difficult when operatin
  & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-  Cloudbreak  &   47 (   7)  &   50 (   2) &  \textbf{  55} (\textbf{   4}) & \textbf{  12} (\textbf{   4}) & \textbf{  15} (\textbf{0}) \\ 
-  Breakdancer &   52 (  10)  &   49 (   2) &    49 (0) &    7 (0) &   14 (\textbf{0}) \\ 
+  Cloudbreak  &   50 (   8)  &   50 (\textbf{   3}) &  \textbf{  55} (\textbf{   4}) & \textbf{  12} (\textbf{   4}) & \textbf{  15} (\textbf{0}) \\ 
+  Breakdancer &   52 (   9)  &   49 (   2) &    49 (0) &    7 (0) &   14 (\textbf{0}) \\ 
   GASVPro     &   31 (   4)  &   25 (0) &    23 (0) &    2 (0) &    6 (\textbf{0}) \\ 
   DELLY       &   22 (   2)  & \textbf{  56} (\textbf{   3}) &    40 (0) &    8 (0) &   12 (\textbf{0}) \\ 
-  Pindel      & \textbf{  60} (\textbf{  35})  &   16 (0) &    41 (   2) &    1 (0) &   12 (\textbf{0})\\ 
+  Pindel      & \textbf{  60} (\textbf{  34})  &   16 (0) &    41 (   2) &    1 (0) &   12 (\textbf{0})\\ 
    \hline
 \end{tabular}
 \end{center}
@@ -165,25 +165,26 @@ Choosing the correct operating point or threshold can be difficult when operatin
 \label{chr2DeletionPredsFDR10}
 \end{table}
 
+
 We also characterized the predictions made by each algorithm at the operating point which gives them maximum sensitivity. For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low. The results are summarized in Table \ref{chr2DeletionPredsMaxSensitivity}. MoDIL has the greatest sensitivity but the precision is extremely low.
 
-\begin{table}[t]
+\begin{table}[b]
 \begin{center}
-\begin{tabular}{rrrrrr}
+\begin{tabular}{rrr|rrrrr}
   \hline
- & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
- Total Number & 224 &  84 & 82 &  31 & 26\\ 
+                        & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+ Total Number &          &           & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-  Cloudbreak  & \textbf{ 155} (\textbf{  11})  &   57 (\textbf{   3}) &    65 (   2) &   15 (0) &   15 (0) \\ 
-  Breakdancer &   89 (0)  &   54 (0) &    53 (0) &    8 (0) &   15 (0) \\ 
-  GASVPro     &   83 (   2)  &   32 (0) &    55 (0) &    8 (0) &   15 (0) \\ 
-  DELLY       &  114 (   7)  & \textbf{  68} (   2) &  \textbf{  66} (   1) &    9 (0) &   17 (   1) \\ 
-  Pindel      &   96 (  10)  &   24 (0) &    48 (0) &    5 (0) &   15 (0)\\ 
-  MoDIL      &  124 (   6)  &   66 (\textbf{   3}) &  \textbf{  66} (\textbf{   6}) & \textbf{  17} (\textbf{   4}) & \textbf{  23} (\textbf{   8})\\ 
+  Cloudbreak    &  \textbf{0.497} & 0.642 & \textbf{ 140} (   5)  &   58 (\textbf{   4}) &    61 (   1) &   13 (0) &   15 (0) \\ 
+  Breakdancer   &  0.356 & 0.49 &   89 (0)  &   54 (0) &    53 (0) &    8 (0) &   15 (0) \\ 
+  GASVPro        & 0.146 & 0.432 &   83 (   2)  &   32 (0) &    55 (0) &    8 (0) &   15 (0) \\ 
+  DELLY           & 0.457 & 0.613 &  114 (   8)  & \textbf{  68} (   2) &  \textbf{  66} (   1) &    9 (0) &   17 (   1) \\ 
+  Pindel           & 0.462 & 0.421 &   96 (\textbf{  14})  &   24 (0) &    48 (0) &    5 (0) &   15 (0)\\ 
+  MoDIL           & 0.132  & \textbf{0.66} &  123 (   6)  &   66 (   2) &  \textbf{  66} (\textbf{   8}) & \textbf{  17} (\textbf{   6}) & \textbf{  23} (\textbf{   8})\\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header. TODO: Add precision and recall!!!!!}
+\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivy, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
 \label{chr2DeletionPredsMaxSensitivity}
 \end{table}
 
@@ -198,18 +199,19 @@ An ROC curve for insertion prediction performance is shown in Figure \ref{chr2In
 
 \begin{table}[t]
 \begin{center}
-\begin{tabular}{rrrrrr}
+\begin{tabular}{rrr|rrrrr}
   \hline
- & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
- Total Number & 199 &  83 & 79 &  21 & 21\\ 
+                        & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+ Total Number &          &           & 199 &  83 & 79 &  21 & 21\\ 
   \hline
-  Cloudbreak  & \textbf{  65} (\textbf{  28})  &    9 (   5) &     3 (   2) &    1 (   1) & 0 (0) \\ 
-  Breakdancer &   23 (   8)  & \textbf{  14} (\textbf{  10}) &     2 (   1) & 0 (0) & 0 (0) \\ 
-  Pindel      &   52 (  26)  &    5 (   4) &  \textbf{  10} (\textbf{  10}) & \textbf{   3} (\textbf{   3}) & \textbf{   9} (\textbf{   9})\\ 
+  Cloudbreak   &\textbf{0.624} & 0.194  & \textbf{  65} (  21)  &    9 (   4) &     3 (   1) &    1 (0) & 0 (0) \\ 
+  Breakdancer & 0.262 & 0.0968  &   23 (   8)  & \textbf{  14} (\textbf{  10}) &     2 (   1) & 0 (0) & 0 (0) \\ 
+  Pindel          & 0.572 & \textbf{0.196} &   52 (\textbf{  25})  &    5 (   3) &  \textbf{  10} (\textbf{  10}) & \textbf{   3} (\textbf{   3}) & \textbf{   9} (\textbf{   9})\\ 
+  MoDIL          & 0.186 & 0.0521 &   14 (   1)  &    4 (   1) &     1 (0) &    2 (   1) & 0 (0)\\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{The number of simulated insertions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those insertions that were discovered exclusively by each tool (in parentheses). The total number of insertions in each size class in the true set of insertions is shown in the second row of the header. TODO: Add modil!!!! TODO: Add precision and recall!!!}
+\caption{The number of simulated insertions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those insertions that were discovered exclusively by each tool (in parentheses). The total number of insertions in each size class in the true set of insertions is shown in the second row of the header.}
 \label{chr2InsertionPreds}
 \end{table}
 
@@ -239,11 +241,11 @@ We then tested the predictions made by each algorithm using the same cutoffs tha
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
 Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
   \hline
-Cloudbreak & 0.0978 & \textbf{0.115} & \textbf{ 423} (\textbf{ 179})  &  128 (\textbf{   9}) &   158 (\textbf{   8}) &   70 (\textbf{   3}) &  186 (\textbf{  12}) \\ 
-Breakdancer & 0.122 & 0.112 &  261 (  41)  & \textbf{ 132} (   8) &  \textbf{ 167} (   1) & \textbf{  92} (0) & \textbf{ 288} (  10) \\  
+Cloudbreak & 0.101 & \textbf{0.131} & \textbf{ 446} (\textbf{ 186})  & \textbf{ 141} (\textbf{  14}) &  \textbf{ 173} (\textbf{  12}) & \textbf{  93} (\textbf{   4}) &  248 (\textbf{  14}) \\ 
+Breakdancer & 0.122 & 0.112 &  261 (  35)  &  132 (   6) &   167 (   1) &   92 (0) & \textbf{ 288} (   6) \\  
   GASVPro & 0.134 & 0.0401 &  104 (  17)  &   37 (   2) &    77 (0) &   26 (0) &   93 (0) \\ 
-  DELLY & 0.0824 & 0.091 &  143 (   9)  &  125 (   7) &   158 (   1) &   83 (   1) &  256 (   3) \\ 
-  Pindel & \textbf{0.16} & 0.0685 &  149 (  12)  &   57 (0) &   140 (   1) &   58 (0) &  172 (   2) \\ 
+  DELLY & 0.0824 & 0.091 &  143 (   8)  &  125 (   6) &   158 (   1) &   83 (   1) &  256 (   3) \\ 
+  Pindel & \textbf{0.16} & 0.0685 &  149 (  12)  &   57 (0) &   140 (0) &   58 (0) &  172 (   1) \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -267,9 +269,9 @@ A similar ROC-like curve for insertions on the NA18507 data set is shown in Figu
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp \\ 
 Total Number & & & 536 & 114 & 45 & 1 \\
   \hline
-Cloudbreak & 0.0365 & 0.198 &  127 (  28)  &   11 (   3) &  0 (0) & 0 (0) \\ 
-Breakdancer & 0.0104 & 0.181 &   97 (  36)  & \textbf{  27} (\textbf{  17}) &     2 (   2) & 0 (0) \\  
-  Pindel & \textbf{0.0387} & \textbf{0.239} & \textbf{ 144} (\textbf{  76})  &   14 (  12) &  \textbf{   7} (\textbf{   7}) & \textbf{   1} (\textbf{   1})  \\ 
+Cloudbreak & \textbf{0.0596} & 0.197 &  124 (  28)  &   13 (   3) &  0 (0) & 0 (0) \\ 
+Breakdancer & 0.0281 & 0.181 &   97 (  37)  & \textbf{  27} (\textbf{  15}) &     2 (   2) & 0 (0) \\  
+  Pindel & 0.0387 & \textbf{0.239} & \textbf{ 144} (\textbf{  79})  &   14 (  12) &  \textbf{   7} (\textbf{   7}) & \textbf{   1} (\textbf{   1})  \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -289,11 +291,11 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 120 & 327 & 553 & 7851 \\ 
   \hline
-  Cloudbreak  &   28 (   4) & \textbf{ 151} (  13) & \textbf{ 204} (\textbf{  46}) & \textbf{ 761} (\textbf{ 165}) \\ 
-  Breakdancer & \textbf{  29} (   5) &  142 (   7) &  186 (  21) &  754 (  39) \\
+  Cloudbreak  &   26 (   3) & \textbf{ 156} (  16) & \textbf{ 238} (\textbf{  61}) & \textbf{ 863} (\textbf{ 169}) \\ 
+  Breakdancer & \textbf{  29} (   5) &  142 (   6) &  186 (  18) &  754 (  30) \\
   GASVPro     &   15 (   2) &   72 (   2) &   71 (   6) &  266 (  13) \\
-  DELLY       &   21 (   2) &  117 (   3) &  147 (  11) &  618 (  10) \\
-  Pindel      &   18 (\textbf{   9}) &  112 (\textbf{  28}) &  103 (   4) &  473 (  11) \\ 
+  DELLY       &   21 (   2) &  117 (   3) &  147 (  10) &  618 (   9) \\
+  Pindel      &   18 (\textbf{   9}) &  112 (\textbf{  27}) &  103 (   3) &  473 (  10) \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -309,9 +311,10 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 133 & 270 & 341 & 355 \\ 
   \hline
-  Cloudbreak  &   19 (   5) & \textbf{  59} (  31) &   73 (  12) &   65 (  19) \\ 
-  Breakdancer &   17 (   8) &   22 (  11) &   82 (  37) &   44 (  18) \\
-  Pindel      & \textbf{  25} (\textbf{  19}) &   54 (\textbf{  33}) & \textbf{  84} (\textbf{  48}) & \textbf{  82} (\textbf{  48}) \\ 
+  Cloudbreak  &   19 (   3) & \textbf{  59} (  23) &   75 (  13) &   62 (  18) \\ 
+  Breakdancer &   17 (   8) &   22 (  11) &   82 (  36) &   44 (  18) \\
+  Pindel      & \textbf{  25} (\textbf{  18}) &   54 (\textbf{  32}) & \textbf{  84} (\textbf{  48}) & \textbf{  82} (\textbf{  51}) \\ 
+  MoDIL      &    5 (0) &   16 (   3) & NA & NA \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -332,8 +335,8 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 \cline{3-6}
 \multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
 \cline{2-6}
-\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 88 & 3 &  70 & 11 \\
- & Heterozygous & 18 & 70 &  4 & 209 \\
+\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 92 & 3 &  74 & 12 \\
+ & Heterozygous & 15 & 71 &  4 & 286 \\
 \cline{2-6}
 \end{tabular}
 \end{center}
