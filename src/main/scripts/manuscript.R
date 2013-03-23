@@ -106,17 +106,17 @@ printPredTableCell <- function(preds, ex, x, y) {
 # chr2
 
 # deletions
-cloudbreakChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/extract_in_hadoop_dels_oldsplot_perf.txt'
+cloudbreakChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/extract_in_hadoop_del_postcombinefix_perf.txt'
 breakdancerChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.perf.txt'
 gasvProChr2DeletionPerfFile <-  '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gasvpro_gte40.perf.txt'
 dellyChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40.perf.txt'
 pindelChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40.perf.txt'
 
-cloudbreakChr2DeletionPredictionsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/dels_called_in_hadoop_2p12_3.bed'
+cloudbreakChr2DeletionPredictionsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/dels_called_in_hadoop_2p22.bed'
 
-cloudbreakChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/dels_called_in_hadoop_2p12_3.hits.txt'
+cloudbreakChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/dels_called_in_hadoop_2p22.hits.txt'
 breakdancerChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.gt4_gte40.hits.txt'
-gasvProChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gasvpro_gte40_gt12.hits.txt'
+gasvProChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gasvpro_gte40_gt11.hits.txt'
 dellyChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40_gt7.hits.txt'
 pindelChr2DeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40_gt13.hits.txt'
 
@@ -133,16 +133,16 @@ pindelChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeli
 modilChr2DeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_del_gt1.hits.txt'
 
 # insertions
-cloudbreakChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_ins_mfw5_gt40_nosplit_mt0p25.perf.txt'
+cloudbreakChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/extract_in_hadoop_ins_postcombinefix_perf.txt'
 breakdancerChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.ins_gte40.perf.txt'
 pindelChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.gte40.perf.txt'
 
-cloudbreakChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_insertions_0p27929.bed'
+cloudbreakChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/ins_called_in_hadoop_0p27929.bed'
 modilChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.bed'
 
-chr2MaxSensitivityInsCutoffs=list(cloudbreak=0.27929, breakdancer=2, Pindel=4)
+chr2MaxSensitivityInsCutoffs=list(cloudbreak=0.27929, breakdancer=2, Pindel=4, MoDIL=1)
 
-cloudbreakChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/cloudbreak_venterchr2allindels100bpdip_readgroup1_ins_mfw5_gte40_gt0p27929.hits.txt'
+cloudbreakChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/ins_called_in_hadoop_0p27929.hits.txt'
 breakdancerChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.ins_gte40.gt2.hits.txt'
 pindelChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.gte40.gt4.hits.txt'
 modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.hits.txt'
@@ -150,34 +150,36 @@ modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeli
 # NA18507
 
 # Deletions
-cloudbreakNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/extract_in_hadoop_del.perf.txt'
+cloudbreakNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/extract_in_hadoop_del_postcombinefix_300reducers.perf.txt'
 breakdancerNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40_perf.txt'
 gasvProNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.perf.txt'
 dellyNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.perf.txt'
 pindelNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.perf.txt'
 
-cloudbreakNA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/dels_called_in_hadoop_gt2p6.bed'
+cloudbreakNA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/dels_called_in_hadoop_gt2p738.bed'
 
-NA18507delCutoffs=list(cloudbreak=2.60, breakdancer=4.9, GASVPro=14.8, DELLY=8.6, Pindel=16.03)
+NA18507delCutoffs=list(cloudbreak=2.738, breakdancer=4.9, GASVPro=13.6, DELLY=8.6, Pindel=16.03)
 
-cloudbreakNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/dels_called_in_hadoop_gt2p6.hits.txt'
+cloudbreakNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/dels_called_in_hadoop_gt2p738.hits.txt'
 breakdancerNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40.gt4p9.hits.txt'
-gasvProNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.gt14p8.hits.txt'
+gasvProNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.gt13p6.hits.txt'
 dellyNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.gt8p6.hits.txt'
 pindelNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.gt16.hits.txt'
 
 # insertions
-cloudbreakNA18507InsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/extract_in_hadoop_ins.perf.txt'
+cloudbreakNA18507InsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/extract_in_hadoop_ins_postcombinefix_300reducers.perf.txt'
 breakdancerNA18507InsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_insertions.gte40.perf.txt'
 pindelNA18507InsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_ins_gte40.perf.txt'
 
-NA18507insertionCutoffs=list(cloudbreak=3.17, breakdancer=2, Pindel=4)
+NA18507insertionCutoffs=list(cloudbreak=1.07, breakdancer=2, Pindel=4)
 
-cloudbreakNA18507InsertionPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/ins_called_in_hadoop_gt3p17.bed'
+cloudbreakNA18507InsertionPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/ins_called_in_hadoop_gt1p07.bed'
 
-cloudbreakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/ins_called_in_hadoop_gt3p17.hits.txt'
+cloudbreakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/ins_called_in_hadoop_gt1p07.hits.txt'
 breakdancerNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3.bd_out.ins.gte2.hits.txt'
 pindelNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/pindel_insertions.gte4.hits.txt'
+
+genotypingAlphaCutoff <- .35
 
 # reference files
 repMask <- import.bed('~/genomes/1kg/hg18/repeatmasker_b36_merged.bed.gz', asRangedData=FALSE)
@@ -262,8 +264,7 @@ extraDataFDR10 <- read.table(cloudbreakChr2DeletionPredictionsFileFDR10, skip=1)
 names(extraDataFDR10) <- c('predchrom', 'predstart', 'predend', 'peaknum', 'maxscore', 'svtype', 'avgMu', 'minMu', 'maxMu', 'avgW', 'minW', 'maxW')
 
 cbpredsWithExtraDataFDR10 <- merge(as.data.frame(cbFDR10), extraDataFDR10)
-
-chr2HapCMFDR10 <- table(cbpredsWithExtraDataFDR10$haps, cbpredsWithExtraDataFDR10$avgW < .2)
+chr2HapCMFDR10 <- table(cbpredsWithExtraDataFDR10$haps, cbpredsWithExtraDataFDR10$avgW < .3)
 
 # test with Max sensitivity
 
@@ -311,7 +312,7 @@ names(extraDataMaxSensitivity) <- c('predchrom', 'predstart', 'predend', 'peaknu
 
 cbpredsWithExtraDataMaxSensitivity <- merge(as.data.frame(cbMaxSensitivity), extraDataMaxSensitivity)
 
-chr2HapCMMaxSensitivity <- table(cbpredsWithExtraDataMaxSensitivity$haps, cbpredsWithExtraDataMaxSensitivity$avgW < .2)
+chr2HapCMMaxSensitivity <- table(cbpredsWithExtraDataMaxSensitivity$haps, cbpredsWithExtraDataMaxSensitivity$avgW < genotypingAlphaCutoff)
 chr2DeletionHapAccuracy <- (chr2HapCMMaxSensitivity['1','FALSE'] + chr2HapCMMaxSensitivity['2','TRUE']) / sum(chr2HapCMMaxSensitivity)
 
 #chr2 100bp diploid insertions
@@ -398,7 +399,7 @@ names(extraInsertionDataMaxSensitivity) <- c('predchrom', 'predstart', 'predend'
 
 cbInsertionPredsWithExtraDataMaxSensitivity <- merge(as.data.frame(cbInsertionsMaxSensitivity), extraInsertionDataMaxSensitivity, by=c("predchrom", "predstart"))
 
-insertionHapCMMaxSensitivity <- table(cbInsertionPredsWithExtraDataMaxSensitivity$haps, cbInsertionPredsWithExtraDataMaxSensitivity$minW < .3)
+insertionHapCMMaxSensitivity <- table(cbInsertionPredsWithExtraDataMaxSensitivity$haps, cbInsertionPredsWithExtraDataMaxSensitivity$minW < genotypingAlphaCutoff)
 print((insertionHapCMMaxSensitivity[1,1] + insertionHapCMMaxSensitivity[2,2]) / sum(insertionHapCMMaxSensitivity))
 
 
@@ -489,7 +490,7 @@ cbpredsWithExtraDataNA18507 <- merge(as.data.frame(cbHitsNA18507), extraDataNA18
 
 cbpredsWithExtraDataNA18507Genotyped <- cbpredsWithExtraDataNA18507[!is.na(cbpredsWithExtraDataNA18507$hap),]
 
-NA18507HapCM <- table(cbpredsWithExtraDataNA18507$hap, cbpredsWithExtraDataNA18507$avgW < .2)
+NA18507HapCM <- table(cbpredsWithExtraDataNA18507$hap, cbpredsWithExtraDataNA18507$avgW < genotypingAlphaCutoff)
 NA18507DeletionHapAccuracy <- (NA18507HapCM['1','FALSE'] + NA18507HapCM['2','TRUE']) / sum(NA18507HapCM)
 
 millsDelsWithGenotypes <- read.table('~/Documents/Papers2/Articles/2011/Mills/Supplemental/dels_gt40_with_genotypes.csv', header=TRUE, sep=",")
@@ -504,7 +505,7 @@ ol <- findOverlaps(trueDelsNA18507, millsGenotypedRanges)
 mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(ol)[,2]])$hap
 
 #chr2 100bp diploid insertions
-totalInsertions <- 10000
+totalInsertions <- 8000
 cloudbreakNA18507InsertionsPerf <- read.table(cloudbreakNA18507InsertionsPerfFile, header=TRUE, sep="\t")
 cloudbreakNA18507InsertionsPerf <- cloudbreakNA18507InsertionsPerf[seq(1,dim(cloudbreakNA18507InsertionsPerf)[1],by=4),]
 breakdancerNA18507InsertionsPerf <- read.table(breakdancerNA18507InsertionsPerfFile, header=TRUE)
@@ -515,7 +516,7 @@ pdf(NA18507InsertionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsListInsertionsNA18507, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
-        totalInsertions, "Insertions in NA18507",legendLoc=xy.coords(10500,100), maxTP=200, sim=FALSE)
+        totalInsertions, "Insertions in NA18507",legendLoc=xy.coords(8500,100), maxTP=300, sim=FALSE)
 dev.off()
 
 # analyze predictions at a given threshold
