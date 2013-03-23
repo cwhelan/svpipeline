@@ -158,3 +158,26 @@ testHomegrown <- function() {
   print(exp(ws))
   print(sum(exp(ws) < .25))
 }
+
+
+pdf('~/Documents/gene_rearrange/svpipeline/example_normal.pdf')
+h <- hist(sim.nodel(35, num.noise=5, max.insert=500), breaks=40, xlab="Observed Insert Size", main=NULL, xlim=c(0,500), ylim=c(0,7), yaxt='n', ann=FALSE)
+lines(seq(000,500), dnorm(seq(000,500), mean=200, sd=30)*300, col="blue", lwd=3)
+dev.off()
+
+pdf('~/Documents/gene_rearrange/svpipeline/example_homdel.pdf')
+h <- hist(sim.homdel(35, 75, num.noise=5, max.insert=500), breaks=40, xlab="Observed Insert Size", main=NULL, xlim=c(0,500), ylim=c(0,7), yaxt='n', ann=FALSE)
+lines(seq(000,500), dnorm(seq(000,500), mean=250, sd=30)*300, col="red", lwd=3)
+dev.off()
+
+pdf('~/Documents/gene_rearrange/svpipeline/example_hetdel.pdf')
+h <- hist(sim.hetdel(35, 75, num.noise=5, max.insert=500), breaks=40, xlab="Observed Insert Size", main=NULL, xlim=c(0,500), ylim=c(0,7), yaxt='n', ann=FALSE)
+lines(seq(000,500), dnorm(seq(000,500), mean=200, sd=30)*150, col="blue", lwd=3)
+lines(seq(000,500), dnorm(seq(000,500), mean=275, sd=30)*150, col="red", lwd=3)
+dev.off()
+
+pdf('~/Documents/gene_rearrange/svpipeline/example_ins.pdf')
+h <- hist(sim.hetdel(35, -75, num.noise=5, max.insert=500), breaks=40, xlab="Observed Insert Size", main=NULL, xlim=c(0,500), ylim=c(0,7), yaxt='n', ann=FALSE)
+lines(seq(000,500), dnorm(seq(000,500), mean=200, sd=30)*150, col="blue", lwd=3)
+lines(seq(000,500), dnorm(seq(000,500), mean=125, sd=30)*150, col="green", lwd=3)
+dev.off()
