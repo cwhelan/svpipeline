@@ -14,7 +14,7 @@
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
   \printtext{\bibstring{in}\intitlepunct}}}
-\addbibresource{recomb.bib}
+\addbibresource{manuscript.bib}
 
 \begin{document}
 
@@ -103,7 +103,7 @@ Our formulation divides processing into three distinct MapReduce jobs. The first
 \caption{The algorithmic framwork for SV calling in MapReduce.}
 \end{algorithm}
 
-The alignment job uses sensitive mapping tools and settings to discover as many mapping locations for each read pair as possible. In the map phase, mappers align reads in single-end mode to the reference genome in parallel, outputting each possible mapping location as a value under a key identifying the read pair. In the reduce phase, the framework combines pairs of mapping locations for the two ends of a read pair to produce all possible combinations of mapping locations found. Our framework could use any aligner that is capable of reporting multiple alignments for reads. The results we report below were generated with alignments from RazerS 3 \autocite{Weese:2012by}, which in our tests displayed the best combination of sensitivity, performance, and memory usage suitable for parallelization in Hadoop. Our implementation also contains wrappers to execute the aligners Novoalign\footnote{\url{http://wwww.novocraft.com}}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
+The alignment job uses sensitive mapping tools and settings to discover as many mapping locations for each read pair as possible. In the map phase, mappers align reads in single-end mode to the reference genome in parallel, outputting each possible mapping location as a value under a key identifying the read pair. In the reduce phase, the framework combines pairs of mapping locations for the two ends of a read pair to produce all possible combinations of mapping locations found. Our framework could use any aligner that is capable of reporting multiple alignments for reads. The results we report below were generated with alignments from the GEM mapper \autocite{MarcoSola:2012hm}, which in our tests displayed the best combination of sensitivity, performance, and memory usage suitable for parallelization in Hadoop. Our implementation also contains wrappers to execute the aligners Novoalign\footnote{\url{http://wwww.novocraft.com}}, RazerS 3 \autocite{Weese:2012by}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
 
 In the second job, we compute a set of features for each location in the genome. To begin, we tile the genome with small fixed-width, non-overlapping intervals. For the experiments reported in this paper we use an interval size of 25bp. Let $L = \left\{l_1,l_2,\ldots,l_N\right\}$ be the set of intervals covering the entire genome. Let $R^1 = \left\{r^{1}_{1},r^{1}_{2},\ldots,r^{1}_{M}\right\}$ and $R^2 = \left\{r^{2}_{1},r^{2}_{2},\ldots,r^{2}_{M}\right\}$ be the input set of paired reads. Let $A^1 = \left\{a^{1}_{m,1},a^{1}_{m,2},\ldots,a^{1}_{m,K}\right\}$ and $A^2 = \left\{a^{2}_{m,1},a^{2}_{m,2},\ldots,a^{2}_{m,L}\right\}$ be the set of alignments for the left and right reads from read pair $m$. For any given pair of alignments of the two reads in a read pair, $a^{1}_{m,i}$ and $a^{2}_{m,j}$, let the $\textrm{ReadPairInfo } rpi_{m,i,j}$ be information about the pair relevant to detecting SVs, e.g. the fragment size implied by the alignments and the likelihood the alignments are correct. We then leave two functions to be implemented depending on the application:
 \begin{flalign*}
@@ -161,25 +161,24 @@ Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algor
 
 Choosing the correct operating point or threshold can be difficult when operating on a new data set, but the use of simulated data and ROC curves allows for some investigation of the perfomance characteristics of algorithms at varying levels. First, we used the results on simulated deletions to characterize the predictions made by each algorithm when a low false discovery rate is required. Table \ref{chr2DeletionPredsFDR10} shows the total number of simulated deletions found by each tool when choosing a threshold that gives an FDR closest to 10\% based on the ROC curve, representing cutoffs of 2.22 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 11 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and a simple score of 13 for Pindel. Cloudbreak shows good performance at detecting deletions in all size classes, and finds more medium and large deletions than the other approaches. Pindel exlusively identifies a large number of small (40bp-100bp) deletions, as is expected for a split-read method.
 
-\begin{table}[b]
+\begin{table}[t]
 \begin{center}
 \begin{tabular}{rrrrrr}
   \hline
  & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-  Cloudbreak  &   48 (   8)  &   49 (\textbf{   2}) &  \textbf{  55} (\textbf{   4}) & \textbf{  12} (\textbf{   4}) & \textbf{  15} (\textbf{0}) \\ 
-  Breakdancer &   52 (  10)  &   49 (\textbf{   2}) &    49 (0) &    7 (0) &   14 (\textbf{0}) \\ 
-  GASVPro     &   35 (   5)  &   26 (0) &    26 (0) &    2 (0) &    6 (\textbf{0}) \\ 
-  DELLY       &   22 (   2)  & \textbf{  56} (\textbf{   2}) &    40 (0) &    8 (0) &   12 (\textbf{0}) \\ 
-  Pindel      & \textbf{  60} (\textbf{  34})  &   16 (0) &    41 (   2) &    1 (0) &   12 (\textbf{0})\\ 
+  Cloudbreak  &  47 (  7)  &  52 (\textbf{  3}) &  \textbf{ 57} (\textbf{  5}) & \textbf{ 12} (\textbf{  4}) & \textbf{ 15} (\textbf{0}) \\ 
+  Breakdancer &  52 ( 10)  &  49 (\textbf{  3}) &   49 (0) &   7 (0) &  14 (\textbf{0}) \\ 
+  GASVPro     &  35 (  4)  &  26 (0) &   26 (0) &   2 (0) &   6 (\textbf{0}) \\ 
+  DELLY       &  22 (  2)  & \textbf{ 56} (  2) &   40 (0) &   8 (0) &  12 (\textbf{0}) \\ 
+  Pindel      & \textbf{ 60} (\textbf{ 34})  &  16 (0) &   41 (  1) &   1 (0) &  12 (\textbf{0})\\ 
    \hline
 \end{tabular}
 \end{center}
 \caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
 \label{chr2DeletionPredsFDR10}
 \end{table}
-
 
 We also characterized the predictions made by each algorithm at the operating point which gives them maximum sensitivity. For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low. The results are summarized in Table \ref{chr2DeletionPredsMaxSensitivity}. MoDIL has the greatest recall but low precision. Cloudbreak has high precision and recall at this threshold, and surprisingly discovers more small deletions than Pindel.
 
@@ -190,12 +189,12 @@ We also characterized the predictions made by each algorithm at the operating po
                         & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number &          &           & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-  Cloudbreak    &  \textbf{0.507} & 0.649 & \textbf{ 144} (   6)  &   57 (\textbf{   4}) &    61 (   1) &   13 (0) &   15 (0) \\ 
-  Breakdancer   &  0.356 & 0.49 &   89 (0)  &   54 (0) &    53 (0) &    8 (0) &   15 (0) \\ 
-  GASVPro        & 0.146 & 0.432 &   83 (   2)  &   32 (0) &    55 (0) &    8 (0) &   15 (0) \\ 
-  DELLY           & 0.457 & 0.613 &  114 (   8)  & \textbf{  68} (   2) &  \textbf{  66} (   1) &    9 (0) &   17 (   1) \\ 
-  Pindel           & 0.462 & 0.421 &   96 (\textbf{  13})  &   24 (0) &    48 (0) &    5 (0) &   15 (0)\\ 
-  MoDIL           & 0.132  & \textbf{0.66} &  123 (   6)  &   66 (   2) &  \textbf{  66} (\textbf{   8}) & \textbf{  17} (\textbf{   6}) & \textbf{  23} (\textbf{   8})\\ 
+  Cloudbreak    &  \textbf{0.532} & \textbf{0.66} & \textbf{146} (  6)  &  58 (\textbf{  4}) &   62 (  1) &  14 (  1) &  15 (0) \\ 
+  Breakdancer   &  0.356 & 0.49 &  89 (0)  &  54 (0) &   53 (0) &   8 (0) &  15 (0) \\ 
+  GASVPro        & 0.146 & 0.432 &  83 (  2)  &  32 (0) &   55 (0) &   8 (0) &  15 (0) \\ 
+  DELLY           & 0.457 & 0.613 & 114 (  8)  & \textbf{ 68} (  2) &  \textbf{ 66} (  1) &   9 (0) &  17 (  1) \\ 
+  Pindel           & 0.462 & 0.421 &  96 (\textbf{ 13})  &  24 (0) &   48 (0) &   5 (0) &  15 (0)\\ 
+  MoDIL           & 0.132  & \textbf{0.66} & 123 (  5)  &  66 (  2) &  \textbf{ 66} (\textbf{  7}) & \textbf{ 17} (\textbf{  6}) & \textbf{ 23} (\textbf{  8})\\ 
    \hline
 \end{tabular}
 \end{center}
@@ -219,10 +218,10 @@ An ROC curve for insertion prediction performance is shown in Figure \ref{chr2In
                         & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
  Total Number &          &           & 199 &  83 & 79 &  21 & 21\\ 
   \hline
-  Cloudbreak   &\textbf{0.769} & \textbf{0.199}  & \textbf{  67} (  24)  &    9 (   3) &     3 (   1) &    1 (0) & 0 (0) \\ 
-  Breakdancer & 0.262 & 0.0968  &   23 (   8)  & \textbf{  14} (\textbf{   9}) &     2 (   1) & 0 (0) & 0 (0) \\ 
-  Pindel          & 0.572 & 0.196 &   52 (\textbf{  26})  &    5 (   3) &  \textbf{  10} (\textbf{  10}) & \textbf{   3} (\textbf{   3}) & \textbf{   9} (\textbf{   9})\\ 
-  MoDIL          & 0.186 & 0.0521 &   14 (   1)  &    4 (   1) &     1 (0) &    2 (   1) & 0 (0)\\ 
+  Cloudbreak   &\textbf{0.705} & \textbf{0.196}  & \textbf{ 67} ( 24)  &   8 (  3) &    3 (  1) &   1 (0) & 0 (0) \\ 
+  Breakdancer & 0.262 & 0.0968  &  23 (  8)  & \textbf{ 14} (\textbf{  9}) &    2 (  1) & 0 (0) & 0 (0) \\ 
+  Pindel          & 0.572 & \textbf{0.196} &  52 (\textbf{ 26})  &   5 (  3) &  \textbf{ 10} (\textbf{ 10}) & \textbf{  3} (\textbf{  3}) & \textbf{  9} (\textbf{  9})\\ 
+  MoDIL          & 0.186 & 0.0521 &  14 (  1)  &   4 (  1) &    1 (0) &   2 (  1) & 0 (0)\\ 
    \hline
 \end{tabular}
 \end{center}
@@ -254,11 +253,11 @@ We then tested the predictions made by each algorithm using the same cutoffs tha
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
 Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
   \hline
-Cloudbreak & 0.111 & \textbf{0.131} & \textbf{ 383} (\textbf{ 139})  & \textbf{ 146} (\textbf{  13}) &  \textbf{ 178} (\textbf{  10}) & \textbf{  95} (\textbf{   3}) & \textbf{ 300} (\textbf{  16}) \\ 
-Breakdancer & 0.122 & 0.112 &  261 (  41)  &  132 (   7) &   167 (0) &   92 (0) &  288 (   2) \\  
-  GASVPro & 0.135 & 0.0449 &  120 (  29)  &   38 (   3) &    80 (0) &   29 (0) &  110 (0) \\ 
-  DELLY & 0.0824 & 0.091 &  143 (   7)  &  125 (   5) &   158 (   1) &   83 (   1) &  256 (   3) \\ 
-  Pindel & \textbf{0.16} & 0.0685 &  149 (  12)  &   57 (0) &   140 (0) &   58 (0) &  172 (0) \\ 
+Cloudbreak & 0.11 & \textbf{0.13} & \textbf{371} (\textbf{127})  & \textbf{146} (\textbf{ 15}) &  \textbf{177} (\textbf{  9}) & \textbf{ 95} (\textbf{  3}) & \textbf{301} (\textbf{ 19}) \\ 
+Breakdancer & 0.122 & 0.112 & 261 ( 41)  & 132 (  6) &  167 (0) &  92 (0) & 288 (  2) \\  
+  GASVPro & 0.135 & 0.0449 & 120 ( 28)  &  38 (  3) &   80 (0) &  29 (0) & 110 (0) \\ 
+  DELLY & 0.0824 & 0.091 & 143 (  8)  & 125 (  4) &  158 (  1) &  83 (  1) & 256 (  3) \\ 
+  Pindel & \textbf{0.16} & 0.0685 & 149 ( 12)  &  57 (0) &  140 (0) &  58 (0) & 172 (0) \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -282,9 +281,9 @@ A similar ROC-like curve for insertions on the NA18507 data set is shown in Figu
  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp \\ 
 Total Number & & & 536 & 114 & 45 & 1 \\
   \hline
-Cloudbreak & 0.0258 & \textbf{0.395} & \textbf{ 249} (\textbf{  85})  &   25 (   9) &     1 (0) & 0 (0) \\ 
-Breakdancer & 0.0281 & 0.181 &   97 (  11)  & \textbf{  27} (   9) &     2 (   1) & 0 (0) \\  
-  Pindel & \textbf{0.0387} & 0.239 &  144 (  40)  &   14 (\textbf{  12}) &  \textbf{   7} (\textbf{   7}) & \textbf{   1} (\textbf{   1})  \\ 
+Cloudbreak & 0.0268 & \textbf{0.391} & \textbf{246} (\textbf{ 83})  &  25 (  9) &    1 (0) & 0 (0) \\ 
+Breakdancer & 0.0281 & 0.181 &  97 ( 11)  & \textbf{ 27} (  9) &    2 (  1) & 0 (0) \\  
+  Pindel & \textbf{0.0387} & 0.239 & 144 ( 41)  &  14 (\textbf{ 12}) &  \textbf{  7} (\textbf{  7}) & \textbf{  1} (\textbf{  1})  \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -304,15 +303,15 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 120 & 327 & 553 & 7851 \\ 
   \hline
-  Cloudbreak  &   27 (   4) & \textbf{ 152} (  14) & \textbf{ 222} (\textbf{  50}) & \textbf{ 880} (\textbf{ 131}) \\ 
-  Breakdancer & \textbf{  29} (   5) &  142 (   7) &  186 (  20) &  754 (  30) \\
-  GASVPro     &   16 (   2) &   79 (   3) &   75 (  10) &  302 (  22) \\
-  DELLY       &   21 (   2) &  117 (   2) &  147 (   8) &  618 (   9) \\
-  Pindel      &   18 (\textbf{   9}) &  112 (\textbf{  27}) &  103 (   4) &  473 (   8) \\ 
+  Cloudbreak  &  25 (  2) & \textbf{158} ( 17) & \textbf{220} (\textbf{ 49}) & \textbf{870} (\textbf{124}) \\ 
+  Breakdancer & \textbf{ 29} (  6) & 142 (  7) & 186 ( 19) & 754 ( 30) \\
+  GASVPro     &  16 (  2) &  79 (  2) &  75 (  9) & 302 ( 22) \\
+  DELLY       &  21 (  2) & 117 (  2) & 147 (  9) & 618 (  8) \\
+  Pindel      &  18 (\textbf{  9}) & 112 (\textbf{ 26}) & 103 (  4) & 473 (  8) \\ 
    \hline
 \end{tabular}
 \end{center}
-\caption{Detected deletions on the simulated and NA18507 data sets identified by each tool at the 10\% FDR cutoff identified in the simulated data set, broken down by whether the deletion overlaps with a RepeatMasker-annotated element.}
+\caption{Detected deletions on the simulated and NA18507 data sets identified by each tool, broken down by whether the deletion overlaps with a RepeatMasker-annotated element.}
 \label{deletionRepmaskpreds}
 \end{table}
 
@@ -324,10 +323,10 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
  &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
  Total Number & 133 & 270 & 341 & 355 \\ 
   \hline
-  Cloudbreak  &   21 (   4) & \textbf{  59} (  24) & \textbf{ 139} (\textbf{  39}) & \textbf{ 136} (\textbf{  55}) \\ 
-  Breakdancer &   17 (   7) &   22 (  11) &   82 (  12) &   44 (   9) \\
-  Pindel      & \textbf{  25} (\textbf{  18}) &   54 (\textbf{  33}) &   84 (  36) &   82 (  24) \\ 
-  MoDIL      &    5 (0) &   16 (   3) & NA & NA \\ 
+  Cloudbreak  &  21 (  4) & \textbf{ 58} ( 24) & \textbf{137} (\textbf{ 37}) & \textbf{135} (\textbf{ 55}) \\ 
+  Breakdancer &  17 (  7) &  22 ( 11) &  82 ( 12) &  44 (  9) \\
+  Pindel      & \textbf{ 25} (\textbf{ 18}) &  54 (\textbf{ 33}) &  84 ( 36) &  82 ( 25) \\ 
+  MoDIL      &   5 (0) &  16 (  3) & NA & NA \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -339,7 +338,7 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
 
 Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing an insertion or deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For benchmarking genotyping of deletions in the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .35 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 88.9\% and 96.2\% accuracy in predicting the genotype of the true positive deletions we detected at our 10\% FDR threshold in the simulated and real data sets respectively. Table \ref{deletionGenotypeaccuracy} shows confusion matrices for the two samples using this classifier. For insertions, none of the three input sets that made up the gold standard for NA18507 contained a sufficient number of insertion rates that meet our size threshold that also had genotyping information. Of the 80 insertions detected by Cloudbreak on the simulated data set, 15 were heterozygous. Using the same cutoff of .35 on $\alpha$, Cloudbreak correctly classified 62 of the 65 homozygous insertions and 10 of the 15 heterozygous insertions discovered, for an overall accuracy rate of 90\%.
 
-\begin{table}[b]
+\begin{table}
 \begin{center}
 \begin{tabular}{r|r|rr|rr|}
 \multicolumn{2}{c}{}  & \multicolumn{4}{c}{Actual Genotypes} \\
@@ -347,8 +346,8 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 \cline{3-6}
 \multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
 \cline{2-6}
-\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 99 & 4 &  78 & 15 \\
- & Heterozygous & 6 & 69 &  3 & 333 \\
+\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 100 & 4 &  77 & 12 \\
+ & Heterozygous & 7 & 72 &  3 & 338 \\
 \cline{2-6}
 \end{tabular}
 \end{center}
@@ -360,7 +359,7 @@ Since Cloudbreak explicitly fits a mixture of insert size distributions at each 
 
 We implemented and executed Cloudbreak on a 56-node Hadoop cluster, with 636 map slots and 477 reduce slots. Not including alignment time, we were able to process the Chromosome 2 simulated data in under 10 minutes, and the the NA18507 data set in under an hour. For the simulated data set we used 100 reducers for the compute SV features job; for the real data set we used 300. The bulk of Cloudbreak's execution is spent in the feature generation step. Extracting deletion and insertion calls take under two minutes each for both the real and simulated data sets; the times are equal because each reducer is responsible for processing a single chromosome, and so the runtime is bounded by the length of time it takes to process the largest chromosome. 
 
-In table \ref{runtimes} we display a comparison of runtimes on the real and simulated data sets for all of the tools evaluated in this work. Each tool varies in the amount of parallelization supported. We report runtimes for tools run in their default single-threaded mode, as well as for levels of parallelization achievable with basic scripting, noting that one of the key advantages of Hadoop/MapReduce is the ability to scale parallel execution to the size of the available compute cluster without any custom programming. Pindel and Breakdancer allow processing of a single chromosome in one process, so it is possible to execute all chromosomes in parallel on a cluster that has a job scheduler and shared filesystem. Breakdancer has an additional preprocessing step (\verb|bam2cfg.pl|) which runs in a single thread. DELLY suggests splitting the input BAM file by chromosome, after which a separate DELLY process can be executed on the data for each chromosome; splitting a large BAM file is a time consuming process and consumes most of the time in this parallel workflow, in fact making it faster to run in single-threaded mode. GASVPro allows paralellization of the MCMC component for resolving ambiguously mapped read pairs; however, this requires a significant amount of custom scripting so we do not report those results here. The MoDIL distribution contains a set of scripts that can be used to submit parallel jobs to the SGE scheduling engine or modified for other schedulers.
+In table \ref{runtimes} we display a comparison of runtimes on the real and simulated data sets for all of the tools evaluated in this work. Each tool varies in the amount of parallelization supported. We report runtimes for tools run in their default single-threaded mode, as well as for levels of parallelization achievable with basic scripting, noting that one of the key advantages of Hadoop/MapReduce is the ability to scale parallel execution to the size of the available compute cluster without any custom programming. Pindel and Breakdancer allow processing of a single chromosome in one process, so it is possible to execute all chromosomes in parallel on a cluster that has a job scheduler and shared filesystem. Breakdancer has an additional preprocessing step (\texttt{bam2cfg.pl}) which runs in a single thread. DELLY suggests splitting the input BAM file by chromosome, after which a separate DELLY process can be executed on the data for each chromosome; splitting a large BAM file is a time consuming process and consumes most of the time in this parallel workflow, in fact making it faster to run in single-threaded mode. GASVPro allows paralellization of the MCMC component for resolving ambiguously mapped read pairs; however, this requires a significant amount of custom scripting so we do not report those results here. The MoDIL distribution contains a set of scripts that can be used to submit parallel jobs to the SGE scheduling engine or modified for other schedulers.
 
 In parallel execution, the total time to execute is bounded by the runtime of the longest-running process. In the case of chromosome-parallelizable tools including Breakdancer, Pindel, and DELLY, this is typically the process working on the largest chromosome.\footnote{We note that one Breakdancer process, handling an unplaced contig in the hg19 reference genome, never completed in our runs and had to be killed manually; we exclude that process from our results.} In the case of MoDIL's run on the simulated data, we found that the different processes varied widely in their execution times, likely caused by regions of high coverage or with many ambiguously mapped reads. Cloudbreak mitigates this problem during the time-consuming feature generation process by using Hadoop partitioners to randomly assign each genomic location to one of the set of reducers, ensuring that the work is evenly distributed across all processes.
 
@@ -372,11 +371,11 @@ In parallel execution, the total time to execute is bounded by the runtime of th
  &  Single CPU & Parallel (Max Proc.) &  Single CPU & Parallel (Max Proc.) \\ 
   \hline
   Cloudbreak  &   NA    & 426 (312)       & NA         & 2,481 (636) \\ 
-  Breakdancer &  653    & NA                 &              &  5,586 (84)  \\
-  GAVPPro       &  3,339  & NA                &              & NA  \\
-  DELLY          &  1,964  & NA                & 14,475  & 37,390 (84) \\
-  Pindel          &  1,336  &  NA               &              & 28,587 (84) \\ 
-  MoDIL         &  NA      & 52,547 (250)  & NA        & NA \\ 
+  Breakdancer &  653    & NA                 & 134,170  &  5,586 (84)  \\
+  GAVPPro       &  3,339  & NA                & 52,385   & NA  \\
+  DELLY          &  1,964  & NA                & 14,475   & 37,390 (84) \\
+  Pindel          &  1,336  &  NA               &               & 28,587 (84) \\ 
+  MoDIL         &  NA      & 52,547 (250)  & NA         & NA \\ 
    \hline
 \end{tabular}
 \end{center}
@@ -388,9 +387,9 @@ In parallel execution, the total time to execute is bounded by the runtime of th
 
 Cloudbreak is a native Java Hadoop application. We deployed Cloudbreak on a 56-node cluster running the Cloudera CDH3 Hadoop distribution, version 0.20.2-cdh3u4. We use snappy compression for MapReduce data. Hadoop's distributed cache mechanism shares the executable files and indices needed for mapping tasks to the nodes in the cluster. To execute the other tools in parallel mode we wrote simple scripts to submit jobs to the cluster using the HTCondor scheduling engine with directed acyclic graphs to describe dependencies between jobs.\footnote{\url{http://research.cs.wisc.edu/htcondor/}}
 
-Simulated reads were aligned to hg18 chromosome 2, and NA18507 reads were aligned to the hg19 assembly. For each evaluated SV detection program we attempt to follow the authors' recommended alignment pipeline, except for MoDIL, for which we used reads aligned with BWA (see below). Cloudbreak alignments were executed in parallel using Hadoop tasks which wrap RazerS 3 version 3.1, with parameters \\ \verb|-rr 99 -i 94 -m 1000|, requesting 99\% sensitivity, a maximum edit distance between read and reference of 6\%, and up to 1000 possible alignments reported for each read. Alignments for the other programs were first aligned using BWA \autocite{Li:2009p836} version 0.6.2-r126, with parameter \verb|-e 5| to allow for longer gaps in alignments due to the number of small indels near the ends of larger indels in the Venter data set. GASVPro also accepts ambiguous mappings; we extracted read pairs that did not align concordantly with BWA and re-aligned them with Novoalign V2.08.01, with parameters \verb|-a -r -Ex 1100 -t 250|. 
+Simulated reads were aligned to hg18 chromosome 2, and NA18507 reads were aligned to the hg19 assembly. For each evaluated SV detection program we attempt to follow the authors' recommended alignment pipeline, except for MoDIL, for which we used reads aligned with BWA (see below). Cloudbreak alignments were executed in parallel using Hadoop tasks which wrap GEM version 1.362 (beta) in single-ended mode, with parameters \texttt{-e 6 -m 6 -s 2 -q ignore -d 1000 --max-big-indel-length 0},  requesting all hits for a read that are within an edit distance of 6 of the reference, within 2 strata of the best hit, with a maximum of 1000 possible alignments reported for each read. Alignments for the other programs were first aligned using BWA \autocite{Li:2009p836} version 0.6.2-r126, with parameter \texttt{-e 5} to allow for longer gaps in alignments due to the number of small indels near the ends of larger indels in the Venter data set. GASVPro also accepts ambiguous mappings; we extracted read pairs that did not align concordantly with BWA and re-aligned them with Novoalign V2.08.01, with parameters \texttt{-a -r -Ex 1100 -t 250}. 
 
-We ran Breakdancer version 1.1\_2011\_02\_21 in single threaded mode by first executing \verb|bam2cfg.pl| and then running \verb|breakdancer_max| with the default parameter values. To run Breakdancer in parallel mode we first ran \verb|bam2cfg.pl| and then launched parallel instances of \verb|breakdancer_max| for each chromosome using the \verb|-o| parameter. We ran DELLY version 0.0.9 with the \verb|-p| parameter and default values for other parameters. For the parallel run of DELLY we first split the original BAM file with BamTools \cite{Barnett:2011hm}, and then ran instances of DELLY in parallel for each BAM file. We ran GASVPro version 1.2 using the \verb|GASVPro.sh| script and default parameters. Pindel 0.2.4t was executed with default parameters in single CPU mode, and executed in parallel mode for each chromosome using the \verb|-c| option.
+We ran Breakdancer version 1.1\_2011\_02\_21 in single threaded mode by first executing \texttt{bam2cfg.pl} and then running \texttt{breakdancer_max} with the default parameter values. To run Breakdancer in parallel mode we first ran \texttt{bam2cfg.pl} and then launched parallel instances of \texttt{breakdancer_max} for each chromosome using the \texttt{-o} parameter. We ran DELLY version 0.0.9 with the \texttt{-p} parameter and default values for other parameters. For the parallel run of DELLY we first split the original BAM file with BamTools \cite{Barnett:2011hm}, and then ran instances of DELLY in parallel for each BAM file. We ran GASVPro version 1.2 using the \texttt{GASVPro.sh} script and default parameters. Pindel 0.2.4t was executed with default parameters in single CPU mode, and executed in parallel mode for each chromosome using the \texttt{-c} option.
 
 \section{Discussion}\label{Discussion}
 
