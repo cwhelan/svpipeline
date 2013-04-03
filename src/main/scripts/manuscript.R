@@ -12,20 +12,31 @@ drawPerfLine <- function(perf, col, lineType, maxFP) {
   lines(fp[fp <= maxFP], tp[fp <= maxFP], col=col, lty=lineType, lwd=3)
 }
 
+rocColors <- function(numLines) {
+  if (numLines <= 9) { 
+    perfCols <- brewer.pal(numLines, "Set1")
+  } else {
+    perfCols <- rainbow(numLines)
+  }
+  return(perfCols)
+}
+
+rocLineTypes <- function(numLines) {
+  seq(1,numLines)
+}
+
 plotROC <- function(perfs, perfNames, totalDels, main, sim=TRUE, maxTP=NA, legendLoc="bottomright") {
   maxFP <- totalDels
   if (is.na(maxTP)) {
     maxTP <- totalDels
   }
   plot(0, type="n", ylim=c(0, maxTP), xlim=c(0,maxFP), xlab=ifelse(sim, "False Positives", "Novel Predictions"), ylab="True Positives", main=main)
-  if (length(perfs) <= 9) {
-    perfCols <- brewer.pal(length(perfs), "Set1")
-  } else {
-    perfCols <- rainbow(length(perfs))
-  }
-  lineTypes <- seq(1,length(perfs))
+  perfCols <- rocColors(length(perfs))
+  lineTypes <- rocLineTypes(length(perfs))
   mapply(drawPerfLine, perfs, perfCols, lineTypes, MoreArgs=list(maxFP=maxFP))  
-  legend(legendLoc, legend=perfNames, col=perfCols, lty=lineTypes, lwd=3, cex=.9)
+  if (! is.null(legendLoc)) {
+    legend(legendLoc, legend=perfNames, col=perfCols, lty=lineTypes, lwd=3, cex=.9)
+  }
 }
 
 overlap <- function(a,b,x,y) {
@@ -188,23 +199,25 @@ repMask <- import.bed('~/genomes/1kg/hg18/repeatmasker_b36_merged.bed.gz', asRan
 
 chr2DeletionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_DELS_ROC.pdf'
 chr2InsertionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf'
+chr2ROCsOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_ROC_COMBINED_ROCS.pdf'
 NA18507DeletionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_DELS_ROC.pdf'
 NA18507InsertionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_INS_ROC.pdf'
+NA18507ROCsOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_COMBINED_ROCS.pdf'
 
 #chr2 100bp diploid deletions
-totalDels <- 400
+totalDelsChr2 <- 400
 cloudbreakChr2DeletionPerf <- read.table(cloudbreakChr2DeletionPerfFile, header=TRUE, sep="\t")
 breakdancerChr2DeletionPerf <- read.table(breakdancerChr2DeletionPerfFile, header=TRUE)
 gasvChr2DeletionPerf <- read.table(gasvProChr2DeletionPerfFile, header=TRUE)
 dellyChr2DeletionPerf <- read.table(dellyChr2DeletionPerfFile, header=TRUE)
 pindelChr2DeletionPerf <- read.table(pindelChr2DeletionPerfFile, header=TRUE)
 
-perfsList <- list(cloudbreak=cloudbreakChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf)
+perfsListDelsChr2 <- list(cloudbreak=cloudbreakChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf)
 pdf(chr2DeletionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
-plotROC(perfsList, 
+plotROC(perfsListDelsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY"), 
-        totalDels, "Deletions in Venter diploid chr2 simulation",legendLoc=xy.coords(425,200), maxTP=350)
+        totalDelsChr2, "Deletions in Venter diploid chr2 simulation",legendLoc=xy.coords(425,200), maxTP=350)
 dev.off()
 
 # analyze predictions at a given threshold
@@ -316,18 +329,32 @@ chr2HapCMMaxSensitivity <- table(cbpredsWithExtraDataMaxSensitivity$haps, cbpred
 chr2DeletionHapAccuracy <- (chr2HapCMMaxSensitivity['1','FALSE'] + chr2HapCMMaxSensitivity['2','TRUE']) / sum(chr2HapCMMaxSensitivity)
 
 #chr2 100bp diploid insertions
-totalInsertions <- 80
+totalInsertionsChr2 <- 80
 cloudbreakChr2InsertionPerf <- read.table(cloudbreakChr2InsertionPerfFile, header=TRUE, sep="\t")
 cloudbreakChr2InsertionPerfSmoothed <- cloudbreakChr2InsertionPerf[seq(1,dim(cloudbreakChr2InsertionPerf)[1],by=10),]
 breakdancerChr2InsertionPerf <- read.table(breakdancerChr2InsertionPerfFile, header=TRUE)
 pindelChr2InsertionPerf <- read.table(pindelChr2InsertionPerfFile, header=TRUE)
 
-perfsListInsertions <- list(cloudbreak=cloudbreakChr2InsertionPerfSmoothed, breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf)
+perfsListInsertionsChr2 <- list(cloudbreak=cloudbreakChr2InsertionPerfSmoothed, breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf)
 pdf(chr2InsertionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
-plotROC(perfsListInsertions, 
+plotROC(perfsListInsertionsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
-        totalInsertions, "Insertions in Venter diploid chr2 simulation",legendLoc=xy.coords(85,50), maxTP=80)
+        totalInsertionsChr2, "Insertions in Venter diploid chr2 simulation",legendLoc=xy.coords(85,50), maxTP=80)
+dev.off()
+
+pdf(chr2ROCsOutputFile, width=15)
+par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,5))
+plotROC(perfsListDelsChr2, 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY"), 
+        totalDelsChr2, "Deletions in Venter diploid chr2 simulation",legendLoc=NULL, maxTP=350)
+par(mar=par()$mar+c(0,0,0,6))
+plotROC(perfsListInsertionsChr2, 
+        c("Cloudbreak", "Breakdancer","Pindel"), 
+        totalInsertionsChr2, "Insertions in Venter diploid chr2 simulation",legendLoc=NA, maxTP=80)
+perfCols <- rocColors(length(perfsListDelsChr2))
+lineTypes <- rocLineTypes(length(perfsListDelsChr2))
+legend(xy.coords(85,50), legend=c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY"), col=perfCols, lty=lineTypes, lwd=3, cex=.9)
 dev.off()
 
 # analyze predictions at a given threshold
@@ -437,17 +464,18 @@ ol <- findOverlaps(trueDelsNA18507, na185071KGDels)
 mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(ol)[,2]])$hap
 
 # ROC curve
-totalDels <- 15000
+totalDelsNA18507 <- 15000
 NA18507cloudbreakDelsPerf <- read.table(cloudbreakNA18507DeletionPerfFile, header=TRUE, sep="\t")
 NA18507breakdancerDelsPerf <- read.table(breakdancerNA18507DeletionPerfFile, header=TRUE)
 NA18507gasvDelsPerf <- read.table(gasvProNA18507DeletionPerfFile, header=TRUE)
 NA18507dellyDelsPerf <- read.table(dellyNA18507DeletionPerfFile, header=TRUE)
 NA18507pindelDelsPerf <- read.table(pindelNA18507DeletionPerfFile, header=TRUE)
 
-perfsList <- list(cloudbreak=NA18507cloudbreakDelsPerf, breakdancer=NA18507breakdancerDelsPerf, pindel=NA18507pindelDelsPerf, gasv=NA18507gasvDelsPerf, delly=NA18507dellyDelsPerf)
+perfsListDelsNA18507 <- list(cloudbreak=NA18507cloudbreakDelsPerf, breakdancer=NA18507breakdancerDelsPerf, pindel=NA18507pindelDelsPerf, gasv=NA18507gasvDelsPerf, delly=NA18507dellyDelsPerf)
 pdf(NA18507DeletionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
-plotROC(perfsList, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", "DELLY", "Cloudbreak"), totalDels, "NA18507", legendLoc=xy.coords(15750,700), maxTP=2000, sim=FALSE)
+plotROC(perfsListDelsNA18507, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", "DELLY", "Cloudbreak"), totalDelsNA18507, 
+        "Deletions in NA18507", legendLoc=xy.coords(15750,1250), maxTP=2000, sim=FALSE)
 dev.off()
 
 # break down predictons
@@ -505,7 +533,7 @@ ol <- findOverlaps(trueDelsNA18507, millsGenotypedRanges)
 mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(ol)[,2]])$hap
 
 #chr2 100bp diploid insertions
-totalInsertions <- 8000
+totalInsertionsNA18507 <- 8000
 cloudbreakNA18507InsertionsPerf <- read.table(cloudbreakNA18507InsertionsPerfFile, header=TRUE, sep="\t")
 cloudbreakNA18507InsertionsPerfSmoothed <- cloudbreakNA18507InsertionsPerf[seq(1,dim(cloudbreakNA18507InsertionsPerf)[1],by=4),]
 breakdancerNA18507InsertionsPerf <- read.table(breakdancerNA18507InsertionsPerfFile, header=TRUE)
@@ -516,7 +544,22 @@ pdf(NA18507InsertionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsListInsertionsNA18507, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
-        totalInsertions, "Insertions in NA18507",legendLoc=xy.coords(8500,100), maxTP=300, sim=FALSE)
+        totalInsertionsNA18507, "Insertions in NA18507",legendLoc=xy.coords(8500,100), maxTP=300, sim=FALSE)
+dev.off()
+
+
+pdf(NA18507ROCsOutputFile, width=15)
+par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,5))
+plotROC(perfsListDelsNA18507, 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY"), 
+        totalDelsNA18507, "Deletions in NA18507",legendLoc=NULL, maxTP=2000, sim=FALSE)
+par(mar=par()$mar+c(0,0,0,6))
+plotROC(perfsListInsertionsNA18507, 
+        c("Cloudbreak", "Breakdancer","Pindel"), 
+        totalInsertionsNA18507, "Insertions in NA18507",legendLoc=NA, maxTP=300, sim=FALSE)
+perfCols <- rocColors(length(perfsListDelsNA18507))
+lineTypes <- rocLineTypes(length(perfsListDelsNA18507))
+legend(xy.coords(8500,175), legend=c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY"), col=perfCols, lty=lineTypes, lwd=3, cex=.9)
 dev.off()
 
 # analyze predictions at a given threshold
@@ -670,4 +713,8 @@ tableEnv = new.env()
 assign("chr2HapCM", chr2HapCMFDR10, envir=tableEnv)
 assign("NA18507HapCM", NA18507HapCM, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/deletionGenotypeAccuracy.table.brew.tex', env=tableEnv)
+
+#allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueend - truestart)))
+#ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot()
+
 
