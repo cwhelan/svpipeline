@@ -4,6 +4,7 @@ library(plyr)
 library(RColorBrewer)
 library(VariantAnnotation)
 library(brew)
+library(ggplot2)
 
 drawPerfLine <- function(perf, col, lineType, maxFP) {
   calls <- c(perf$Calls, min(perf$Calls) - min(perf$TP), 0)
@@ -811,7 +812,10 @@ assign("chr2HapCM", chr2HapCMFDR10, envir=tableEnv)
 assign("NA18507HapCM", NA18507HapCM, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/deletionGenotypeAccuracy.table.brew.tex', env=tableEnv)
 
-#allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueend - truestart)))
-#ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot()
+
+pdf("~/Documents/svpipeline/manuscript/breakpoint_resolution.pdf")
+allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueend - truestart)))
+ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot() + xlab("") + ylab("Difference in length")
+dev.off()
 
 
