@@ -211,15 +211,16 @@ repMask <- import.bed('~/genomes/1kg/hg18/repeatmasker_b36_merged.bed.gz', asRan
 
 # output files
 
-chr2DeletionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_DELS_ROC.pdf'
-chr2InsertionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf'
-chr2ROCsOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_ROC_COMBINED_ROCS.pdf'
-chr2ROCsPosterOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_ROC_COMBINED_ROCS_POSTER.pdf'
-NA18507DeletionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_DELS_ROC.pdf'
-NA18507InsertionsROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_INS_ROC.pdf'
-NA18507ROCsOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_COMBINED_ROCS.pdf'
-NA18507ROCsPosterOutputFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_COMBINED_ROCS_POSTER.pdf'
-chr2DelReportsComparisonROCOutputFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2_SIM_DEL_REPORTSCOMPARISON_ROC.pdf'
+chr2DeletionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_DELS_ROC.pdf'
+chr2InsertionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_INS_ROC.pdf'
+chr2ROCsOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_ROC_COMBINED_ROCS.pdf'
+chr2ROCsPosterOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_ROC_COMBINED_ROCS_POSTER.pdf'
+NA18507DeletionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507/NA18507_DELS_ROC.pdf'
+NA18507InsertionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507/NA18507_INS_ROC.pdf'
+NA18507ROCsOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507_COMBINED_ROCS.pdf'
+NA18507ROCsPosterOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507_COMBINED_ROCS_POSTER.pdf'
+chr2DelReportsComparisonROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2_SIM_DEL_REPORTSCOMPARISON_ROC.pdf'
+breakpointResolutionOutputFile <- '~/Documents/svpipeline/manuscript/figures/breakpoint_resolution.pdf'
 
 #chr2 100bp diploid deletions
 totalDelsChr2 <- 400
@@ -827,7 +828,7 @@ assign("NA18507HapCM", NA18507HapCM, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/deletionGenotypeAccuracy.table.brew.tex', env=tableEnv)
 
 
-pdf("~/Documents/svpipeline/manuscript/breakpoint_resolution.pdf")
+pdf(breakpointResolutionOutputFile)
 allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueend - truestart)))
 ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot() + xlab("") + ylab("Difference in length")
 dev.off()

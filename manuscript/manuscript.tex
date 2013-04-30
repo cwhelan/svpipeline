@@ -127,7 +127,7 @@ We have implemented an indel detection algorithm for medium-to-high coverage dip
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{/users/cwhelan/insert_size_mixtures.pdf}
+\includegraphics[width=1\textwidth]{../figures/insert_size_mixtures.pdf}
 \caption{Illustration of insert size mixtures at individual genomic locations. A) there is no variant present at the location indicated by the vertical line (left), so the mix of insert sizes (right) follows the expected distribution of the library centered at 200bp, with a small amount of noise coming from low-quality mappings. B) a homozygous deletion of 50bp at the location has shifted the distribution of observed insert sizes. C) A heterozygous deletion at the location causes a mixture of normal and long insert sizes to be detected. D) A heterozygous small insertion shifts a portion of the mixture to have lower insert sizes.}
 \label{insert_size_mixes}
 \end{figure}
@@ -149,7 +149,7 @@ A diagram of the Cloudbreak algorithm working on a simple example is shown in Fi
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{cloudbreak_mapred_diagram.pdf}
+\includegraphics[width=1\textwidth]{../figures/cloudbreak_mapred_diagram.pdf}
 \caption{An example of the Cloudbreak MapReduce algorithm. A) In the first MapReduce job, mappers scan input reads in FASTQ format and execute an alignment program in single-ended mode to generate aligned reads. Reducers gather all alignments for both reads in each pair. B) In the second MapReduce job, mappers first emit information about each read pair (in this case the insert size and quality) keys indicating the genomic location spanned by that pair. Only one genomic location is diagrammed here for simplicity. Reducers then compute features for each location on the genome by fitting a GMM to the distribution of spanning insert sizes. C) Mappers group all emitted features by their chromosome, and reducers find contiguous blocks of features that indicate the presence of a deletion.}
 \label{algorithm_example}
 \end{figure}
@@ -168,14 +168,14 @@ As has been observed elsewhere, there is no available test set of real Illumina 
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_DELS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{../figures/CHR2SIM_DELS_ROC.pdf}
 \caption{ROC curve of deletion prediction performance on a simulated set of reads giving diploid coverage of 30X on human chromosome 2 with insertions and deletions from the Venter genome added to one or both haplotypes. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score.}
 \label{chr2DeletionsRoc}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{../figures/CHR2SIM_INS_ROC.pdf}
 \caption{ROC curve of insertion prediction performance on the chromosome 2 simulated data set.}
 \label{chr2InsertionsRoc}
 \end{figure}
@@ -244,7 +244,7 @@ To create a gold standard set of insertions and deletions to test against, we po
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/NA18507/NA18507_DELS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{../figures/NA18507_DELS_ROC.pdf}
 \caption{ROC curve of deletion prediction performance on the 37X NA18507 sample, tested against the combined gold standard deletion set taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}.}
 \label{NA18507DeletionsRoc}
 \end{figure}
@@ -274,7 +274,7 @@ Breakdancer & 0.122 & 0.112 & 261 ( 41)  & 132 (  6) &  167 (0) &  92 (0) & 288 
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/NA18507/NA18507_INS_ROC.pdf}
+\includegraphics[width=0.75\textwidth]{../figures/NA18507_INS_ROC.pdf}
 \caption{ROC curve of insertion prediction performance on the 37X NA18507 sample.}
 \label{NA18507InsertionsRoc}
 \end{figure}
