@@ -9,6 +9,7 @@
 \usepackage{url}
 \usepackage{multirow}
 \usepackage{authblk}
+\usepackage{rotating}
 
 \usepackage[style=authoryear,maxbibnames=5,mincitenames=1,maxcitenames=1]{biblatex}
 \renewbibmacro{in:}{%
@@ -126,12 +127,12 @@ We have implemented an indel detection algorithm for medium-to-high coverage dip
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{/users/cwhelan/Documents/gene_rearrange/insert_size_mixtures.pdf}
+\includegraphics[width=1\textwidth]{/users/cwhelan/insert_size_mixtures.pdf}
 \caption{Illustration of insert size mixtures at individual genomic locations. A) there is no variant present at the location indicated by the vertical line (left), so the mix of insert sizes (right) follows the expected distribution of the library centered at 200bp, with a small amount of noise coming from low-quality mappings. B) a homozygous deletion of 50bp at the location has shifted the distribution of observed insert sizes. C) A heterozygous deletion at the location causes a mixture of normal and long insert sizes to be detected. D) A heterozygous small insertion shifts a portion of the mixture to have lower insert sizes.}
 \label{insert_size_mixes}
 \end{figure}
 
-To handle incorrect and ambiguous mappings, we assume that in general they will not form normally distributed clusters in the same way that correct mappings will, and therefore use an outlier detection technique to filter the observed insert sizes for each location. We sort the observed insert sizes and define as an outlier an observation whose $k$th nearest neighbor is more than $n\sigma$ distant, where $k = 3$ and $n = 5$. In addition, we rank all observations by the estimated probability that the mapping is correct and use an \emph{adaptive quality cutoff} to filter observations: we discard all observations where the estimated probability the mapping is correct is less than the score of the maximum quality observation minus a constant $c$. This allows the use of more uncertain mappings in repetitive regions of the genome while restricting the use of low-quality mappings in unique regions. Defining $\textsc{Mismatches}(a)}$ to be the number of mismatches between a read and the reference genome in the alignment $a$, we approximate the probability $p^{k}_c$ of each end alignment being correct by:
+To handle incorrect and ambiguous mappings, we assume that in general they will not form normally distributed clusters in the same way that correct mappings will, and therefore use an outlier detection technique to filter the observed insert sizes for each location. We sort the observed insert sizes and define as an outlier an observation whose $k$th nearest neighbor is more than $n\sigma$ distant, where $k = 3$ and $n = 5$. In addition, we rank all observations by the estimated probability that the mapping is correct and use an \emph{adaptive quality cutoff} to filter observations: we discard all observations where the estimated probability the mapping is correct is less than the score of the maximum quality observation minus a constant $c$. This allows the use of more uncertain mappings in repetitive regions of the genome while restricting the use of low-quality mappings in unique regions. Defining $\textsc{Mismatches}(a)$ to be the number of mismatches between a read and the reference genome in the alignment $a$, we approximate the probability $p^{k}_c$ of each end alignment being correct by:
 
 \[ p^{k}_c(a^{k}_{m,i}) = \frac{\exp({-\textsc{Mismatches}(a^{k}_{m,i})/2)}}{\sum_j{\exp(-\textsc{Mismatches}(a^{k}_{m,j})/2)}} \]
 
@@ -172,9 +173,16 @@ As has been observed elsewhere, there is no available test set of real Illumina 
 \label{chr2DeletionsRoc}
 \end{figure}
 
-Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algorithm for detecting deletions on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. The output which we obtained from MoDIL did not have a threshold that could be varied to correlate with the tradeoff between precision and recall; therefore it is not included in this figure.
+\begin{figure}
+\centering
+\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf}
+\caption{ROC curve of insertion prediction performance on the chromosome 2 simulated data set.}
+\label{chr2InsertionsRoc}
+\end{figure}
 
-Choosing the correct operating point or threshold can be difficult when operating on a new data set, but the use of simulated data and ROC curves allows for some investigation of the performance characteristics of algorithms at varying levels. First, we used the results on simulated deletions to characterize the predictions made by each algorithm when a low false discovery rate is required. Table \ref{chr2DeletionPredsFDR10} shows the total number of simulated deletions found by each tool when choosing a threshold that gives an FDR closest to 10\% based on the ROC curve, representing cutoffs of 2.22 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 11 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and a simple score of 13 for Pindel. Cloudbreak shows good performance at detecting deletions in all size classes, and finds more medium and large deletions than the other approaches. Pindel exclusively identifies a large number of small (40bp-100bp) deletions, as is expected for a split-read method.
+Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algorithm for detecting deletions on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. The output which we obtained from MoDIL did not have a threshold that could be varied to correlate with the tradeoff between precision and recall; therefore it is not included in this figure. A ROC curve for insertion prediction performance is shown in Figure \ref{chr2InsertionsRoc}.
+
+Choosing the correct operating point or threshold can be difficult when operating on a new data set, but the use of simulated data and ROC curves allows for some investigation of the performance characteristics of algorithms at varying levels. First, we used the ROC curves to attempt to characterize the predictions made by each algorithm when a low false discovery rate is required. Table \ref{chr2DeletionPredsFDR10} shows the total number of simulated deletions found by each tool when choosing a threshold that gives an FDR closest to 10\% based on the ROC curve, representing cutoffs of 2.22 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 11 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and a simple score of 13 for Pindel. Cloudbreak shows good performance at detecting deletions in all size classes, and finds more medium and large deletions than the other approaches. Pindel exclusively identifies a large number of small (40bp-100bp) deletions, as is expected for a split-read method. Performance on insertions never reached a level with an FDR of 10\%, so insertion predictions are not included in this table.
 
 \begin{table}
 \begin{center}
@@ -195,53 +203,37 @@ Choosing the correct operating point or threshold can be difficult when operatin
 \label{chr2DeletionPredsFDR10}
 \end{table}
 
-We also characterized the predictions made by each algorithm at the operating point which gives them maximum sensitivity. For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low. The results are summarized in Table \ref{chr2DeletionPredsMaxSensitivity}. MoDIL has the greatest recall but low precision. Cloudbreak has high precision and recall at this threshold, and surprisingly discovers more small deletions than Pindel.
+We also characterized the predictions made by each algorithm at the operating point which gives them maximum sensitivity. For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low. The results for both deletion and insertion predictions are summarized in Table \ref{chr2DeletionAndInsertionPredsMaxSensitivity}. MoDIL and Cloudbreak exhibited the greatest recall for deletions. Cloudbreak has high precision and recall for deletions at this threshold, and surprisingly discovers more small deletions than Pindel. For insertions, Cloudbreak shows excellent precision, although recall is low for all four approaches, with Cloudbreak and Pindel showing the highest recall rates. Cloudbreak again identifies the most small variants. Pindel is the only tool which can consitently identify large insertions, as insertions larger than the library insert size do not produce mapping signatures detectable by read-pair mapping.
+
 
 \begin{table}
 \begin{center}
-\begin{tabular}{rrr|rrrrr}
+\begin{tabular}{r|rrr|rrrrr}
+  \cline{2-9}
+   &                     & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+\hline
+\multirow{7}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number &          &           & 224 &  84 & 82 &  31 & 26\\ 
   \hline
-                        & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
- Total Number &          &           & 224 &  84 & 82 &  31 & 26\\ 
-  \hline
-  Cloudbreak    &  \textbf{0.532} & \textbf{0.66} & \textbf{146} (  6)  &  58 (\textbf{  4}) &   62 (  1) &  14 (  1) &  15 (0) \\ 
-  Breakdancer   &  0.356 & 0.49 &  89 (0)  &  54 (0) &   53 (0) &   8 (0) &  15 (0) \\ 
-  GASVPro        & 0.146 & 0.432 &  83 (  2)  &  32 (0) &   55 (0) &   8 (0) &  15 (0) \\ 
-  DELLY           & 0.457 & 0.613 & 114 (  8)  & \textbf{ 68} (  2) &  \textbf{ 66} (  1) &   9 (0) &  17 (  1) \\ 
-  Pindel           & 0.462 & 0.421 &  96 (\textbf{ 13})  &  24 (0) &   48 (0) &   5 (0) &  15 (0)\\ 
-  MoDIL           & 0.132  & \textbf{0.66} & 123 (  5)  &  66 (  2) &  \textbf{ 66} (\textbf{  7}) & \textbf{ 17} (\textbf{  6}) & \textbf{ 23} (\textbf{  8})\\ 
+\cline{2-9}
+&  Cloudbreak    &  0.532 & \textbf{0.66} & \textbf{146} (  6)  &  58 (\textbf{  4}) &   62 (  1) &  14 (  1) &  15 (0) \\ 
+&  Breakdancer   &  0.356 & 0.49 &  89 (0)  &  54 (0) &   53 (0) &   8 (0) &  15 (0) \\ 
+&  GASVPro        & 0.146 & 0.432 &  83 (  2)  &  32 (0) &   55 (0) &   8 (0) &  15 (0) \\ 
+&  DELLY-RP           & 0.457 & 0.613 & 114 (  8)  & \textbf{ 68} (  2) &  \textbf{ 66} (0) &   9 (0) &  17 (0) \\ 
+&  DELLY-SR           & \textbf{0.679} & 0.166 & 0 (0)  &   3 (0) &   49 (0) &   6 (0) &  16 (0) \\ 
+&  Pindel           & 0.462 & 0.421 &  96 (\textbf{ 13})  &  24 (0) &   48 (0) &   5 (0) &  15 (0)\\ 
+&  MoDIL           & 0.132  & \textbf{0.66} & 123 (  5)  &  66 (  2) &  \textbf{ 66} (\textbf{  7}) & \textbf{ 17} (\textbf{  6}) & \textbf{ 23} (\textbf{  8})\\ 
    \hline
+\multirow{5}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number &          &           & 199 &  83 & 79 &  21 & 21\\ 
+\cline{2-9}
+&  Cloudbreak   &\textbf{0.705} & \textbf{0.196}  & \textbf{ 67} ( 24)  &   8 (  3) &    3 (  1) &   1 (0) & 0 (0) \\ 
+&  Breakdancer & 0.262 & 0.0968  &  23 (  8)  & \textbf{ 14} (\textbf{  9}) &    2 (  1) & 0 (0) & 0 (0) \\ 
+&  Pindel          & 0.572 & \textbf{0.196} &  52 (\textbf{ 26})  &   5 (  3) &  \textbf{ 10} (\textbf{ 10}) & \textbf{  3} (\textbf{  3}) & \textbf{  9} (\textbf{  9})\\ 
+&  MoDIL          & 0.186 & 0.0521 &  14 (  1)  &   4 (  1) &    1 (0) &   2 (  1) & 0 (0)\\ 
+\hline
 \end{tabular}
 \end{center}
-\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
-\label{chr2DeletionPredsMaxSensitivity}
-\end{table}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.75\textwidth]{/Users/cwhelan/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/CHR2SIM_INS_ROC.pdf}
-\caption{ROC curve of insertion prediction performance on the chromosome 2 simulated data set.}
-\label{chr2InsertionsRoc}
-\end{figure}
-
-An ROC curve for insertion prediction performance is shown in Figure \ref{chr2InsertionsRoc}. The number of insertions identified by each algorithm at maximum sensitivity, again broken down by size, is shown in Table \ref{chr2InsertionPreds}. Cloudbreak shows excellent precision, although recall is low for all four approaches. Cloudbreak again identifies the most small variants. Pindel is the only tool which can identify large insertions, as insertions larger than the library insert size do not produce mapping signatures detectable by read-pair mapping.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{rrr|rrrrr}
-  \hline
-                        & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
- Total Number &          &           & 199 &  83 & 79 &  21 & 21\\ 
-  \hline
-  Cloudbreak   &\textbf{0.705} & \textbf{0.196}  & \textbf{ 67} ( 24)  &   8 (  3) &    3 (  1) &   1 (0) & 0 (0) \\ 
-  Breakdancer & 0.262 & 0.0968  &  23 (  8)  & \textbf{ 14} (\textbf{  9}) &    2 (  1) & 0 (0) & 0 (0) \\ 
-  Pindel          & 0.572 & \textbf{0.196} &  52 (\textbf{ 26})  &   5 (  3) &  \textbf{ 10} (\textbf{ 10}) & \textbf{  3} (\textbf{  3}) & \textbf{  9} (\textbf{  9})\\ 
-  MoDIL          & 0.186 & 0.0521 &  14 (  1)  &   4 (  1) &    1 (0) &   2 (  1) & 0 (0)\\ 
-   \hline
-\end{tabular}
-\end{center}
-\caption{The number of simulated insertions in the 30X diploid chromosome 2 with Venter indels found by each tool at maximum sensitivity, as well as the number of those insertions that were discovered exclusively by each tool (in parentheses). The total number of insertions in each size class in the true set of insertions is shown in the second row of the header.}
-\label{chr2InsertionPreds}
+\caption{The precision and recall of each tool for the simulated deletions and insertions in the 30X diploid chromosome 2 with Venter indels at maximum sensitivity, as well as the number of those variants discovered in each size class. Variants exclusively predicted by one tool are shown in parentheses. The total number of variants in each size class in the true set of deletions and insertions is shown in the first row of each section.}
+\label{chr2DeletionAndInsertionPredsMaxSensitivity}
 \end{table}
 
 \subsection{Tests with Biological Data}
