@@ -256,27 +256,36 @@ To create a gold standard set of insertions and deletions to test against, we po
 \label{NA18507DeletionsRoc}
 \end{figure}
 
-Figure \ref{NA18507DeletionsRoc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard deletion set, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at more stringent thresholds, and remains near the top at higher sensitivity levels.
+Figure \ref{NA18507DeletionsRoc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard deletion set, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at more stringent thresholds, and remains near the top at higher sensitivity levels. A similar ROC-like curve for insertions on the NA18507 data set is shown in Figure \ref{NA18507InsertionsRoc}. Cloudbreak has optimal performance at all thresholds for insertions, although all algorithms make many novel predictions.
 
-We then tested the predictions made by each algorithm using the same cutoffs that yielded a 10\% FDR on the simulated chromosome 2 data set, adjusted proportionally for the difference in coverage from 30X to 37X. The precision and recall with respect to the gold standard deletion set, as well as the performance of each algorithm at predicting each size class at those thresholds, is shown in Table \ref{NA18507DeletionPreds}. Cloudbreak has the greatest sensitivity of any tool at these thresholds, identifying the most variants in each size class.
+We then tested the deletion predictions made by each algorithm using the same cutoffs that yielded a 10\% FDR on the simulated chromosome 2 data set, adjusted proportionally for the difference in coverage from 30X to 37X. For insertions, again, we were forced to use the thresholds that gave maximum sensitivity for each tool due to the high observed FDR rates in the simulated data. The precision and recall with respect to the gold standard deletion set, as well as the performance of each algorithm at predicting each size class at those thresholds, is shown in Table \ref{NA18507DeletionAndInsertionPreds}. For deletions, Cloudbreak has the greatest sensitivity of any tool at these thresholds, identifying the most variants in each size class. Pindel exhibits the highest precision with respect to the gold standard set. For insertions, Pindel again has the highest precision at maximum sensitivity, although according the ROC curve it is possible to choose a threshold for Cloudbreak with higher precision and recall. At maximum sensitivity, Cloudbreak identifies 100 more insertions from the gold standard set than Pindel, giving it by far the highest recall.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{rrr|rrrrr}
+\begin{tabular}{r|rrr|rrrrr}
+  \cline{2-9}
+&  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+\hline
+\multirow{6}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
   \hline
- & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
-Total Number & & & 7,466 & 235 & 218 & 110 & 375 \\
-  \hline
-Cloudbreak & 0.11 & \textbf{0.13} & \textbf{371} (\textbf{127})  & \textbf{146} (\textbf{ 15}) &  \textbf{177} (\textbf{  9}) & \textbf{ 95} (\textbf{  3}) & \textbf{301} (\textbf{ 19}) \\ 
-Breakdancer & 0.122 & 0.112 & 261 ( 41)  & 132 (  6) &  167 (0) &  92 (0) & 288 (  2) \\  
-  GASVPro & 0.135 & 0.0449 & 120 ( 28)  &  38 (  3) &   80 (0) &  29 (0) & 110 (0) \\ 
-  DELLY & 0.0824 & 0.091 & 143 (  8)  & 125 (  4) &  158 (  1) &  83 (  1) & 256 (  3) \\ 
-  Pindel & \textbf{0.16} & 0.0685 & 149 ( 12)  &  57 (0) &  140 (0) &  58 (0) & 172 (0) \\ 
-   \hline
+\cline{2-9}
+& Cloudbreak & 0.11 & \textbf{0.13} & \textbf{371} (\textbf{127})  & \textbf{146} (\textbf{ 15}) &  \textbf{177} (\textbf{  9}) & \textbf{ 95} (\textbf{  3}) & \textbf{301} (\textbf{ 17}) \\ 
+& Breakdancer & 0.122 & 0.112 & 261 ( 41)  & 132 (  6) &  167 (0) &  92 (0) & 288 (  2) \\  
+&  GASVPro & 0.135 & 0.0449 & 120 ( 28)  &  38 (  3) &   80 (0) &  29 (0) & 110 (0) \\ 
+&  DELLY-RP & 0.0824 & 0.091 & 143 (  8)  & 125 (  4) &  158 (  1) &  83 (  1) & 256 (  1) \\ 
+&  DELLY-SR & 0.135 & 0.0439 & 0 (0)  &  25 (0) &  117 (0) &  56 (0) & 171 (0) \\ 
+&  Pindel & \textbf{0.16} & 0.0685 & 149 ( 12)  &  57 (0) &  140 (0) &  58 (0) & 172 (0) \\ 
+\hline
+\multirow{4}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number & & & 536 & 114 & 45 & 1 \\
+\cline{2-9}
+& Cloudbreak & 0.0268 & \textbf{0.391} & \textbf{246} (\textbf{ 83})  &  25 (  9) &    1 (0) & 0 (0) \\ 
+& Breakdancer & 0.0281 & 0.181 &  97 ( 11)  & \textbf{ 27} (  9) &    2 (  1) & 0 (0) \\  
+&  Pindel & \textbf{0.0387} & 0.239 & 144 ( 41)  &  14 (\textbf{ 12}) &  \textbf{  7} (\textbf{  7}) & \textbf{  1} (\textbf{  1})  \\ 
+\hline
 \end{tabular}
 \end{center}
-\caption{The precision and recall with respect to the gold standard set of each tool on the NA18507 data, as well as the number of deletions in each size class found. The same cutoffs were used as for the simulated data as in Table \ref{chr2DeletionPredsFDR10}, adjusted for the difference in coverage from 30X to 37X.}
-\label{NA18507DeletionPreds}
+\caption{The precision and recall with respect to the gold standard set of deletions and insertions for each tool on the NA18507 data, as well as the number of variants found in each size class found. Exclusive predictions are in parentheses. For deletions, the same cutoffs were used as for the simulated data as in Table \ref{chr2DeletionPredsFDR10}, adjusted for the difference in coverage from 30X to 37X. For insertions, the maximum sensitivity cutoff was used.}
+\label{NA18507DeletionAndInsertionPreds}
 \end{table}
 
 \begin{figure}
@@ -285,25 +294,6 @@ Breakdancer & 0.122 & 0.112 & 261 ( 41)  & 132 (  6) &  167 (0) &  92 (0) & 288 
 \caption{ROC curve of insertion prediction performance on the 37X NA18507 sample.}
 \label{NA18507InsertionsRoc}
 \end{figure}
-
-A similar ROC-like curve for insertions on the NA18507 data set is shown in Figure \ref{NA18507InsertionsRoc}. The number of insertions detected at maximum sensitivity for the three algorithms is shown in Table \ref{NA18507InsertionPreds}, along with their precision and recall at that threshold. Cloudbreak has the greatest recall, identifying twice as many short insertions as Pindel, while Pindel has the best precision.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{rrr|rrrrr}
-  \hline
- & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp \\ 
-Total Number & & & 536 & 114 & 45 & 1 \\
-  \hline
-Cloudbreak & 0.0268 & \textbf{0.391} & \textbf{246} (\textbf{ 83})  &  25 (  9) &    1 (0) & 0 (0) \\ 
-Breakdancer & 0.0281 & 0.181 &  97 ( 11)  & \textbf{ 27} (  9) &    2 (  1) & 0 (0) \\  
-  Pindel & \textbf{0.0387} & 0.239 & 144 ( 41)  &  14 (\textbf{ 12}) &  \textbf{  7} (\textbf{  7}) & \textbf{  1} (\textbf{  1})  \\ 
-   \hline
-\end{tabular}
-\end{center}
-\caption{The precision and recall with respect to the gold standard set of insertions for each tool on the NA18507 data, as well as the number of insertions in each size class found, at maximum sensitivity.}
-\label{NA18507InsertionPreds}
-\end{table}
 
 \subsection{Performance in Repetitive Areas}
 
@@ -375,7 +365,7 @@ We implemented and executed Cloudbreak on a 56-node Hadoop cluster, with 636 map
 
 In table \ref{runtimes} we display a comparison of runtimes on the real and simulated data sets for all of the tools evaluated in this work. Each tool varies in the amount of parallelization supported. We report runtimes for tools run in their default single-threaded mode, as well as for levels of parallelization achievable with basic scripting, noting that one of the key advantages of Hadoop/MapReduce is the ability to scale parallel execution to the size of the available compute cluster without any custom programming. Pindel allows multi-threaded operation on multicore servers. Pindel and Breakdancer allow processing of a single chromosome in one process, so it is possible to execute all chromosomes in parallel on a cluster that has a job scheduler and shared filesystem. Breakdancer has an additional preprocessing step (\texttt{bam2cfg.pl}) which runs in a single thread. DELLY suggests splitting the input BAM file by chromosome, after which a separate DELLY process can be executed on the data for each chromosome; splitting a large BAM file is a time consuming process and consumes most of the time in this parallel workflow, in fact making it faster to run in single-threaded mode. GASVPro allows parallelization of the MCMC component for resolving ambiguously mapped read pairs; however, this requires a significant amount of custom scripting, and we did not find that the MCMC module consumed most of the runtime in our experiments, so we do not attempt to parallelize this componen. The MoDIL distribution contains a set of scripts that can be used to submit parallel jobs to the SGE scheduling engine or modified for other schedulers; we adapted these for use in our cluster.
 
-In parallel execution, the total time to execute is bounded by the runtime of the longest-running process. In the case of chromosome-parallelizable tools including Breakdancer, Pindel, and DELLY, this is typically the process working on the largest chromosome.\footnote{We note that one Breakdancer process, handling an unplaced contig in the hg19 reference genome, never completed in our runs and had to be killed manually; we exclude that process from our results.} In the case of MoDIL's run on the simulated data, we found that the different processes varied widely in their execution times, likely caused by regions of high coverage or with many ambiguously mapped reads. Cloudbreak mitigates this problem during the time-consuming feature generation process by using Hadoop partitioners to randomly assign each genomic location to one of the set of reducers, ensuring that the work is evenly distributed across all processes. This distribution of processing across the entire cluster also server to protect against server slowdowns and hardware failures - for example, we were still able to complete processing of the NA18507 data set in under 50 minutes during a run where one of the compute nodes was rebooted midway through the feature generation job.
+In parallel execution, the total time to execute is bounded by the runtime of the longest-running process. In the case of chromosome-parallelizable tools including Breakdancer, Pindel, and DELLY, this is typically the process working on the largest chromosome.\footnote{We note that one Breakdancer process, handling an unplaced contig in the hg19 reference genome, never completed in our runs and had to be killed manually; we exclude that process from our results.} In the case of MoDIL's run on the simulated data, we found that the different processes varied widely in their execution times, likely caused by regions of high coverage or with many ambiguously mapped reads. Cloudbreak mitigates this problem during the time-consuming feature generation process by using Hadoop partitioners to randomly assign each genomic location to one of the set of reducers, ensuring that the work is evenly distributed across all processes. This distribution of processing across the entire cluster also serves to protect against server slowdowns and hardware failures - for example, we were still able to complete processing of the NA18507 data set in under 50 minutes during a run where one of the compute nodes was rebooted midway through the feature generation job.
 
 \begin{table}
 \begin{center}
