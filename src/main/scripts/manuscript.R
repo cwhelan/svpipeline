@@ -211,16 +211,17 @@ repMask <- import.bed('~/genomes/1kg/hg18/repeatmasker_b36_merged.bed.gz', asRan
 
 # output files
 
-chr2DeletionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_DELS_ROC.pdf'
-chr2InsertionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_INS_ROC.pdf'
-chr2ROCsOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_ROC_COMBINED_ROCS.pdf'
-chr2ROCsPosterOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2SIM_ROC_COMBINED_ROCS_POSTER.pdf'
-NA18507DeletionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507/NA18507_DELS_ROC.pdf'
-NA18507InsertionsROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507/NA18507_INS_ROC.pdf'
-NA18507ROCsOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507_COMBINED_ROCS.pdf'
-NA18507ROCsPosterOutputFile <- '~/Documents/svpipeline/manuscript/figures/NA18507_COMBINED_ROCS_POSTER.pdf'
-chr2DelReportsComparisonROCOutputFile <- '~/Documents/svpipeline/manuscript/figures/CHR2_SIM_DEL_REPORTSCOMPARISON_ROC.pdf'
-breakpointResolutionOutputFile <- '~/Documents/svpipeline/manuscript/figures/breakpoint_resolution.pdf'
+chr2DeletionsROCOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_DELS_ROC.pdf'
+chr2InsertionsROCOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_INS_ROC.pdf'
+chr2ROCsOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_ROC_COMBINED_ROCS.pdf'
+chr2ROCsPosterOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_ROC_COMBINED_ROCS_POSTER.pdf'
+NA18507DeletionsROCOutputFile <- '~/Documents/svpipeline/figures/NA18507_DELS_ROC.pdf'
+NA18507InsertionsROCOutputFile <- '~/Documents/svpipeline/figures/NA18507_INS_ROC.pdf'
+NA18507ROCsOutputFile <- '~/Documents/svpipeline/figures/NA18507_COMBINED_ROCS.pdf'
+NA18507ROCsPosterOutputFile <- '~/Documents/svpipeline/figures/NA18507_COMBINED_ROCS_POSTER.pdf'
+chr2DelReportsComparisonROCOutputFile <- '~/Documents/svpipeline/figures/CHR2_SIM_DEL_REPORTSCOMPARISON_ROC.pdf'
+breakpointResolutionOutputFile <- '~/Documents/svpipeline/figures/breakpoint_resolution.pdf'
+runtimeByNumberOfNodesOutputFile <- '~/Documents/svpipeline/figures/runtimeByNodes.pdf'
 
 #chr2 100bp diploid deletions
 totalDelsChr2 <- 400
@@ -827,10 +828,17 @@ assign("chr2HapCM", chr2HapCMFDR10, envir=tableEnv)
 assign("NA18507HapCM", NA18507HapCM, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/deletionGenotypeAccuracy.table.brew.tex', env=tableEnv)
 
-
+# breakpoint resolution
 pdf(breakpointResolutionOutputFile)
 allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueend - truestart)))
 ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot() + xlab("") + ylab("Difference in length")
 dev.off()
 
+# plot EC2 runtimes on chr2 features with different numbers of reducers
+nodes <- c(5,10,20,30,40)
+featureCompTimes <- c(1491,1049,552,412,458)
+runtimeDF <- data.frame(nodes=nodes, featureCompTimes=featureCompTimes)
+pdf(runtimeByNumberOfNodesOutputFile)
+ggplot(aes(x=nodes,y=featureCompTimes), data=runtimeDF) + geom_line() + xlab("Nodes") + ylab("Feature Computation Time (seconds)") + labs(title="Runtime by Number of Nodes in Cluster")
+dev.off()
 
