@@ -91,21 +91,28 @@ numPredictionsAtLevel <- function(perfTable, threshold) {
   return(perfTable[perfTable$Thresh == min(perfTable[perfTable$Thresh >= threshold,'Thresh']),'Calls'])
 }
 
+formatNumber <- function(d) {
+  formatC(d,digits=3,format="fg",width=-1,drop0trailing=TRUE)
+}
+
 printPredTableValue <- function(t, x, y) {
+  if (! y %in% colnames(t)) {
+    return(0)
+  }
   d <- t[x,y]
-  if (t[x,y] == max(t[,y])) {
-    return(paste0("\\textbf{",formatC(d,digits=3,format="fg",width=0),"}"))
+  if (d == max(t[,y])) {
+    return(paste0("\\textbf{",formatNumber(d),"}"))
   } else {
-    return(formatC(d,digits=3,format="fg",width=0))
+    return(formatNumber(d))
   }
 }
 
 printPredTableValueFromList <- function(x, l) {
-  d <- l[x]
+  d <- ifelse(is.na(l[x]), 0, l[x])
   if (d == max(l)) {
-    return(paste0("\\textbf{",formatC(d,digits=3,format="fg",width=0),"}"))
+    return(paste0("\\textbf{",formatNumber(d),"}"))
   } else {
-    return(formatC(d,digits=3,format="fg",width=0))
+    return(formatNumber(d))
   }
 }
 
@@ -173,23 +180,23 @@ modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeli
 # NA18507
 
 # Deletions
-cloudbreakNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_gmm_300reducers_del_perf.txt'
-breakdancerNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40_perf.txt'
-gasvProNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.perf.txt'
-dellyNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.perf.txt'
-dellyBRNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_br.perf.txt'
-pindelNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.perf.txt'
+cloudbreakNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/1KG_imprecise_sv_dels.perf.txt'
+breakdancerNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40.new1KGCalls.perf.txt'
+gasvProNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.new1KGCalls.perf.txt'
+dellyNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del.new1KGCalls.perf.txt'
+dellyBRNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_br.new1KGCalls.perf.txt'
+pindelNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.new1KGCalls.perf.txt'
 
 cloudbreakNA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_del_calls_gt2p82.bed'
 
 NA18507delCutoffs=list(cloudbreak=2.82, breakdancer=4.9, GASVPro=13.6, DELLY=8.6, DELLYSR=13.6, Pindel=16.03)
 
-cloudbreakNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_del_calls_gt2p82.hits.txt'
-breakdancerNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40.gt4p9.hits.txt'
-gasvProNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.gt13p6.hits.txt'
-dellyNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.gt8p6.hits.txt'
-dellyBRNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_br.gt13p6.hits.txt'
-pindelNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.gt16.hits.txt'
+cloudbreakNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_del_calls_gt2p82.new1KGCalls.hits.txt'
+breakdancerNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40.gt4p9.new1KGCalls.hits.txt'
+gasvProNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.gt13p6.new1KGCalls.hits.txt'
+dellyNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.gt8p6.new1KGCalls.hits.txt'
+dellyBRNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_br_del_gte40.gt13p6.new1KGCalls.hits.txt'
+pindelNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.gt16.new1KGCalls.hits.txt'
 
 # insertions
 cloudbreakNA18507InsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_gmm_300reducers_ins_perf.txt'
@@ -516,20 +523,35 @@ trueDelsNA18507Sizes <- table(trueDelsNA18507Gte40$sizeclasses)
 
 trueDelRepmaskNA18507 <- table(trueDelsNA18507Gte40$repMask)
 
-na185071KGVariants <- readVcf('~/Documents/gene_rearrange/svpipeline/NA18507/ALL.integrated_phase1_v3.20101123.snps_indels_svs.genotypes.NA18507.vcf.gz', "hg19")
-
-mcols(rowData(na185071KGVariants))$gt <- as.factor(geno(na185071KGVariants)$GT)
-mcols(rowData(na185071KGVariants))$hap <- ifelse(mcols(rowData(na185071KGVariants))$gt == "1|1", 2, 1)
-
-na185071KGDels <- rowData(na185071KGVariants)[nchar(fixed(na185071KGVariants)$REF) > nchar(unlist(fixed(na185071KGVariants)$ALT))]
-
-na185071KGDels <- na185071KGDels[width(na185071KGDels) >= 40]
+# na185071KGVariants <- readVcf('~/Documents/gene_rearrange/svpipeline/NA18507/ALL.integrated_phase1_v3.20101123.snps_indels_svs.genotypes.NA18507.vcf.gz', "hg19")
+# 
+# mcols(rowData(na185071KGVariants))$gt <- as.factor(geno(na185071KGVariants)$GT)
+# mcols(rowData(na185071KGVariants))$hap <- ifelse(mcols(rowData(na185071KGVariants))$gt == "1|1", 2, 1)
+# 
+# na185071KGDels <- rowData(na185071KGVariants)[nchar(fixed(na185071KGVariants)$REF) > nchar(unlist(fixed(na185071KGVariants)$ALT))]
+# 
+# na185071KGDels <- na185071KGDels[width(na185071KGDels) >= 40]
 
 mcols(trueDelsNA18507)$hap <- NA
 
-ol <- findOverlaps(trueDelsNA18507, na185071KGDels)  
+newNA185071KGData <- read.table('/Users/cwhelan/Documents/gene_rearrange/svpipeline/NA18507/ALL.integrated_phase1_v3.20101123.snps_indels_svs.genotypes.NA18507.indels_and_svs.txt.gz',
+                                    col.names=c('chrom', 'pos', 'ref', 'alt', 'gtr', 'gt', 'type', 'svtype', 'imprecise', 'end', 'cipos', 'ciend'))
 
-mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(ol)[,2]])$hap
+newNA185071KGDelsData <- newNA185071KGData[newNA185071KGData$type == 'SV' 
+                                           | (newNA185071KGData$type == 'INDEL' & 
+                                                 (unlist(lapply(as.character(newNA185071KGData$ref), nchar)) > unlist(lapply(as.character(newNA185071KGData$alt), nchar)))),]
+
+newNA185071KGDels <- GRanges(seqnames=newNA185071KGDelsData$chrom,
+                             ranges=IRanges(start=newNA185071KGDelsData$pos,
+                                            end=ifelse(newNA185071KGDelsData$type == "INDEL",
+                                                       newNA185071KGDelsData$pos + unlist(lapply(as.character(newNA185071KGDelsData$ref), nchar)),
+                                                       as.numeric(ifelse(newNA185071KGDelsData$end == ".", "0", as.character(newNA185071KGDelsData$end))))),
+                            hap=ifelse(newNA185071KGDelsData$gt == "1|1", 2, 1))
+newNA185071KGDels <- newNA185071KGDels[width(newNA185071KGDels) >= 40]
+
+ol <- findOverlaps(trueDelsNA18507, newNA185071KGDels)  
+
+mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(newNA185071KGDels[as.matrix(ol)[,2]])$hap
 
 # ROC curve
 totalDelsNA18507 <- 15000
@@ -614,9 +636,9 @@ millsFullGenotypedDels <- merge(millsDelsWithGenotypes,millsGenotypeData)
 
 millsGenotypedRanges <- GRanges(seqnames=substr(millsFullGenotypedDels$CHR,4,length(millsFullGenotypedDels$CHR)), ranges=IRanges(start=millsFullGenotypedDels$START, end=millsFullGenotypedDels$STOP), mcols=DataFrame(hap=millsFullGenotypedDels$SED00002_NA18507.CEL))
 
-ol <- findOverlaps(trueDelsNA18507, millsGenotypedRanges)  
+#ol <- findOverlaps(trueDelsNA18507, millsGenotypedRanges)  
 
-mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(ol)[,2]])$hap
+# mcols(trueDelsNA18507[as.matrix(ol)[,1]])$hap <- mcols(na185071KGDels[as.matrix(ol)[,2]])$hap
 
 #chr2 100bp diploid insertions
 totalInsertionsNA18507 <- 8000
@@ -679,15 +701,15 @@ mcols(trueInsertionsNA18507)$sizeclasses <- factor(as.character(sizeclasses(mcol
 mcols(trueInsertionsNA18507)$repMask <- 0
 mcols(trueInsertionsNA18507[as.matrix(findOverlaps(repMaskHg19,trueInsertionsNA18507))[,2]])$repMask <- 1
 
-na185071KGInsLengths <- nchar(unlist(fixed(na185071KGVariants)$ALT)) - nchar(fixed(na185071KGVariants)$REF)
-na185071KGIns <- rowData(na185071KGVariants)[na185071KGInsLengths >= 40]
-
-
 mcols(trueInsertionsNA18507)$hap <- NA
 
-# right now not getting any genotypes from the 1KG insertions
-ol <- findOverlaps(trueInsertionsNA18507, na185071KGIns) 
-mcols(trueInsertionsNA18507[as.matrix(ol)[,1]])$hap <- mcols(trueInsertionsNA18507[as.matrix(ol)[,2]])$hap
+# # right now not getting any genotypes from the 1KG insertions
+# 
+# na185071KGInsLengths <- nchar(unlist(fixed(na185071KGVariants)$ALT)) - nchar(fixed(na185071KGVariants)$REF)
+# na185071KGIns <- rowData(na185071KGVariants)[na185071KGInsLengths >= 40]
+# 
+# ol <- findOverlaps(trueInsertionsNA18507, na185071KGIns) 
+# mcols(trueInsertionsNA18507[as.matrix(ol)[,1]])$hap <- mcols(trueInsertionsNA18507[as.matrix(ol)[,2]])$hap
 
 millsInsertionsWithIds <- read.table('/Users/cwhelan/Documents/Papers2/Articles/2011/Mills/Supplemental/Mills_2011_NA18507_INS.b37.bed')
 names(millsInsertionsWithIds) <- c("chrom", "start", "end", "length", "probeset_id")
@@ -801,6 +823,20 @@ assign("recall", NA18507InsertionRecall, envir=tableEnv)
 assign("preds", NA18507insertionPredsBySize, envir=tableEnv)
 assign("exPreds", NA18507insertionExPredsBySize, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/NA18507InsertionPredsBySize.table.brew.tex', env=tableEnv)
+
+# NA18507 Deletions and Insertions combined table
+tableEnv = new.env()
+assign("totalDels", trueDelsNA18507Sizes, envir=tableEnv)
+assign("delPrecision", NA18507DelPrecision, envir=tableEnv)
+assign("delRecall", NA18507DelRecall, envir=tableEnv)
+assign("delPreds", predsBySizeNA18507, envir=tableEnv)
+assign("exDelPreds", exBySizeNA18507, envir=tableEnv)
+assign("totalIns", trueInsertionsNA18507Sizes, envir=tableEnv)
+assign("insPrecision", NA18507InsertionPrecision, envir=tableEnv)
+assign("insRecall", NA18507InsertionRecall, envir=tableEnv)
+assign("insPreds", NA18507insertionPredsBySize, envir=tableEnv)
+assign("exInsPreds", NA18507insertionExPredsBySize, envir=tableEnv)
+brew('~/Documents/svpipeline/manuscript/NA18507DeletionAndInsertionPredsBySize.table.brew.tex', env=tableEnv)
 
 # deletions in repetitive regions
 tableEnv = new.env()

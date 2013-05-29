@@ -1,0 +1,165 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{authblk}
+\usepackage{rotating}
+\usepackage{xr}
+
+% \renewcommand{\thetable}{S\arabic{table}}   
+% \renewcommand{\thefigure}{S\arabic{figure}}
+% \renewcommand{\thealgorithm}{\arabic{algorithm}}
+
+\renewcommand{\figurename}{Supplementary Figure}
+\renewcommand{\tablename}{Supplementary Table}
+
+\newfloat{suppalgorithm}{p}{cap}
+\floatname{suppalgorithm}{Supplementary Algorithm}
+
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\textwidth]{../figures/cloudbreak_mapred_diagram.pdf}
+\caption{An example of the Cloudbreak MapReduce algorithm. A) In the first MapReduce job, mappers scan input reads in FASTQ format and execute an alignment program in single-ended mode to generate aligned reads. Reducers gather all alignments for both reads in each pair. B) In the second MapReduce job, mappers first emit information about each read pair (in this case the insert size and quality) keys indicating the genomic location spanned by that pair. Only one genomic location is diagrammed here for simplicity. Reducers then compute features for each location on the genome by fitting a GMM to the distribution of spanning insert sizes. C) Mappers group all emitted features by their chromosome, and reducers find contiguous blocks of features that indicate the presence of a deletion.}
+\label{algorithm_example}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+\centering
+\includegraphics[width=1\textwidth]{../figures/insert_size_mixtures.pdf}
+\caption{Illustration of insert size mixtures at individual genomic locations. A) there is no variant present at the location indicated by the vertical line (left), so the mix of insert sizes (right) follows the expected distribution of the library centered at 200bp, with a small amount of noise coming from low-quality mappings. B) a homozygous deletion of 50bp at the location has shifted the distribution of observed insert sizes. C) A heterozygous deletion at the location causes a mixture of normal and long insert sizes to be detected. D) A heterozygous small insertion shifts a portion of the mixture to have lower insert sizes.}
+\label{insert_size_mixes}
+\end{figure}
+
+\clearpage
+
+\begin{suppalgorithm}[h]
+\algrenewcommand\algorithmicprocedure{\textbf{job}}
+  \begin{algorithmic}[1]
+    \Procedure{Alignment}{}
+    \Function{Map}{$\textrm{ReadPairId }rpid, \textrm{ReadId }r, \textrm{ReadSequence }s, \textrm{ReadQuality }q$}
+    \ForAll{$ \textrm{Alignments }a \in \textsc{Align}(<s,q>)$}
+    \State $\textsc{Emit}(\textrm{ReadPairId }rpid, \textrm{Alignment }a)$
+    \EndFor
+    \EndFunction
+    \Function{Reduce}{$\textrm{ReadPairId }rpid, \textrm{Alignments }a_{1,2,\ldots}$}
+    \State $\textrm{AlignmentPairList }ap \gets \textsc{ValidAlignmentPairs}(a_{1,2,\ldots})$
+    \State $\textsc{Emit}(\textrm{ReadPairId }rp, \textrm{AlignmentPairList } ap)$
+    \EndFunction
+    \EndProcedure
+
+    \Procedure{Compute SV Features}{}
+    \Function{Map}{$\textrm{ReadPairId }rp, \textrm{AlignmentPairList }ap$}
+    \ForAll{$ \textrm{AlignmentPairs }<a_1,a_2>  \in ap$}
+    \ForAll{$ \textrm{GenomicLocations }l \in \textsc{Loci }(a_1,a_2)$}
+    \State $ \textrm{ReadPairInfo }rpi \gets <\textrm{InsertSize}(a_1,a_2), \textrm{AlignmentScore}(a_1,a_2)>$
+    \State $\textsc{Emit}(\textrm{GenomicLocation }l, \textrm{ReadPairInfo }rpi)$
+    \EndFor
+    \EndFor
+    \EndFunction
+    \Function{Reduce}{$\textrm{GenomicLocation }l, \textrm{ReadPairInfos }rpi_{1,2,\ldots}$}
+    \State $\textrm{SVFeatures } \phi_l \gets \Phi(\textrm{InsertSizes }i_{1,2,\ldots}, \textrm{AlignmentScores }q_{1,2,\ldots})$
+    \State $\textsc{Emit}(\textrm{GenomicLocation }l, \textrm{SVFeatures } \phi_l)$
+    \EndFunction
+    \EndProcedure
+
+    \Procedure{Call SVs}{}
+    \Function{Map}{$\textrm{GenomicLocation }l, \textrm{SVFeatures } \phi_l$}
+    \State $\textsc{Emit}(\textrm{Chromosome}(l), <l,\phi_l>)$
+    \EndFunction
+    \Function{Reduce}{$\textrm{Chromosome }c, \textrm{GenomicLocation } l_{1,2,\ldots},\phi_{1,2,\ldots}$}
+    \State $\textrm{StructuralVariationCalls } svs_c \gets \textsc{PostProcess }(\phi_{1,2,\ldots})$
+    \EndFunction
+    \EndProcedure
+  \end{algorithmic}
+\caption{The algorithmic framework for SV calling in MapReduce.}
+\label{cb_algo}
+\end{suppalgorithm}
+
+\newpage
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{r|r|rrr|rrr}
+\multicolumn{2}{c}{}  & \multicolumn{3}{c}{Simulated Data} & \multicolumn{3}{c}{NA18507} \\
+\hline
+ & SV Types &  Single CPU & Parallel & Proc. &  Single CPU & Parallel & Proc.  \\ 
+  \hline
+  Cloudbreak & D,I &   NA    & 308 & 312    & NA         & 2,310 & 636 \\ 
+  Breakdancer & D,I,V,T &  653   & NA       & NA          & 134,170 &  5,586 & 84 \\
+  GASVPro & D,V   &  3,339  & NA       & NA         & 52,385  & NA & NA \\
+  DELLY & D         &  1,964 & NA          & NA      & 30,311  & 20,224 & 84 \\
+  Pindel & D,I,V,P         & 37,006 &  4,885     & 8          &  284,932  & 28,587 & 84 \\ 
+  MoDIL & D,I        &  NA      & 52,547 & 250 & NA         & NA  & NA\\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{Runtimes (elapsed) on both data sets of each tool tested, in single-processor and parallel mode. For parallel runs, Proc. is the maximum number of simultaneously running processes or threads. All times are in seconds. The types of variants detected by each program are listed with the abbreviations: D - deletion; I - insertion; V - Inversion; P - duplication; T - translocation. Interchromosomal translocations are only detected by Breakdancer in single CPU mode. }
+\label{runtimes}
+\end{table}
+
+\newpage
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{rrr|rr}
+ & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
+\hline
+ &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
+ Total Number & 133 & 270 & 341 & 355 \\ 
+  \hline
+  Cloudbreak  & 21 (4) & \textbf{58} (24) & \textbf{137} (\textbf{37}) & \textbf{135} (\textbf{55}) \\ 
+  Breakdancer & 17 (7) & 22 (11) & 82 (12) & 44 (9) \\
+  Pindel      & \textbf{25} (\textbf{18}) & 54 (\textbf{33}) & 84 (36) & 82 (25) \\ 
+  MoDIL      & 5 (0) & 16 (3) & NA & NA \\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{Detected insertions in the simulated and NA18507 data sets identified by each tool, broken down by whether the insertion occurs in a RepeatMasker-annotated element.}
+\label{insertionRepmaskpreds}
+\end{table}
+
+\newpage
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{r|r|rr|rr|}
+\multicolumn{2}{c}{}  & \multicolumn{4}{c}{Actual Genotypes} \\
+\multicolumn{2}{c}{}  & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
+\cline{3-6}
+\multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
+\cline{2-6}
+\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 100 & 4 &  77 & 12 \\
+ & Heterozygous & 7 & 72 &  3 & 338 \\
+\cline{2-6}
+\end{tabular}
+\end{center}
+\caption{Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
+\label{deletionGenotypeaccuracy}
+\end{table}
+
+\newpage 
+
+\section{Supplementary Discussion}
+
+\subsection{A general framework for SV Detection in MapReduce}
+
+\subsection{Runtime Analysis}
+
+We implemented and executed Cloudbreak on a 56-node Hadoop cluster, with 636 map slots and 477 reduce slots. Not including alignment time, we were able to process the Chromosome 2 simulated data in under 6 minutes, and the the NA18507 data set in under 40 minutes. For the simulated data set we used 100 reducers for the compute SV features job; for the real data set we used 300. The bulk of Cloudbreak's execution is spent in the feature generation step. Extracting deletion and insertion calls take under two minutes each for both the real and simulated data sets; the times are equal because each reducer is responsible for processing a single chromosome, and so the runtime is bounded by the length of time it takes to process the largest chromosome. 
+
+In table \ref{runtimes} we display a comparison of runtimes on the real and simulated data sets for all of the tools evaluated in this work. Each tool varies in the amount of parallelization supported. We report runtimes for tools run in their default single-threaded mode, as well as for levels of parallelization achievable with basic scripting, noting that one of the key advantages of Hadoop/MapReduce is the ability to scale parallel execution to the size of the available compute cluster without any custom programming. Pindel allows multi-threaded operation on multicore servers. Pindel and Breakdancer allow processing of a single chromosome in one process, so it is possible to execute all chromosomes in parallel on a cluster that has a job scheduler and shared filesystem. Breakdancer has an additional preprocessing step (\texttt{bam2cfg.pl}) which runs in a single thread. DELLY suggests splitting the input BAM file by chromosome, after which a separate DELLY process can be executed on the data for each chromosome; splitting a large BAM file is a time consuming process and consumes most of the time in this parallel workflow, in fact making it faster to run in single-threaded mode. GASVPro allows parallelization of the MCMC component for resolving ambiguously mapped read pairs; however, this requires a significant amount of custom scripting, and we did not find that the MCMC module consumed most of the runtime in our experiments, so we do not attempt to parallelize this componen. The MoDIL distribution contains a set of scripts that can be used to submit parallel jobs to the SGE scheduling engine or modified for other schedulers; we adapted these for use in our cluster.
+
+In parallel execution, the total time to execute is bounded by the runtime of the longest-running process. In the case of chromosome-parallelizable tools including Breakdancer, Pindel, and DELLY, this is typically the process working on the largest chromosome.\footnote{We note that one Breakdancer process, handling an unplaced contig in the hg19 reference genome, never completed in our runs and had to be killed manually; we exclude that process from our results.} In the case of MoDIL's run on the simulated data, we found that the different processes varied widely in their execution times, likely caused by regions of high coverage or with many ambiguously mapped reads. Cloudbreak mitigates this problem during the time-consuming feature generation process by using Hadoop partitioners to randomly assign each genomic location to one of the set of reducers, ensuring that the work is evenly distributed across all processes. This distribution of processing across the entire cluster also serves to protect against server slowdowns and hardware failures - for example, we were still able to complete processing of the NA18507 data set in under 50 minutes during a run where one of the compute nodes was rebooted midway through the feature generation job.
+
+
+\end{document}

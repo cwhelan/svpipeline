@@ -10,8 +10,10 @@
 \usepackage{multirow}
 \usepackage{authblk}
 \usepackage{rotating}
+\usepackage{xr}
+\externaldocument[S]{nm_supp}
 
-\usepackage[style=authoryear,maxbibnames=5,mincitenames=1,maxcitenames=1]{biblatex}
+\usepackage[style=nature,maxbibnames=5,mincitenames=1,maxcitenames=1]{biblatex}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
   \printtext{\bibstring{in}\intitlepunct}}}
@@ -53,13 +55,15 @@ Google's MapReduce \autocite{Dean:2008p277} and its open-source implementation H
 
 In this paper, we describe a framework for solving SV detection problems in Hadoop and MapReduce based on the computation of local features along the genome from paired end mappings. We then demonstrate the development in this framework of an algorithm, Cloudbreak, for discovering genomic deletions and short insertions. Cloudbreak computes local features that build on the ideas of \autocite{Lee:2009da}, who modeled the distribution of insert sizes at each genomic location as a Gaussian Mixture Model (GMM). Use of the Hadoop/MapReduce framework enables scalable implementations of this class of algorithm. We then characterize our algorithm's performance on simulated and real data sets and compare it with those of recently published methods.
 
-\section{A MapReduce Framework for SV Detection Algorithms}
+\section{Results}
+
+\subsection{A MapReduce Framework for SV Detection Algorithms}
 
 The MapReduce programming model \autocite{Dean:2008p277} divides computation across a cluster into three phases. In the first phase, \emph{mappers} developed by the application programmer examine small blocks of data and emit a set of $\langle key, value \rangle$ pairs for each block examined. The MapReduce framework then sorts the output of the mappers by key, and aggregates all values that are associated with each key. Finally, the framework executes \emph{reducers}, also created by the application developer, which process all of the values for a particular key and produce one or more outputs that summarize or aggregate those values. Hadoop is an open source project of the Apache Foundation which provides an implementation of the MapReduce programming framework as well as a distributed file system (HDFS) for distributing the redundant storage of large data sets across a cluster. MapReduce and Hadoop allow efficient processing of large data sets by scheduling tasks for execution as close as possible to the nodes which hold the required data, minimizing network traffic and I/O contention.
 
 The need to separate logic into mappers and reducers makes it difficult to implement traditional RP-based SV detection approaches in MapReduce. This is especially true because of the global clustering of paired end mappings at the heart of many RP approaches. MapReduce algorithms, by contrast, excel at conducting many independent calculations in parallel. In sequencing applications, for example, MapReduce based SNP-callers Crossbow \autocite{Langmead:2009p1225} and GATK \autocite{McKenna:2010p1051} perform independent calculations for each location or partition in the genome. The RP-based SV callers MoDIL \autocite{Lee:2009da} and forestSV \autocite{Michaelson:2012fj} attempt to solve the SV detection problem by computing scores or features at locations along the genome and then producing SV predictions from those features in a post-processing step. Here we show that this technique can be easily translated to the MapReduce programming model.
 
-Our formulation divides processing into three distinct MapReduce jobs, and is summarized in Figure \ref{cloudbreak_workflow}. The first job finds possible alignment locations for pairs of reads in FASTQ format. The second job computes features from the set of alignment pairs that are relevant to each of a set of small intervals covering the genome. In the third stage, the features for all locations on each chromosome are examined to find contiguous blocks of locations that support an SV call. This MapReduce framework is summarized in Algorithm 1.
+Our formulation divides processing into three distinct MapReduce jobs, and is summarized in Figure \ref{cloudbreak_workflow}. The first job finds possible alignment locations for pairs of reads in FASTQ format. The second job computes features from the set of alignment pairs that are relevant to each of a set of small intervals covering the genome. In the third stage, the features for all locations on each chromosome are examined to find contiguous blocks of locations that support an SV call. This MapReduce framework is summarized in Supplementary Algorithm \ref{Scb_algo}.
 
 \begin{figure}
 \centering
@@ -68,48 +72,6 @@ Our formulation divides processing into three distinct MapReduce jobs, and is su
 \label{cloudbreak_workflow}
 \end{figure}
 
-\begin{algorithm}
-\algrenewcommand\algorithmicprocedure{\textbf{job}}
-  \begin{algorithmic}[1]
-    \Procedure{Alignment}{}
-    \Function{Map}{$\textrm{ReadPairId }rpid, \textrm{ReadId }r, \textrm{ReadSequence }s, \textrm{ReadQuality }q$}
-    \ForAll{$ \textrm{Alignments }a \in \textsc{Align}(<s,q>)$}
-    \State $\textsc{Emit}(\textrm{ReadPairId }rpid, \textrm{Alignment }a)$
-    \EndFor
-    \EndFunction
-    \Function{Reduce}{$\textrm{ReadPairId }rpid, \textrm{Alignments }a_{1,2,\ldots}$}
-    \State $\textrm{AlignmentPairList }ap \gets \textsc{ValidAlignmentPairs}(a_{1,2,\ldots})$
-    \State $\textsc{Emit}(\textrm{ReadPairId }rp, \textrm{AlignmentPairList } ap)$
-    \EndFunction
-    \EndProcedure
-
-    \Procedure{Compute SV Features}{}
-    \Function{Map}{$\textrm{ReadPairId }rp, \textrm{AlignmentPairList }ap$}
-    \ForAll{$ \textrm{AlignmentPairs }<a_1,a_2>  \in ap$}
-    \ForAll{$ \textrm{GenomicLocations }l \in \textsc{Loci }(a_1,a_2)$}
-    \State $ \textrm{ReadPairInfo }rpi \gets <\textrm{InsertSize}(a_1,a_2), \textrm{AlignmentScore}(a_1,a_2)>$
-    \State $\textsc{Emit}(\textrm{GenomicLocation }l, \textrm{ReadPairInfo }rpi)$
-    \EndFor
-    \EndFor
-    \EndFunction
-    \Function{Reduce}{$\textrm{GenomicLocation }l, \textrm{ReadPairInfos }rpi_{1,2,\ldots}$}
-    \State $\textrm{SVFeatures } \phi_l \gets \Phi(\textrm{InsertSizes }i_{1,2,\ldots}, \textrm{AlignmentScores }q_{1,2,\ldots})$
-    \State $\textsc{Emit}(\textrm{GenomicLocation }l, \textrm{SVFeatures } \phi_l)$
-    \EndFunction
-    \EndProcedure
-
-    \Procedure{Call SVs}{}
-    \Function{Map}{$\textrm{GenomicLocation }l, \textrm{SVFeatures } \phi_l$}
-    \State $\textsc{Emit}(\textrm{Chromosome}(l), <l,\phi_l>)$
-    \EndFunction
-    \Function{Reduce}{$\textrm{Chromosome }c, \textrm{GenomicLocation } l_{1,2,\ldots},\phi_{1,2,\ldots}$}
-    \State $\textrm{StructuralVariationCalls } svs_c \gets \textsc{PostProcess }(\phi_{1,2,\ldots})$
-    \EndFunction
-    \EndProcedure
-  \end{algorithmic}
-\label{cloudbreakAlgorithm}
-\caption{The algorithmic framework for SV calling in MapReduce.}
-\end{algorithm}
 
 The alignment job uses sensitive mapping tools and settings to discover as many mapping locations for each read pair as possible. In the map phase, mappers align reads in single-end mode to the reference genome in parallel, outputting each possible mapping location as a value under a key identifying the read pair. In the reduce phase, the framework combines pairs of mapping locations for the two ends of a read pair to produce all possible combinations of mapping locations found. Our framework could use any aligner that is capable of reporting multiple alignments for reads. The results we report below were generated with alignments from the GEM mapper \autocite{MarcoSola:2012hm}, which in our tests displayed the best combination of sensitivity, performance, and memory usage suitable for parallelization in Hadoop. Our implementation also contains wrappers to execute the aligners Novoalign\footnote{\url{http://wwww.novocraft.com}}, RazerS 3 \autocite{Weese:2012by}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
 
@@ -130,14 +92,7 @@ We describe our implementations of the $\textsc{Loci}$, $\Phi$, and $\textsc{Pos
 We have implemented an indel detection algorithm for medium-to-high coverage diploid samples in this framework called Cloudbreak. Our implementation defines the three application-specific functions described above as:
 \begin{description}
 \item[\sc{Loci}] Because we are detecting deletions and short insertions, we map ReadPairInfos from each possible alignment to the genomic locations overlapped by the implied internal insert between the reads. For efficiency, we define a maximum detectable deletion size of 25,000bp, and therefore alignment pairs in which the ends are more than 25kb apart, or in the incorrect orientation, map to no genomic locations.
-\item[$\Phi$] To compute features for each genomic location, we follow \textcite{Lee:2009da}, who observed that if all mappings are correct, the insert sizes implied by mappings which span a given genomic location should follow a Gaussian mixture model (GMM) whose parameters depend on whether a deletion or insertion is present at that locus (Figure \ref{insert_size_mixes}). Briefly: if there is no indel, the insert sizes implied by spanning alignment pairs should follow the distribution of actual fragment sizes in the sample, which is typically modeled as normally distributed with mean $\mu$ and standard deviation $\sigma$. If there is a homozygous deletion or insertion of length $l$ at the location, $\mu$ should be shifted to $\mu + l$, while $\sigma$ will remain constant. Finally, in the case of a heterozygous event, the distribution of insert sizes will follow a mixture of two normal distributions, one with mean $\mu$, and the other with mean $\mu + l$, both with an unchanged standard deviation of $\sigma$, and mixing parameter $\alpha$ that describes the relative weights of the two components. Because the mean and standard deviation of the fragment sizes are selected by the experimenter and therefore known \emph{a priori} (or at least easily estimated based on a sample of alignments), we only need to estimate the mean of the second component at each locus, and the mixing parameter $\alpha$.
-
-\begin{figure}
-\centering
-\includegraphics[width=1\textwidth]{../figures/insert_size_mixtures.pdf}
-\caption{Illustration of insert size mixtures at individual genomic locations. A) there is no variant present at the location indicated by the vertical line (left), so the mix of insert sizes (right) follows the expected distribution of the library centered at 200bp, with a small amount of noise coming from low-quality mappings. B) a homozygous deletion of 50bp at the location has shifted the distribution of observed insert sizes. C) A heterozygous deletion at the location causes a mixture of normal and long insert sizes to be detected. D) A heterozygous small insertion shifts a portion of the mixture to have lower insert sizes.}
-\label{insert_size_mixes}
-\end{figure}
+\item[$\Phi$] To compute features for each genomic location, we follow \textcite{Lee:2009da}, who observed that if all mappings are correct, the insert sizes implied by mappings which span a given genomic location should follow a Gaussian mixture model (GMM) whose parameters depend on whether a deletion or insertion is present at that locus (Supplementary Figure \ref{Sinsert_size_mixes}). Briefly: if there is no indel, the insert sizes implied by spanning alignment pairs should follow the distribution of actual fragment sizes in the sample, which is typically modeled as normally distributed with mean $\mu$ and standard deviation $\sigma$. If there is a homozygous deletion or insertion of length $l$ at the location, $\mu$ should be shifted to $\mu + l$, while $\sigma$ will remain constant. Finally, in the case of a heterozygous event, the distribution of insert sizes will follow a mixture of two normal distributions, one with mean $\mu$, and the other with mean $\mu + l$, both with an unchanged standard deviation of $\sigma$, and mixing parameter $\alpha$ that describes the relative weights of the two components. Because the mean and standard deviation of the fragment sizes are selected by the experimenter and therefore known \emph{a priori} (or at least easily estimated based on a sample of alignments), we only need to estimate the mean of the second component at each locus, and the mixing parameter $\alpha$.
 
 To handle incorrect and ambiguous mappings, we assume that in general they will not form normally distributed clusters in the same way that correct mappings will, and therefore use an outlier detection technique to filter the observed insert sizes for each location. We sort the observed insert sizes and define as an outlier an observation whose $k$th nearest neighbor is more than $n\sigma$ distant, where $k = 3$ and $n = 5$. In addition, we rank all observations by the estimated probability that the mapping is correct and use an \emph{adaptive quality cutoff} to filter observations: we discard all observations where the estimated probability the mapping is correct is less than the score of the maximum quality observation minus a constant $c$. This allows the use of more uncertain mappings in repetitive regions of the genome while restricting the use of low-quality mappings in unique regions. Defining $\textsc{Mismatches}(a)$ to be the number of mismatches between a read and the reference genome in the alignment $a$, we approximate the probability $p^{k}_c$ of each end alignment being correct by:
 
@@ -152,42 +107,24 @@ The features generated for each location $l$ include the log-likelihood ratio of
 \item[\sc{PostProcess}] We convert our features along the genome to insertion and deletion calls by first extracting contiguous genomic loci where the log-likelihood ratio of the two models is greater than a given threshold. To eliminate noise we apply a median filter with window size 5. We end regions when $\mu'$ changes by more than 60bp ($2\sigma$), and discard regions where the average value of $\mu'$ is less than $\mu$ or where the length of the region differs from $\mu'$ by more than $\mu$.
 \end{description}
 
-A diagram of the Cloudbreak algorithm working on a simple example is shown in Figure \ref{algorithm_example}.
-
-\begin{figure}
-\centering
-\includegraphics[width=1\textwidth]{../figures/cloudbreak_mapred_diagram.pdf}
-\caption{An example of the Cloudbreak MapReduce algorithm. A) In the first MapReduce job, mappers scan input reads in FASTQ format and execute an alignment program in single-ended mode to generate aligned reads. Reducers gather all alignments for both reads in each pair. B) In the second MapReduce job, mappers first emit information about each read pair (in this case the insert size and quality) keys indicating the genomic location spanned by that pair. Only one genomic location is diagrammed here for simplicity. Reducers then compute features for each location on the genome by fitting a GMM to the distribution of spanning insert sizes. C) Mappers group all emitted features by their chromosome, and reducers find contiguous blocks of features that indicate the presence of a deletion.}
-\label{algorithm_example}
-\end{figure}
-
-\section{Results}\label{results}
-
-We compared the performance of Cloudbreak for detecting deletions and insertions to a selection of popular tools: the RP method Breakdancer \autocite{Chen:2009p3}, GASVPro, an RP method that integrates RD signals and ambiguous mappings to increase sensitivity and specificity \autocite{Sindi:2012kk}, the SR method Pindel \autocite{Ye:2009p2}, and the hybrid RP-SR method DELLY \autocite{Rausch:2012he}. We also attempted to evaluate MoDIL on the same data. All of these methods detect deletions; in addition Breakdancer, Pindel, and MoDIL are capable of detecting insertions. In each case we use default parameters and attempt to follow the recommend pipelines for alignment for each tool (See Methods for details).
-
-We use the following criteria to define a true prediction given a gold standard set of deletion and insertion variants to test against: A predicted deletion is counted as a true positive if a) it overlaps with a deletion from the gold standard set, b) the length of the predicted call is within 300bp (the library fragment size in both our real and simulated libraries) of the length of the true deletion, and c) the true deletion has not been already been discovered by another prediction from the same method. For evaluating insertions, each algorithm produces insertion predictions that define an interval in which the insertion is predicted to have occurred with start and end coordinates $s$ and $e$ as well as the predicted length of the insertion, $l$. The true insertions are defined in terms of their actual insertion coordinate $i$ and their actual length $l_a$. Given this information, we modify the overlap criteria in a) to include overlaps of the intervals $\langle s,\max{\left(e,s+l\right)} \rangle$ and $\langle i,i+l_a \rangle$. In this study we are interested in detecting events larger than 40bp, because with longer reads, smaller events can be more easily discovered by examining gaps in individual reads. Both Pindel and MoDIL make many calls with a predicted event size of under 40bp, so we remove those calls from the output sets of those programs. Finally, we exclude from consideration calls from all approaches that match a true deletion of less than 40bp where the predicted variant length is less than or equal to 75bp in length.
-
-It should be noted that the methods tested here vary in their breakpoint resolution: SR methods have higher resolution than RP methods. Cloudbreak sacrifices additional resolution (by dividing the genome into 25bp windows); we strive however to increase sensitivity and specificity in the hopes that such calls could still be useful even if their resolution is limited. This seems reasonable to us given the possibility of pipelines in which RP calls are refined by SR mappings or local assembly methods.
+An illustration of the Cloudbreak algorithm working on a simple example is shown in Figure S\ref{Salgorithm_example}.
 
 \subsection{Tests with Simulated Data}
+
+We compared the performance of Cloudbreak for detecting deletions and insertions to a selection of popular tools: the RP method Breakdancer \autocite{Chen:2009p3}, GASVPro, an RP method that integrates RD signals and ambiguous mappings to increase sensitivity and specificity \autocite{Sindi:2012kk}, the SR method Pindel \autocite{Ye:2009p2}, and the hybrid RP-SR method DELLY \autocite{Rausch:2012he}. DELLY produces two sets of calls, one based solely on RP signals, and hte other based on RP calls that could be supported by SR evidence. We refer to these sets of calls as DELLY-RP and DELLY-SR in the following results. We also attempted to evaluate MoDIL on the same data. All of these methods detect deletions; in addition Breakdancer, Pindel, and MoDIL are capable of detecting insertions. In each case we use default parameters and attempt to follow the recommend pipelines for alignment for each tool (See Methods for details).
+
+It should be noted that the methods tested here vary in their breakpoint resolution: SR methods have higher resolution than RP methods. Cloudbreak sacrifices additional resolution (by dividing the genome into 25bp windows); we strive however to increase sensitivity and specificity in the hopes that such calls could still be useful even if their resolution is limited. This seems reasonable to us given the possibility of pipelines in which RP calls are refined by SR mappings or local assembly methods.
 
 As has been observed elsewhere, there is no available test set of real Illumina sequencing data from a sample that has a complete annotation of structural variations from the reference. Therefore, testing with simulated data is important to fully characterize an algorithm's performance characteristics. On the other hand, it is important that the simulated data contain realistic SVs that follow patterns of SVs observed in real data. To address this, we took one of the most complete lists of SVs from a single sample available, the list of homozygous insertions and deletions from the genome of J. Craig Venter \autocite{Levy:2007fb}. Since there are relatively few heterozygous insertions and deletions annotated in the Venter genome, we randomly assigned each variant to be either homozygous or heterozygous and applied them to one or both of two copies of the human GRCh36 chromosome 2 reference sequence. We then simulated paired Illumina reads from these modified references using \emph{dwgsim} from the DNAA software package\footnote{\url{http://sourceforge.net/apps/mediawiki/dnaa/}}. We simulated 100bp reads with a mean fragment size of 300bp and a standard deviation of 30bp, and generated 15X coverage for each modified sequence. Pooling the reads from both simulations gives 30X coverage for a diploid sample with a mix of homozygous and heterozygous insertions and deletions.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{../figures/CHR2SIM_DELS_ROC.pdf}
-\caption{ROC curve of deletion prediction performance on a simulated set of reads giving diploid coverage of 30X on human chromosome 2 with insertions and deletions from the Venter genome added to one or both haplotypes. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score.}
-\label{chr2DeletionsRoc}
+\includegraphics[width=1\textwidth]{../figures/chr2_sim_rocs_runtime.pdf}
+\caption{Accuracy and runtime performance on a simulated data set. (a) Receiver Operating Characteristic (ROC) curves showing the specificity and sensitivity of each tool to deletions larger than 40bp on a simulated set of reads giving diploid coverage of 30X on human chromosome 2. Deletions from the Venter genome were randomly added to one or both haplotypes. Each point on a curve represents a different threshold on the confidence of predictions made by that tool. Thresholds vary by: Cloudbreak - likelihood ratio; Breakdancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score. (b) ROC curves for insertion predictions. (c) Runtimes for each tool, not includding alignment time, parallelized when possible (see Supplementary Material).}
+\label{chr2CombinedRoc}
 \end{figure}
 
-\begin{figure}
-\centering
-\includegraphics[width=0.75\textwidth]{../figures/CHR2SIM_INS_ROC.pdf}
-\caption{ROC curve of insertion prediction performance on the chromosome 2 simulated data set.}
-\label{chr2InsertionsRoc}
-\end{figure}
-
-Figure \ref{chr2DeletionsRoc} shows an ROC plot of the performance of each algorithm for detecting deletions on the simulated data set. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity at higher levels of sensitivity, followed by DELLY. The output which we obtained from MoDIL did not have a threshold that could be varied to correlate with the tradeoff between precision and recall; therefore it is not included in this figure. A ROC curve for insertion prediction performance is shown in Figure \ref{chr2InsertionsRoc}.
+Figure \ref{chr2CombinedRoc} shows ROC curves of the performance of each algorithm for detecting deletions and insertions on the simulated data set, as well as the runtimes of the approaches tested. All approaches show excellent specificity at high thresholds in this simulation. Cloudbreak provides the greatest specificity for deletions at higher levels of sensitivity, followed by DELLY. For insertions, Cloudbreak clearly provides the best combinations of sensitivity and specificity. Cloudbreak's runtime is half that Breakdancer, the next fastest tool, albeit using many more CPUs. See Supplementary Material and Supplementary Table \ref{Sruntimes} for a discussion of runtimes and parallelization. The output which we obtained from MoDIL did not have a threshold that could be varied to correlate with the tradeoff between precision and recall and therefore it is not included in ROC curves; in addition, MoDIL ran for 52,547 seconds using 250 CPUs in our cluster, so results are not included in the runtime figure.
 
 Choosing the correct operating point or threshold can be difficult when operating on a new data set, but the use of simulated data and ROC curves allows for some investigation of the performance characteristics of algorithms at varying levels. First, we used the ROC curves to attempt to characterize the predictions made by each algorithm when a low false discovery rate is required. Table \ref{chr2DeletionPredsFDR10} shows the total number of simulated deletions found by each tool when choosing a threshold that gives an FDR closest to 10\% based on the ROC curve, representing cutoffs of 2.22 log likelihood ratio for Cloudbreak, 4 supporting read pairs for Breakdancer, 11 supporting read pairs for GASVPro, 7 supporting read pairs for DELLY, and a simple score of 13 for Pindel. Cloudbreak shows good performance at detecting deletions in all size classes, and finds more medium and large deletions than the other approaches. Pindel exclusively identifies a large number of small (40bp-100bp) deletions, as is expected for a split-read method. Performance on insertions never reached a level with an FDR of 10\%, so insertion predictions are not included in this table.
 
@@ -213,7 +150,7 @@ Choosing the correct operating point or threshold can be difficult when operatin
 
 We also characterized the predictions made by each algorithm at the operating point which gives them maximum sensitivity. For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low. The results for both deletion and insertion predictions are summarized in Table \ref{chr2DeletionAndInsertionPredsMaxSensitivity}. MoDIL and Cloudbreak exhibited the greatest recall for deletions. Cloudbreak has high precision and recall for deletions at this threshold, and surprisingly discovers more small deletions than Pindel. For insertions, Cloudbreak shows excellent precision, although recall is low for all four approaches, with Cloudbreak and Pindel showing the highest recall rates. Cloudbreak again identifies the most small variants. Pindel is the only tool which can consistently identify large insertions, as insertions larger than the library insert size do not produce mapping signatures detectable by read-pair mapping.
 
-\begin{table}
+\begin{table}[t]
 \begin{center}
 \begin{tabular}{r|rrr|rrrrr}
   \cline{2-9}
@@ -245,19 +182,18 @@ We also characterized the predictions made by each algorithm at the operating po
 
 \subsection{Tests with Biological Data}
 
-
 We downloaded a data set of reads taken from a DNA sample of Yoruban individual NA18507, experiment ERX009609 from the Sequence Read Archive.\footnote{\url{http://sra.dnanexus.com/experiments/ERX009609}} This sample was sequenced on the Illumina Genome Analyzer II platform with 100bp paired end reads and a mean fragment size (minus adapters) of 300bp, with a standard deviation of 15bp. The sample was sequenced to a depth of approximately 37X coverage.
 
 To create a gold standard set of insertions and deletions to test against, we pooled annotated variants discovered by three previous studies on the same sample. These included data from the Human Genome Structural Variation Project\footnote{\url{http://hgsv.washington.edu/general/download/SNPs_DIPs/}} reported by \textcite{Kidd:2008p926}, a survey of small indels conducted by \textcite{Mills:2011fi}, and insertions and deletions from the merged call set of the phase 1 release of the 1000 Genomes Project \autocite{GenomesProjectConsortium:2012co} which were genotyped as present in NA18507. We merged any overlapping calls of the same type into the region spanned by their unions. It should be noted that the 1000 Genomes call set was partially produced using DELLY and Breakdancer, and therefore those calls are ones that those tools are sensitive to, biasing this test in their favor. We were unable to run MoDIL on the whole-genome data set due to the estimated runtime and storage requirements.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{../figures/NA18507_DELS_ROC.pdf}
-\caption{ROC curve of deletion prediction performance on the 37X NA18507 sample, tested against the combined gold standard deletion set taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}.}
-\label{NA18507DeletionsRoc}
+\includegraphics[width=1\textwidth]{../figures/NA18507_rocs_runtime.pdf}
+\caption{Accuracy and performance on the 37X NA18507 sample. (a) ROC curve for deletion prediction performance, tested against the combined gold standard sets of deletions taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}. (b) ROC curve for insertion prediciton performance. (c) Runtimes for each tool, not includding alignment time, parallelized when possible (see Supplementary Material). }
+\label{NA18507CombinedRoc}
 \end{figure}
 
-Figure \ref{NA18507DeletionsRoc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard deletion set, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at more stringent thresholds, and remains near the top at higher sensitivity levels. A similar ROC-like curve for insertions on the NA18507 data set is shown in Figure \ref{NA18507InsertionsRoc}. Cloudbreak has optimal performance at all thresholds for insertions, although all algorithms make many novel predictions.
+Figure \ref{NA18507CombinedRoc} shows the performance of each algorithm on the NA18507 data set when compared against the gold standard set for both deletions and insertions, using the same rules for a match as described in the previous section. All algorithms show far less specificity for the gold standard set than they did for the true deletions in the single chromosome simulation, although it is difficult to tell how much of the difference is due to the added complexity of real data and a whole genome, and how much is due to missing deletions in the gold standard set that are actually present in the sample. Cloudbreak is the best performer at the most stringent thresholds, and has the highest or second highest precision at higher sensitivity levels. Cloudbreak has optimal performance at all thresholds for insertions.
 
 We then tested the deletion predictions made by each algorithm using the same cutoffs that yielded a 10\% FDR on the simulated chromosome 2 data set, adjusted proportionally for the difference in coverage from 30X to 37X. For insertions, again, we were forced to use the thresholds that gave maximum sensitivity for each tool due to the high observed FDR rates in the simulated data. The precision and recall with respect to the gold standard deletion set, as well as the performance of each algorithm at predicting each size class at those thresholds, is shown in Table \ref{NA18507DeletionAndInsertionPreds}. For deletions, Cloudbreak has the greatest sensitivity of any tool at these thresholds, identifying the most variants in each size class. Pindel exhibits the highest precision with respect to the gold standard set. For insertions, Pindel again has the highest precision at maximum sensitivity, although according the ROC curve it is possible to choose a threshold for Cloudbreak with higher precision and recall. At maximum sensitivity, Cloudbreak identifies 100 more insertions from the gold standard set than Pindel, giving it by far the highest recall.
 
@@ -289,12 +225,7 @@ We then tested the deletion predictions made by each algorithm using the same cu
 \label{NA18507DeletionAndInsertionPreds}
 \end{table}
 
-\begin{figure}
-\centering
-\includegraphics[width=0.75\textwidth]{../figures/NA18507_INS_ROC.pdf}
-\caption{ROC curve of insertion prediction performance on the 37X NA18507 sample.}
-\label{NA18507InsertionsRoc}
-\end{figure}
+
 
 \subsection{Performance on a Low-Coverage Cancer Data Set}
 
@@ -302,7 +233,7 @@ We also tested Cloudbreak on a sequencing data set obtained from a patient with 
 
 \subsection{Performance in Repetitive Areas}
 
-We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements in both the simulated and NA18507 data sets. Table \ref{deletionRepmaskpreds} shows the number of deletions that overlap repeats at the 10\% FDR cutoff described above. In the NA18507 data set, Cloudbreak identifies 15\% more repeat-overlapping variants than the nearest competitor, Breakdancer. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible. Performance on insertions is displayed in Table \ref{insertionRepmaskpreds}; again, Cloudbreak identifies more events that lie in repetitive regions than the other tools.
+We analyzed the predictions made by Cloudbreak to determine whether any particular class of deletion event was contributing to its performance. We found that Cloudbreak shows particularly strong performance in detecting deletions that overlap RepeatMasker-annotated elements in both the simulated and NA18507 data sets. Table \ref{deletionRepmaskpreds} shows the number of deletions that overlap repeats at the 10\% FDR cutoff described above. In the NA18507 data set, Cloudbreak identifies 15\% more repeat-overlapping variants than the nearest competitor, Breakdancer. Since deletions and other SVs are enriched in repetitive regions of the genome in both of our data sets, this contributes greatly to Cloudbreak's performance, and demonstrates the value in considering as many possible mappings of ambiguously mapping reads as possible. Performance on insertions is displayed in Supplementary Table \ref{SinsertionRepmaskpreds}; again, Cloudbreak identifies more events that lie in repetitive regions than the other tools.
 
 \begin{table}[b]
 \begin{center}
@@ -325,81 +256,10 @@ We analyzed the predictions made by Cloudbreak to determine whether any particul
 \label{deletionRepmaskpreds}
 \end{table}
 
-\begin{table}[b]
-\begin{center}
-\begin{tabular}{rrr|rr}
- & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
-\hline
- &  Non-repeat & Repeat  &  Non-repeat & Repeat \\ 
- Total Number & 133 & 270 & 341 & 355 \\ 
-  \hline
-  Cloudbreak  & 21 (4) & \textbf{58} (24) & \textbf{137} (\textbf{37}) & \textbf{135} (\textbf{55}) \\ 
-  Breakdancer & 17 (7) & 22 (11) & 82 (12) & 44 (9) \\
-  Pindel      & \textbf{25} (\textbf{18}) & 54 (\textbf{33}) & 84 (36) & 82 (25) \\ 
-  MoDIL      & 5 (0) & 16 (3) & NA & NA \\ 
-   \hline
-\end{tabular}
-\end{center}
-\caption{Detected insertions in the simulated and NA18507 data sets identified by each tool, broken down by whether the insertion occurs in a RepeatMasker-annotated element.}
-\label{insertionRepmaskpreds}
-\end{table}
 
 \subsection{Genotyping Variants}
 
-Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing an insertion or deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For benchmarking genotyping of deletions in the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .25 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 86.8\% and 96.0\% accuracy in predicting the genotype of the true positive deletions we detected at our 10\% FDR threshold in the simulated and real data sets respectively. Table \ref{deletionGenotypeaccuracy} shows confusion matrices for the two samples using this classifier. For insertions, none of the three input sets that made up the gold standard for NA18507 contained a sufficient number of insertion rates that meet our size threshold that also had genotyping information. Of the 79 insertions detected by Cloudbreak on the simulated data set, 13 were heterozygous. Using the same cutoff of .35 on $\alpha$, Cloudbreak correctly classified 62 of the 66 homozygous insertions and 10 of the 13 heterozygous insertions discovered, for an overall accuracy rate of 91\%.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{r|r|rr|rr|}
-\multicolumn{2}{c}{}  & \multicolumn{4}{c}{Actual Genotypes} \\
-\multicolumn{2}{c}{}  & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
-\cline{3-6}
-\multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
-\cline{2-6}
-\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & 100 & 4 &  95 & 19 \\
- & Heterozygous & 7 & 72 &  4 & 451 \\
-\cline{2-6}
-\end{tabular}
-\end{center}
-\caption{Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
-\label{deletionGenotypeaccuracy}
-\end{table}
-
-\subsection{Runtimes}
-
-We implemented and executed Cloudbreak on a 56-node Hadoop cluster, with 636 map slots and 477 reduce slots. Not including alignment time, we were able to process the Chromosome 2 simulated data in under 6 minutes, and the the NA18507 data set in under 40 minutes. For the simulated data set we used 100 reducers for the compute SV features job; for the real data set we used 300. The bulk of Cloudbreak's execution is spent in the feature generation step. Extracting deletion and insertion calls take under two minutes each for both the real and simulated data sets; the times are equal because each reducer is responsible for processing a single chromosome, and so the runtime is bounded by the length of time it takes to process the largest chromosome. 
-
-In table \ref{runtimes} we display a comparison of runtimes on the real and simulated data sets for all of the tools evaluated in this work. Each tool varies in the amount of parallelization supported. We report runtimes for tools run in their default single-threaded mode, as well as for levels of parallelization achievable with basic scripting, noting that one of the key advantages of Hadoop/MapReduce is the ability to scale parallel execution to the size of the available compute cluster without any custom programming. Pindel allows multi-threaded operation on multicore servers. Pindel and Breakdancer allow processing of a single chromosome in one process, so it is possible to execute all chromosomes in parallel on a cluster that has a job scheduler and shared filesystem. Breakdancer has an additional preprocessing step (\texttt{bam2cfg.pl}) which runs in a single thread. DELLY suggests splitting the input BAM file by chromosome, after which a separate DELLY process can be executed on the data for each chromosome; splitting a large BAM file is a time consuming process and consumes most of the time in this parallel workflow, in fact making it faster to run in single-threaded mode. GASVPro allows parallelization of the MCMC component for resolving ambiguously mapped read pairs; however, this requires a significant amount of custom scripting, and we did not find that the MCMC module consumed most of the runtime in our experiments, so we do not attempt to parallelize this componen. The MoDIL distribution contains a set of scripts that can be used to submit parallel jobs to the SGE scheduling engine or modified for other schedulers; we adapted these for use in our cluster.
-
-In parallel execution, the total time to execute is bounded by the runtime of the longest-running process. In the case of chromosome-parallelizable tools including Breakdancer, Pindel, and DELLY, this is typically the process working on the largest chromosome.\footnote{We note that one Breakdancer process, handling an unplaced contig in the hg19 reference genome, never completed in our runs and had to be killed manually; we exclude that process from our results.} In the case of MoDIL's run on the simulated data, we found that the different processes varied widely in their execution times, likely caused by regions of high coverage or with many ambiguously mapped reads. Cloudbreak mitigates this problem during the time-consuming feature generation process by using Hadoop partitioners to randomly assign each genomic location to one of the set of reducers, ensuring that the work is evenly distributed across all processes. This distribution of processing across the entire cluster also serves to protect against server slowdowns and hardware failures - for example, we were still able to complete processing of the NA18507 data set in under 50 minutes during a run where one of the compute nodes was rebooted midway through the feature generation job.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{r|r|rrr|rrr}
-\multicolumn{2}{c}{}  & \multicolumn{3}{c}{Simulated Data} & \multicolumn{3}{c}{NA18507} \\
-\hline
- & SV Types &  Single CPU & Parallel & Proc. &  Single CPU & Parallel & Proc.  \\ 
-  \hline
-  Cloudbreak & D,I &   NA    & 308 & 312    & NA         & 2,310 & 636 \\ 
-  Breakdancer & D,I,V,T &  653   & NA       & NA          & 134,170 &  5,586 & 84 \\
-  GASVPro & D,V   &  3,339  & NA       & NA         & 52,385  & NA & NA \\
-  DELLY & D         &  1,964 & NA          & NA      & 30,311  & 20,224 & 84 \\
-  Pindel & D,I,V,P         & 37,006 &  4,885     & 8          &  284,932  & 28,587 & 84 \\ 
-  MoDIL & D,I        &  NA      & 52,547 & 250 & NA         & NA  & NA\\ 
-   \hline
-\end{tabular}
-\end{center}
-\caption{Runtimes (elapsed) on both data sets of each tool tested, in single-processor and parallel mode. For parallel runs, Proc. is the maximum number of simultaneously running processes or threads. All times are in seconds. The types of variants detected by each program are listed with the abbreviations: D - deletion; I - insertion; V - Inversion; P - duplication; T - translocation. Interchromosomal translocations are only detected by Breakdancer in single CPU mode. }
-\label{runtimes}
-\end{table}
-
-\section{Methods}\label{discussion}
-
-Cloudbreak is a native Java Hadoop application. We deployed Cloudbreak on a 56-node cluster running the Cloudera CDH3 Hadoop distribution, version 0.20.2-cdh3u4. We use snappy compression for MapReduce data. Hadoop's distributed cache mechanism shares the executable files and indices needed for mapping tasks to the nodes in the cluster. To execute the other tools in parallel mode we wrote simple scripts to submit jobs to the cluster using the HTCondor scheduling engine with directed acyclic graphs to describe dependencies between jobs.\footnote{\url{http://research.cs.wisc.edu/htcondor/}}
-
-Simulated reads were aligned to hg18 chromosome 2, and NA18507 reads were aligned to the hg19 assembly. For each evaluated SV detection program we attempt to follow the authors' recommended alignment pipeline, except for MoDIL, for which we used reads aligned with BWA (see below). Cloudbreak alignments were executed in parallel using Hadoop tasks which wrap GEM version 1.362 (beta) in single-ended mode, with parameters \texttt{-e 6 -m 6 -s 2 -q ignore -d 1000 --max-big-indel-length 0},  requesting all hits for a read that are within an edit distance of 6 of the reference, within 2 strata of the best hit, with a maximum of 1000 possible alignments reported for each read. Alignments for the other programs were first aligned using BWA \autocite{Li:2009p836} version 0.6.2-r126, with parameter \texttt{-e 5} to allow for longer gaps in alignments due to the number of small indels near the ends of larger indels in the Venter data set. GASVPro also accepts ambiguous mappings; we extracted read pairs that did not align concordantly with BWA and re-aligned them with Novoalign V2.08.01, with parameters \texttt{-a -r -Ex 1100 -t 250}. 
-
-We ran Breakdancer version 1.1\_2011\_02\_21 in single threaded mode by first executing \texttt{bam2cfg.pl} and then running \texttt{breakdancer\_max} with the default parameter values.  To run Breakdancer in parallel mode we first ran \texttt{bam2cfg.pl} and then launched parallel instances of \texttt{breakdancer\_max} for each chromosome using the \texttt{-o} parameter. We ran DELLY version 0.0.9 with the \texttt{-p} parameter and default values for other parameters. For the parallel run of DELLY we first split the original BAM file with BamTools \autocite{Barnett:2011hm}, and then ran instances of DELLY in parallel for each BAM file. We ran GASVPro version 1.2 using the \texttt{GASVPro.sh} script and default parameters. Pindel 0.2.4t was executed with default parameters in single CPU mode, and executed in parallel mode for each chromosome using the \texttt{-c} option.
+Since Cloudbreak explicitly fits a mixture of insert size distributions at each location, and each component of the mixture represents an allele containing or not containing an insertion or deletion, it should be possible to use the parameters of the fit GMM to infer the genotype of each predicted variant, assuming that our pipeline is capturing all relevant read mappings near the locus of the variant. To test this, we attempted to classify the true positive Cloudbreak predictions described above for both the simulated and biological data sets. Because we simulated a diploid genome, we had genotypes for the simulated data readily available. For benchmarking genotyping of deletions in the real dataset, we only considered the deletions from the 1000 Genomes Project data set, which had been genotyped as part of the Phase 1 release using the population-scale SV detection algorithm Genome STRiP \autocite{Handsaker:2011ki}. We found that we could use $\alpha$, the mixing parameter that controls the weight of the two components in the GMM, to accurately predict deletion genotypes. By setting a simple cutoff of .35 on the average value of $\alpha$ in each Cloudbreak prediction, we were able to achieve 88.1\% and 96.5\% accuracy in predicting the genotype of the true positive deletions we detected at our 10\% FDR threshold in the simulated and real data sets respectively. Supplementary Table \ref{SdeletionGenotypeaccuracy} shows confusion matrices for the two samples using this classifier. For insertions, none of the three input sets that made up the gold standard for NA18507 contained a sufficient number of insertion rates that meet our size threshold that also had genotyping information. Of the 79 insertions detected by Cloudbreak on the simulated data set, 13 were heterozygous. Using the same cutoff of .35 on $\alpha$, Cloudbreak correctly classified 62 of the 66 homozygous insertions and 10 of the 13 heterozygous insertions discovered, for an overall accuracy rate of 91\%.
 
 \section{Discussion}\label{Discussion}
 
@@ -410,6 +270,23 @@ Among Big Data infrastructures, MapReduce is emerging as a standard framework fo
 On simulated and real data sets, our approach performs well across a wide range of deletion sizes and achieves performance similar to or better than a variety of state-of-the-art structural variation detection algorithms that run on traditional workload clusters and servers. Detection of deletions is an important area of research; \textcite{Mills:2011fi} recently identified over 220 coding deletions in a survey of a large number of individuals, and they note that such variants are likely to cause phenotypic variation in humans. In addition, an increased ability to detect variants in regions of the genome that are repetitive and difficult to align reads to opens up new possibilities in exploring human genetic variation.
 
 In addition to delivering state-of-the-art performance in a RP-based SV detection problem, our approach offers a basis for developing a variety of SV algorithms that are capable of running in a MapReduce pipeline with the power to process vast amounts of data in a cloud or commodity server setting. Using tools like Apache Whirr\footnote{\url{http://whirr.apache.org/}}, it is becoming trivially easy to instantiate on-demand Hadoop compute clusters with cloud providers such as Amazon's EC2. Having computational approaches that can harness this capability will become increasingly important for researchers or clinicians who are unable to afford or unwilling to maintain large, specialized servers to analyze their data.
+
+\newpage
+
+\section{Methods}\label{discussion}
+
+\subsection{Cloudbreak Implementation}
+Cloudbreak is a native Java Hadoop application. We deployed Cloudbreak on a 56-node cluster running the Cloudera CDH3 Hadoop distribution, version 0.20.2-cdh3u4. We use snappy compression for MapReduce data. Hadoop's distributed cache mechanism shares the executable files and indices needed for mapping tasks to the nodes in the cluster. To execute the other tools in parallel mode we wrote simple scripts to submit jobs to the cluster using the HTCondor scheduling engine with directed acyclic graphs to describe dependencies between jobs.\footnote{\url{http://research.cs.wisc.edu/htcondor/}}
+
+\subsection{Read Alignments}
+Simulated reads were aligned to hg18 chromosome 2, and NA18507 reads were aligned to the hg19 assembly. For each evaluated SV detection program we attempt to follow the authors' recommended alignment pipeline, except for MoDIL, for which we used reads aligned with BWA (see below). Cloudbreak alignments were executed in parallel using Hadoop tasks which wrap GEM version 1.362 (beta) in single-ended mode, with parameters \texttt{-e 6 -m 6 -s 2 -q ignore -d 1000 --max-big-indel-length 0},  requesting all hits for a read that are within an edit distance of 6 of the reference, within 2 strata of the best hit, with a maximum of 1000 possible alignments reported for each read. Alignments for the other programs were first aligned using BWA \autocite{Li:2009p836} version 0.6.2-r126, with parameter \texttt{-e 5} to allow for longer gaps in alignments due to the number of small indels near the ends of larger indels in the Venter data set. GASVPro also accepts ambiguous mappings; we extracted read pairs that did not align concordantly with BWA and re-aligned them with Novoalign V2.08.01, with parameters \texttt{-a -r -Ex 1100 -t 250}. 
+
+\subsection{SV Tool Executution}
+We ran Breakdancer version 1.1\_2011\_02\_21 in single threaded mode by first executing \texttt{bam2cfg.pl} and then running \texttt{breakdancer\_max} with the default parameter values.  To run Breakdancer in parallel mode we first ran \texttt{bam2cfg.pl} and then launched parallel instances of \texttt{breakdancer\_max} for each chromosome using the \texttt{-o} parameter. We ran DELLY version 0.0.9 with the \texttt{-p} parameter and default values for other parameters. For the parallel run of DELLY we first split the original BAM file with BamTools \autocite{Barnett:2011hm}, and then ran instances of DELLY in parallel for each BAM file. We ran GASVPro version 1.2 using the \texttt{GASVPro.sh} script and default parameters. Pindel 0.2.4t was executed with default parameters in single CPU mode, and executed in parallel mode for each chromosome using the \texttt{-c} option.
+
+\subsection{SV Prediction Evaluation}
+We use the following criteria to define a true prediction given a gold standard set of deletion and insertion variants to test against: A predicted deletion is counted as a true positive if a) it overlaps with a deletion from the gold standard set, b) the length of the predicted call is within 300bp (the library fragment size in both our real and simulated libraries) of the length of the true deletion, and c) the true deletion has not been already been discovered by another prediction from the same method. For evaluating insertions, each algorithm produces insertion predictions that define an interval in which the insertion is predicted to have occurred with start and end coordinates $s$ and $e$ as well as the predicted length of the insertion, $l$. The true insertions are defined in terms of their actual insertion coordinate $i$ and their actual length $l_a$. Given this information, we modify the overlap criteria in a) to include overlaps of the intervals $\langle s,\max{\left(e,s+l\right)} \rangle$ and $\langle i,i+l_a \rangle$. In this study we are interested in detecting events larger than 40bp, because with longer reads, smaller events can be more easily discovered by examining gaps in individual reads. Both Pindel and MoDIL make many calls with a predicted event size of under 40bp, so we remove those calls from the output sets of those programs. Finally, we exclude from consideration calls from all approaches that match a true deletion of less than 40bp where the predicted variant length is less than or equal to 75bp in length.
+
 
 \newpage
 
