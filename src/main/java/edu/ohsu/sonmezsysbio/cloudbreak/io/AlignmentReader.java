@@ -13,18 +13,19 @@ import java.util.List;
  * Time: 2:05 PM
  */
 public interface AlignmentReader {
-    AlignmentRecord parseRecord(String[] fields);
+    AlignmentRecord parseRecord(String alignmentRecord);
 
-    List<AlignmentRecord> parseAlignmentsIntoRecords(String[] alignments);
+    double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments);
 
-    double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2);
+    ReadPairAlignments parsePairAlignmentLine(String line);
 
-    void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments);
+    ReadPairAlignments parsePairAlignmentLine(String line, AlignmentRecordFilter filter);
 
     public static class AlignmentReaderFactory {
         public static AlignmentReader getInstance(String aligner) {
             if (Cloudbreak.ALIGNER_NOVOALIGN.equals(aligner)) return new NovoalignAlignmentReader();
             if (Cloudbreak.ALIGNER_MRFAST.equals(aligner)) return new MrfastAlignmentReader();
+            if (Cloudbreak.ALIGNER_GENERIC_SAM.equals(aligner)) return new SAMAlignmentReader();
             return null;
         }
 

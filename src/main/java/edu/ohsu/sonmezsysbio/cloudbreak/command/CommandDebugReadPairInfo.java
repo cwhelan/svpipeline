@@ -7,6 +7,9 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadGroupInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.DFSFacade;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQualityGroupingComparator;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQualitySortComparator;
+import edu.ohsu.sonmezsysbio.cloudbreak.partitioner.GenomicLocationWithQualityPartitioner;
 import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
 import edu.ohsu.sonmezsysbio.cloudbreak.mapper.SingleEndAlignmentsToReadPairInfoMapper;
@@ -57,7 +60,7 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
     Long endFilter;
 
     @Parameter(names = {"--resolution"})
-    final int resolution = Cloudbreak.DEFAULT_RESOLUTION;
+    int resolution = Cloudbreak.DEFAULT_RESOLUTION;
 
     @Parameter(names = {"--excludePairsMappingIn"})
     String exclusionRegionsFileName;
@@ -67,6 +70,9 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
 
     @Parameter(names = {"--aligner"})
     String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
+
+    @Parameter(names = {"--minScore"})
+    int minScore = -1;
 
     public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
@@ -116,9 +122,15 @@ public class CommandDebugReadPairInfo extends BaseCloudbreakCommand {
         conf.set("alignments.filterstart", startFilter.toString());
         conf.set("alignments.filterend", endFilter.toString());
 
+        conf.set("pileupDeletionScore.minScore", String.valueOf(minScore));
+
         conf.setMapperClass(SingleEndAlignmentsToReadPairInfoMapper.class);
         conf.setMapOutputKeyClass(GenomicLocationWithQuality.class);
         conf.setMapOutputValueClass(ReadPairInfo.class);
+        conf.setOutputKeyComparatorClass(GenomicLocationWithQualitySortComparator.class);
+        conf.setOutputValueGroupingComparator(GenomicLocationWithQualityGroupingComparator.class);
+        conf.setPartitionerClass(GenomicLocationWithQualityPartitioner.class);
+
 
         conf.setReducerClass(IdentityReducer.class);
 

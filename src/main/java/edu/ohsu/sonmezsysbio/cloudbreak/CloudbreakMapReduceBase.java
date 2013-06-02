@@ -16,6 +16,7 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
 
     protected int resolution = Cloudbreak.DEFAULT_RESOLUTION;
     protected AlignmentReader alignmentReader;
+    private String alignerName;
 
     public int getResolution() {
         return resolution;
@@ -25,13 +26,22 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
         this.resolution = resolution;
     }
 
+    public String getAlignerName() {
+        return alignerName;
+    }
+
+    public void setAlignerName(String alignerName) {
+        this.alignerName = alignerName;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
         if (job.get("cloudbreak.resolution") != null) {
             resolution = Integer.parseInt(job.get("cloudbreak.resolution"));
         }
-        alignmentReader = AlignmentReader.AlignmentReaderFactory.getInstance(job.get("cloudbreak.aligner"));
+        alignerName = job.get("cloudbreak.aligner");
+        alignmentReader = AlignmentReader.AlignmentReaderFactory.getInstance(alignerName);
     }
 
     public AlignmentReader getAlignmentReader() {
@@ -42,16 +52,4 @@ public class CloudbreakMapReduceBase extends MapReduceBase {
         this.alignmentReader = alignmentReader;
     }
 
-    protected ReadPairAlignments parsePairAlignmentLine(String line) {
-        String[] readAligments = line.split(Cloudbreak.READ_SEPARATOR);
-        String read1AlignmentsString = readAligments[0];
-        String[] read1Alignments = read1AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-
-        List<AlignmentRecord> read1AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read1Alignments);
-
-        String read2AlignmentsString = readAligments[1];
-        String[] read2Alignments = read2AlignmentsString.split(Cloudbreak.ALIGNMENT_SEPARATOR);
-        List<AlignmentRecord> read2AlignmentRecords = alignmentReader.parseAlignmentsIntoRecords(read2Alignments);
-        return new ReadPairAlignments(read1AlignmentRecords, read2AlignmentRecords);
-    }
 }

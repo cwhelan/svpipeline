@@ -1,0 +1,16 @@
+\begin{table}
+\begin{center}
+\begin{tabular}{r|r|rr|rr|}
+\multicolumn{2}{c}{}  & \multicolumn{4}{c}{Actual Genotypes} \\
+\multicolumn{2}{c}{}  & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
+\cline{3-6}
+\multicolumn{2}{c|}{} &  Homozygous & Heterozygous & Homozygous & Heterozygous \\ 
+\cline{2-6}
+\multirow{2}{*}{\shortstack{Predicted \\ Genotypes}} & Homozygous & <%= chr2HapCM["2", "TRUE"] %> & <%= chr2HapCM["1", "TRUE"] %> &  <%= NA18507HapCM["2", "TRUE"] %> & <%= NA18507HapCM["1", "TRUE"] %> \\
+ & Heterozygous & <%= chr2HapCM["2", "FALSE"] %> & <%= chr2HapCM["1", "FALSE"] %> &  <%= NA18507HapCM["2", "FALSE"] %> & <%= NA18507HapCM["1", "FALSE"] %> \\
+\cline{2-6}
+\end{tabular}
+\end{center}
+\caption{Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
+\label{deletionGenotypeaccuracy}
+\end{table}

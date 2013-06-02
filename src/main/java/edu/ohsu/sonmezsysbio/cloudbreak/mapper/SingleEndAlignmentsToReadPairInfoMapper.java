@@ -4,17 +4,20 @@ import edu.ohsu.sonmezsysbio.cloudbreak.*;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.BigWigFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.FaidxFileHelper;
 import edu.ohsu.sonmezsysbio.cloudbreak.file.GFFFileHelper;
-import edu.ohsu.sonmezsysbio.cloudbreak.file.ReadGroupInfoFileHelper;
+import edu.ohsu.sonmezsysbio.cloudbreak.io.AlignmentRecordFilter;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.GenomicLocationWithQuality;
 import edu.ohsu.sonmezsysbio.cloudbreak.io.ReadPairInfo;
-import org.apache.hadoop.fs.Path;
+import edu.ohsu.sonmezsysbio.svpipeline.io.GenomicLocation;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,11 +28,13 @@ import java.util.Set;
  * Date: 4/6/12
  * Time: 1:03 PM
  */
-public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduceBase
-        implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo> {
+public class SingleEndAlignmentsToReadPairInfoMapper extends SingleEndAlignmentsMapper
+        implements Mapper<Text, Text, GenomicLocationWithQuality, ReadPairInfo>, AlignmentRecordFilter {
 
-    private boolean matePairs;
-    private Integer maxInsertSize = Cloudbreak.DEFAULT_MAX_INSERT_SIZE;
+    private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentsToReadPairInfoMapper.class);
+
+    { logger.setLevel(Level.INFO); }
+
     private PairedAlignmentScorer scorer;
     private String faidxFileName;
     FaidxFileHelper faix;
@@ -40,9 +45,25 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
     private Long endFilter;
     private GFFFileHelper exclusionRegions;
     private BigWigFileHelper mapabilityWeighting;
-    private double targetIsize;
-    private double targetIsizeSD;
-    private Short readGroupId;
+
+    private int minScore = -1;
+    private int maxMismatches = -1;
+
+    public int getMaxMismatches() {
+        return maxMismatches;
+    }
+
+    public void setMaxMismatches(int maxMismatches) {
+        this.maxMismatches = maxMismatches;
+    }
+
+    public int getMinScore() {
+        return minScore;
+    }
+
+    public void setMinScore(int minScore) {
+        this.minScore = minScore;
+    }
 
     public FaidxFileHelper getFaix() {
         return faix;
@@ -76,14 +97,6 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         this.endFilter = endFilter;
     }
 
-    public boolean isMatePairs() {
-        return matePairs;
-    }
-
-    public void setMatePairs(boolean matePairs) {
-        this.matePairs = matePairs;
-    }
-
     public Integer getMaxInsertSize() {
         return maxInsertSize;
     }
@@ -108,30 +121,29 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         this.exclusionRegions = exclusionRegions;
     }
 
-    public Short getReadGroupId() {
-        return readGroupId;
-    }
-
-    public void setReadGroupId(Short readGroupId) {
-        this.readGroupId = readGroupId;
-    }
-
     public void map(Text key, Text value, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Reporter reporter) throws IOException {
         String line = value.toString();
-        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
-        alignmentReader.resetForReadPairAlignemnts(readPairAlignments);
+
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line, this);
+
+        // ignoring OEA for now
+        if (readPairAlignments.getRead1Alignments().size() == 0 || readPairAlignments.getRead2Alignments().size() == 0) {
+            return;
+        }
 
         Set<AlignmentRecord> recordsInExcludedAreas = new HashSet<AlignmentRecord>();
         try {
             if (exclusionRegions != null) {
                 for (AlignmentRecord record : readPairAlignments.getRead1Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
+                        logger.debug("excluding record " + record);
                         recordsInExcludedAreas.add(record);
                     }
                 }
 
                 for (AlignmentRecord record : readPairAlignments.getRead2Alignments()) {
                     if (exclusionRegions.doesLocationOverlap(record.getChromosomeName(), record.getPosition(), record.getPosition() + record.getSequenceLength())) {
+                        logger.debug("excluding record " + record);
                         recordsInExcludedAreas.add(record);
                     }
                 }
@@ -143,96 +155,181 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
         }
 
         try {
-            emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
+            Map<GenomicLocation, ReadPairInfo> bestScoresForGL = emitReadPairInfoForAllPairs(readPairAlignments, output, recordsInExcludedAreas);
+            for (GenomicLocation genomicLocation : bestScoresForGL.keySet()) {
+                ReadPairInfo bestRpi = bestScoresForGL.get(genomicLocation);
+                GenomicLocationWithQuality genomicLocationWithQuality =
+                        new GenomicLocationWithQuality(genomicLocation.chromosome, genomicLocation.pos, bestRpi.pMappingCorrect);
+                output.collect(genomicLocationWithQuality, bestRpi);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output, Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
-        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
-            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) return;
-                emitReadPairInfoForPair(record1, record2, readPairAlignments, output);
+    private Map<GenomicLocation, ReadPairInfo> emitReadPairInfoForAllPairs(ReadPairAlignments readPairAlignments,
+                                             OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
+                                             Set<AlignmentRecord> recordsInExcludedAreas) throws Exception {
+        Map<GenomicLocation, ReadPairInfo> bestScoresForGL = new HashMap<GenomicLocation, ReadPairInfo>();
+        if (!emitConcordantAlignmentIfFound(readPairAlignments, output, bestScoresForGL)) {
+
+            for (String chrom : readPairAlignments.getRead1AlignmentsByChromosome().keySet()) {
+                if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chrom))
+                    continue;
+
+                if (getChromosomeFilter() != null && ! chrom.equals(getChromosomeFilter()))
+                    continue;
+
+                for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chrom)) {
+                    if (getMinScore() != -1) {
+                        if (record1.getAlignmentScore() < getMinScore()) {
+                            continue;
+                        }
+                    }
+                    for (AlignmentRecord record2 : readPairAlignments.getRead2AlignmentsByChromosome().get(chrom)) {
+                        if (getMinScore() != -1) {
+                            if (record2.getAlignmentScore() < getMinScore()) {
+                                continue;
+                            }
+                        }
+                        if (recordsInExcludedAreas.contains(record1) || recordsInExcludedAreas.contains(record2)) continue;
+                        emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
+                    }
+                }
             }
         }
+        return bestScoresForGL;
     }
 
-    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output) throws IOException {
+    private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments,
+                                                   OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
+                                                   Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
+        boolean foundConcordant = false;
+        for (String chrom : readPairAlignments.getRead1AlignmentsByChromosome().keySet()) {
+            if (getChromosomeFilter() != null && ! chrom.equals(getChromosomeFilter()))
+                continue;
 
-        // todo: not handling translocations for now
-        if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
-            return;
-        }
+            if (! readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chrom))
+                continue;
 
-        if (getChromosomeFilter() != null) {
-            if (! record1.getChromosomeName().equals(getChromosomeFilter())) return;
-        }
+            for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chrom)) {
+                for (AlignmentRecord record2 : readPairAlignments.getRead2AlignmentsByChromosome().get(chrom)) {
+                    if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) continue;
+                    AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
+                            record1 : record2;
+                    AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
+                            record2 : record1;
 
-        int insertSize;
-        AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
-                record1 : record2;
-        AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
-                record2 : record1;
-
-        // todo: not handling inversions for now
-        if (!scorer.validateMappingOrientations(record1, record2, matePairs)) return;
-
-        insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
-
-        if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
-
-        int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % resolution;
-
-
-        int genomicWindow = insertSize +
-                leftRead.getPosition() % resolution +
-                (resolution - rightRead.getPosition() % resolution);
-
-
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
-
-        if (mapabilityWeighting != null) {
-            if (insertSize > targetIsize + 6 * targetIsizeSD) {
-                String chrom = record1.getChromosomeName();
-                int leftReadStart = leftRead.getPosition();
-                int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
-                double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
-                //System.err.println("left read mapability from " + leftRead.getPosition() + " to " + (leftRead.getPosition() + leftRead.getSequenceLength()) + " = " + leftReadMapability);
-
-                int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
-                int rightReadEnd = rightRead.getPosition();
-                double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
-                //System.err.println("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
-
-                //System.err.println("old pmc: " + pMappingCorrect);
-                pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
-                //System.err.println("new pmc: " + pMappingCorrect);
+                    int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
+                    if (Math.abs(insertSize - getTargetIsize()) < 3 * getTargetIsizeSD()) {
+                        emitReadPairInfoForPair(record1, record2, readPairAlignments, output, bestScoresForGL);
+                        foundConcordant = true;
+                    }
+                }
             }
         }
+        return foundConcordant;
+    }
 
-        ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, readGroupId);
+    private void emitReadPairInfoForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments,
+                                         OutputCollector<GenomicLocationWithQuality, ReadPairInfo> output,
+                                         Map<GenomicLocation, ReadPairInfo> bestScoresForGL) throws IOException {
 
-        for (int i = 0; i <= genomicWindow; i = i + resolution) {
-            Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
-            if (chromosome == null) {
-                throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
+        try {
+            // todo: not handling translocations for now
+            if (! record1.getChromosomeName().equals(record2.getChromosomeName())) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("translocation: r1 = " + record1 + "; r2 = " + record2);
+                }
+                return;
             }
-
-            int pos = genomeOffset + i;
 
             if (getChromosomeFilter() != null) {
-                if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
-                    pos < getStartFilter() || pos > getEndFilter()) {
+                if (! record1.getChromosomeName().equals(getChromosomeFilter())) {
                     return;
                 }
             }
 
-            //System.err.println("Emitting insert size " + insertSize);
-            GenomicLocationWithQuality genomicLocation = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
-            output.collect(genomicLocation, readPairInfo);
+            int insertSize;
+            AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
+                    record1 : record2;
+            AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
+                    record2 : record1;
 
+            // todo: not handling inversions for now
+            if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("failed mapping orientation check: r1 = " + record1 + "; r2 = " + record2 + ", matepair = " + isMatePairs());
+                }
+                return;
+            }
+
+            insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
+
+            if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) {
+                return;
+            }
+
+            int leftReadEnd = leftRead.getPosition() + leftRead.getSequenceLength();
+            int genomeOffset = leftReadEnd - leftReadEnd % resolution;
+
+
+            int internalIsize = rightRead.getPosition() - leftReadEnd;
+            int genomicWindow = internalIsize +
+                    leftReadEnd % resolution +
+                    (resolution - rightRead.getPosition() % resolution);
+
+
+            double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
+
+            if (mapabilityWeighting != null) {
+                if (insertSize > getTargetIsize() + 6 * getTargetIsizeSD()) {
+                    String chrom = record1.getChromosomeName();
+                    int leftReadStart = leftRead.getPosition();
+                    double leftReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, leftReadStart, leftReadEnd);
+                    logger.debug("left read mapability from " + leftRead.getPosition() + " to " + leftReadEnd + " = " + leftReadMapability);
+
+                    int rightReadStart = rightRead.getPosition() - rightRead.getSequenceLength();
+                    int rightReadEnd = rightRead.getPosition();
+                    double rightReadMapability = mapabilityWeighting.getMinValueForRegion(chrom, rightReadStart, rightReadEnd);
+                    logger.debug("right read mapability from " + (rightRead.getPosition() - rightRead.getSequenceLength()) + " to " + rightRead.getPosition() + " = " + rightReadMapability);
+
+                    logger.debug("old pmc: " + pMappingCorrect);
+                    pMappingCorrect = pMappingCorrect + Math.log(leftReadMapability) + Math.log(rightReadMapability);
+                    logger.debug("new pmc: " + pMappingCorrect);
+                }
+            }
+
+            ReadPairInfo readPairInfo = new ReadPairInfo(insertSize, pMappingCorrect, getReadGroupId());
+
+            for (int i = 0; i <= genomicWindow; i += resolution) {
+                Short chromosome = faix.getKeyForChromName(record1.getChromosomeName());
+                if (chromosome == null) {
+                    throw new RuntimeException("Bad chromosome in record: " + record1.getChromosomeName());
+                }
+
+                int pos = genomeOffset + i;
+
+                if (getChromosomeFilter() != null) {
+                    if (! record1.getChromosomeName().equals(getChromosomeFilter()) ||
+                        pos < getStartFilter() || pos > getEndFilter()) {
+                        continue;
+                    }
+                }
+
+                logger.debug("Emitting insert size " + insertSize);
+                GenomicLocationWithQuality genomicLocationWithQuality = new GenomicLocationWithQuality(chromosome, pos, readPairInfo.pMappingCorrect);
+                GenomicLocation genomicLocation = new GenomicLocation(genomicLocationWithQuality.chromosome, genomicLocationWithQuality.pos);
+                if (bestScoresForGL.containsKey(genomicLocation) && bestScoresForGL.get(genomicLocation).pMappingCorrect >= readPairInfo.pMappingCorrect) {
+                    continue;
+                } else {
+                    bestScoresForGL.put(genomicLocation, readPairInfo);
+                }
+            }
+        } catch (BadAlignmentRecordException e) {
+            logger.error(e);
+            logger.error("skipping bad record pair: "+ record1 + ", " + record2);
         }
 
     }
@@ -240,36 +337,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
 
     public void configure(JobConf job) {
         super.configure(job);
-
-        // todo: if we change to the non-deprecated API, need to update this as described here
-        // todo: https://issues.apache.org/jira/browse/MAPREDUCE-2166
-        String inputFile = getInputPath(job.get("map.input.file"));
-
-        String readGroupInfoFile = job.get("read.group.info.file");
-        ReadGroupInfoFileHelper readGroupInfoFileHelper = new ReadGroupInfoFileHelper();
-        Map<Short, ReadGroupInfo> readGroupInfos = null;
-        try {
-            readGroupInfos = readGroupInfoFileHelper.readReadGroupsById(readGroupInfoFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.err.println("Looking up the read group for input file: " + inputFile);
-        boolean configuredReadGroup = false;
-        for (Short readGroupInfoId : readGroupInfos.keySet()) {
-            System.err.println("comparing to: " + readGroupInfos.get(readGroupInfoId).hdfsPath);
-            if (inputFile.startsWith(readGroupInfos.get(readGroupInfoId).hdfsPath)) {
-                System.err.println("got it!");
-                this.readGroupId = readGroupInfoId;
-                ReadGroupInfo readGroupInfo = readGroupInfos.get(readGroupInfoId);
-                matePairs = readGroupInfo.matePair;
-                targetIsize = readGroupInfo.isize;
-                targetIsizeSD = readGroupInfo.isizeSD;
-                configuredReadGroup = true;
-                break;
-            }
-        }
-        if (! configuredReadGroup) throw new RuntimeException("Unable to configure read group for " + inputFile);
+        configureReadGroups(job);
 
         scorer = new ProbabilisticPairedAlignmentScorer();
 
@@ -280,7 +348,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             setChromosomeFilter(job.get("alignments.filterchr"));
             setStartFilter(Long.parseLong(job.get("alignments.filterstart")));
             setEndFilter(Long.parseLong(job.get("alignments.filterend")));
-            System.err.println("Configured filter");
+            logger.debug("Configured filter");
         }
 
 
@@ -291,7 +359,7 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.err.println("configured exclusion regions with " + exclusionRegionsFileName);
+            logger.debug("configured exclusion regions with " + exclusionRegionsFileName);
         }
 
 
@@ -303,18 +371,24 @@ public class SingleEndAlignmentsToReadPairInfoMapper extends CloudbreakMapReduce
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.err.println("configured mapability with " + mapabilityWeightingFileName);
+            logger.debug("configured mapability with " + mapabilityWeightingFileName);
         }
 
         if (job.get("pileupDeletionScore.maxInsertSize") != null) {
             maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
-            System.err.println("configured max insert to " + maxInsertSize);
+            logger.debug("configured max insert to " + maxInsertSize);
         }
-        System.err.println("done with configuration");
+        minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
+
+        maxMismatches = Integer.parseInt(job.get("pileupDeletionScore.maxMismatches"));
+
+        logger.debug("done with configuration");
     }
 
-    protected static String getInputPath(String mapInputProperty) {
-        String path = new Path(mapInputProperty).toUri().getPath();
-        return path;
+    public boolean passes(AlignmentRecord record) {
+        if (maxMismatches != -1 && getAlignerName().equals(Cloudbreak.ALIGNER_GENERIC_SAM)) {
+            return ((SAMRecord) record).getMismatches() < maxMismatches;
+        }
+        return true;
     }
 }

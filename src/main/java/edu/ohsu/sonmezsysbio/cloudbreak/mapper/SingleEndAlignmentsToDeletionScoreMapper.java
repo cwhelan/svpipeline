@@ -2,7 +2,6 @@ package edu.ohsu.sonmezsysbio.cloudbreak.mapper;
 
 import edu.ohsu.sonmezsysbio.cloudbreak.*;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
@@ -83,7 +82,12 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
             throws IOException {
         String line = value.toString();
 
-        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
+        // ignoring OEA for now
+        if (readPairAlignments.getRead1Alignments().size() == 0 || readPairAlignments.getRead2Alignments().size() == 0) {
+            return;
+        }
+
         emitDeletionScoresForAllPairs(readPairAlignments, output);
     }
 
@@ -115,7 +119,6 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
         isizeMean = targetIsize;
         isizeSD = targetIsizeSD;
         if (matePairs) {
-            //System.err.println("insert size: " + insertSize);
             if (!scorer.isMatePairNotSmallFragment(record1, record2)) {
                 isizeMean = 150.0;
                 isizeSD = 15.0;
@@ -126,7 +129,7 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
+        Double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
         double deletionScore = scorer.computeDeletionScore(
                 insertSize,
@@ -134,7 +137,6 @@ public class SingleEndAlignmentsToDeletionScoreMapper extends CloudbreakMapReduc
                 isizeSD,
                 pMappingCorrect
         );
-        //System.err.println("computed deletion score : " + deletionScore);
 
         int genomeOffset = leftRead.getPosition() - leftRead.getPosition() % resolution;
 

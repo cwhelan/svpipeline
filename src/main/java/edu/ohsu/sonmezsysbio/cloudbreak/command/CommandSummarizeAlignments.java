@@ -25,6 +25,9 @@ public class CommandSummarizeAlignments implements CloudbreakCommand {
     @Parameter(names = {"--outputHDFSDir"}, required = true)
     String outputHDFSDir;
 
+    @Parameter(names = {"--aligner"})
+    String aligner = Cloudbreak.ALIGNER_NOVOALIGN;
+
     public void run(Configuration conf) throws Exception {
         runHadoopJob(conf);
     }
@@ -39,6 +42,8 @@ public class CommandSummarizeAlignments implements CloudbreakCommand {
         FileSystem.get(conf).delete(outputDir);
 
         FileOutputFormat.setOutputPath(conf, outputDir);
+
+        conf.set("cloudbreak.aligner", aligner);
 
         conf.setInputFormat(SequenceFileInputFormat.class);
 

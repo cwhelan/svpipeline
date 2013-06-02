@@ -15,18 +15,17 @@ import java.io.IOException;
  * Date: 5/23/11
  * Time: 10:12 AM
  */
-public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase implements Mapper<Text, Text, Text, Text> {
+public class SingleEndAlignmentsToBedSpansMapper extends SingleEndAlignmentsMapper implements Mapper<Text, Text, Text, Text> {
 
     private boolean matePairs;
     private Integer maxInsertSize = 500000;
-    private Double targetIsize;
-    private Double targetIsizeSD;
-    
+
     // region to dump spans over
     private String chromosome;
     private int regionStart;
     private int regionEnd;
     private PairedAlignmentScorer scorer;
+    private int minScore = -1;
 
     public Integer getMaxInsertSize() {
         return maxInsertSize;
@@ -34,31 +33,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
 
     public void setMaxInsertSize(Integer maxInsertSize) {
         this.maxInsertSize = maxInsertSize;
-    }
-
-    public boolean isMatePairs() {
-        return matePairs;
-    }
-
-    public void setMatePairs(boolean matePairs) {
-        this.matePairs = matePairs;
-    }
-
-
-    public Double getTargetIsize() {
-        return targetIsize;
-    }
-
-    public void setTargetIsize(Double targetIsize) {
-        this.targetIsize = targetIsize;
-    }
-
-    public Double getTargetIsizeSD() {
-        return targetIsizeSD;
-    }
-
-    public void setTargetIsizeSD(Double targetIsizeSD) {
-        this.targetIsizeSD = targetIsizeSD;
     }
 
     public String getChromosome() {
@@ -85,15 +59,31 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         this.regionEnd = regionEnd;
     }
 
+    public int getMinScore() {
+        return minScore;
+    }
+
+    public void setMinScore(int minScore) {
+        this.minScore = minScore;
+    }
+
+    public PairedAlignmentScorer getScorer() {
+        return scorer;
+    }
+
+    public void setScorer(PairedAlignmentScorer scorer) {
+        this.scorer = scorer;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
-        targetIsize = Double.parseDouble(job.get("pileupDeletionScore.targetIsize"));
-        targetIsizeSD = Double.parseDouble(job.get("pileupDeletionScore.targetIsizeSD"));
+        configureReadGroups(job);
 
         maxInsertSize = Integer.parseInt(job.get("pileupDeletionScore.maxInsertSize"));
-        matePairs = Boolean.parseBoolean(job.get("pileupDeletionScore.isMatePairs"));
         parseRegion(job.get("pileupDeletionScore.region"));
+
+        minScore = Integer.parseInt(job.get("pileupDeletionScore.minScore"));
 
         scorer = new ProbabilisticPairedAlignmentScorer();
     }
@@ -108,18 +98,67 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
             throws IOException {
 
         String line = value.toString();
-        //System.err.println("LINE: " + line);
 
-        ReadPairAlignments readPairAlignments = parsePairAlignmentLine(line);
+        ReadPairAlignments readPairAlignments = alignmentReader.parsePairAlignmentLine(line);
+
+        // ignoring OEA for now
+        if (readPairAlignments.getRead1Alignments().size() == 0 || readPairAlignments.getRead2Alignments().size() == 0) {
+            return;
+        }
+
         emitDeletionScoresForAllPairs(readPairAlignments, output);
     }
 
     private void emitDeletionScoresForAllPairs(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
-        for (AlignmentRecord record1 : readPairAlignments.getRead1Alignments()) {
-            for (AlignmentRecord record2 : readPairAlignments.getRead2Alignments()) {
-                emitBedSpanForPair(record1, record2, readPairAlignments, output);
+        if (!emitConcordantAlignmentIfFound(readPairAlignments, output)) {
+
+            if (! (readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome) &&
+                    readPairAlignments.getRead1AlignmentsByChromosome().containsKey(chromosome)))
+                return;
+
+            for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chromosome)) {
+                if (getMinScore() != -1) {
+                    if (record1.getAlignmentScore() < getMinScore()) {
+                        continue;
+                    }
+                }
+                for (AlignmentRecord record2 : readPairAlignments.getRead2AlignmentsByChromosome().get(chromosome)) {
+                    if (getMinScore() != -1) {
+                        if (record2.getAlignmentScore() < getMinScore()) {
+                            continue;
+                        }
+                    }
+                    emitBedSpanForPair(record1, record2, readPairAlignments, output);
+                }
+            }
+
+        }
+    }
+
+    private boolean emitConcordantAlignmentIfFound(ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
+        boolean foundConcordant = false;
+        if (! (readPairAlignments.getRead2AlignmentsByChromosome().containsKey(chromosome) &&
+                 readPairAlignments.getRead1AlignmentsByChromosome().containsKey(chromosome)))
+            return false;
+
+        for (AlignmentRecord record1 : readPairAlignments.getRead1AlignmentsByChromosome().get(chromosome)) {
+            for (AlignmentRecord record2 : readPairAlignments.getRead2AlignmentsByChromosome().get(chromosome)) {
+                if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) continue;
+                AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
+                        record1 : record2;
+                AlignmentRecord rightRead = record1.getPosition() < record2.getPosition() ?
+                        record2 : record1;
+
+                int insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
+                if (Math.abs(insertSize - targetIsize) < 3 * targetIsizeSD) {
+                    emitBedSpanForPair(record1, record2, readPairAlignments, output);
+                    foundConcordant = true;
+                }
             }
         }
+
+        return foundConcordant;
+
     }
 
     public void emitBedSpanForPair(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments, OutputCollector<Text, Text> output) throws IOException {
@@ -131,8 +170,6 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
         if (!scorer.validateMappingOrientations(record1, record2, isMatePairs())) return;
 
         int insertSize;
-        Double isizeMean;
-        Double isizeSD;
 
         AlignmentRecord leftRead = record1.getPosition() < record2.getPosition() ?
                 record1 : record2;
@@ -143,29 +180,14 @@ public class SingleEndAlignmentsToBedSpansMapper extends CloudbreakMapReduceBase
                leftRead.getPosition() < regionEnd && rightRead.getPosition() > regionStart))
             return;
 
-        isizeMean = targetIsize;
-        isizeSD = targetIsizeSD;
-        if (matePairs) {
-            if (!scorer.isMatePairNotSmallFragment(record1, record2)) {
-                isizeMean = 150.0;
-                isizeSD = 15.0;
-            }
-        }
-
         insertSize = rightRead.getPosition() + rightRead.getSequenceLength() - leftRead.getPosition();
 
         if (! scorer.validateInsertSize(insertSize, record1.getReadId(), maxInsertSize)) return;
 
-        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2);
-        double deletionScore = scorer.computeDeletionScore(
-                insertSize,
-                isizeMean,
-                isizeSD,
-                pMappingCorrect
-        );
+        double pMappingCorrect = alignmentReader.probabilityMappingIsCorrect(record1, record2, readPairAlignments);
 
         output.collect(new Text(leftRead.getReadId()),
-                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + insertSize + "\t" + pMappingCorrect + "\t" + deletionScore));
+                new Text(leftRead.getChromosomeName() + "\t" + leftRead.getPosition() + "\t" + rightRead.getPosition() + "\t" + leftRead.getReadId() + "\t" + insertSize + "\t" + pMappingCorrect));
 
     }
 }

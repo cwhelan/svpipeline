@@ -38,7 +38,7 @@ public class SingleEndAlignmentsToPairsReducer extends MapReduceBase
             }
         }
 
-        if (read1Alignments.size() > 0 && read2Alignments.size() > 0) {
+        if (read1Alignments.size() > 0 || read2Alignments.size() > 0) {
             StringBuffer valueBuffer = new StringBuffer();
             appendAligmentsToBuffer(read1Alignments, valueBuffer);
             valueBuffer.append(Cloudbreak.READ_SEPARATOR);

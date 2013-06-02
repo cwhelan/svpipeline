@@ -19,10 +19,10 @@ public class Cloudbreak extends Configured implements Tool
 
     public static final String ALIGNER_NOVOALIGN = "novoalign";
     public static final String ALIGNER_MRFAST = "mrfast";
+    public static final String ALIGNER_GENERIC_SAM = "sam";
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new Cloudbreak(), args);
-
         System.exit(res);
     }
 
@@ -58,8 +58,24 @@ public class Cloudbreak extends Configured implements Tool
 
         CommandReadPairedEndFilesIntoHDFS readFiles = new CommandReadPairedEndFilesIntoHDFS();
         jc.addCommand("readPairedEndFilesIntoHDFS", readFiles);
+
+        CommandReadSAMFileIntoHDFS readSamFile = new CommandReadSAMFileIntoHDFS();
+        jc.addCommand("readSAMFileIntoHDFS", readSamFile);
+
         CommandNovoalignSingleEnds singleEnds  = new CommandNovoalignSingleEnds();
         jc.addCommand("alignSingleEnds", singleEnds);
+
+        CommandBowtie2SingleEnds bowtie2SingleEnds  = new CommandBowtie2SingleEnds();
+        jc.addCommand("bowtie2SingleEnds", bowtie2SingleEnds);
+
+        CommandRazerS3SingleEnds razerS3SingleEnds  = new CommandRazerS3SingleEnds();
+        jc.addCommand("razerS3SingleEnds", razerS3SingleEnds);
+
+        CommandBowtie2PairedEnds bowtie2PairedEnds  = new CommandBowtie2PairedEnds();
+        jc.addCommand("bowtie2PairedEnds", bowtie2PairedEnds);
+
+        CommandRazerS3PairedEnds razerS3PairedEnds  = new CommandRazerS3PairedEnds();
+        jc.addCommand("razerS3PairedEnds", razerS3PairedEnds);
 
         CommandMrFastSingleEnds mrFastSingleEnds  = new CommandMrFastSingleEnds();
         jc.addCommand("mrfastSingleEnds", mrFastSingleEnds);
@@ -70,6 +86,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandIncrementalUpdateSingleEndDeletionScores incrementalUpdateSingleEndDeletionScores = new CommandIncrementalUpdateSingleEndDeletionScores();
         jc.addCommand("incrementalUpdateSingleEndDeletionScores", incrementalUpdateSingleEndDeletionScores);
 
+        CommandGMMFitSingleEndInsertSizes GMMFitSingleEndInsertSizes = new CommandGMMFitSingleEndInsertSizes();
+        jc.addCommand("GMMFitSingleEndInsertSizes", GMMFitSingleEndInsertSizes);
+
         CommandVESingleEndDeletionScores veSingleEndDeletionScores = new CommandVESingleEndDeletionScores();
         jc.addCommand("veSingleEndDeletionScores", veSingleEndDeletionScores);
 
@@ -78,6 +97,9 @@ public class Cloudbreak extends Configured implements Tool
 
         CommandExportWigAndBedFiles exportWigAndBedFiles = new CommandExportWigAndBedFiles();
         jc.addCommand("exportWigAndBedFiles", exportWigAndBedFiles);
+
+        CommandExportGMMResults exportGMMResults = new CommandExportGMMResults();
+        jc.addCommand("exportGMMResults", exportGMMResults);
 
         CommandDumpReadsWithScores dumpReadsWithScores = new CommandDumpReadsWithScores();
         jc.addCommand("dumpReadsWithScores", dumpReadsWithScores);
@@ -88,6 +110,9 @@ public class Cloudbreak extends Configured implements Tool
         CommandDebugReadPairInfo commandDebugReadPairInfo = new CommandDebugReadPairInfo();
         jc.addCommand("debugReadPairInfo", commandDebugReadPairInfo);
 
+        CommandFindAlignment commandFindAlignment = new CommandFindAlignment();
+        jc.addCommand("findAlignment", commandFindAlignment);
+
         CommandSummarizeAlignments commandSummarizeAlignments = new CommandSummarizeAlignments();
         jc.addCommand("summarizeAlignments", commandSummarizeAlignments);
 
@@ -96,6 +121,12 @@ public class Cloudbreak extends Configured implements Tool
 
         CommandConvertTextAlignmentsToSnappySequence convertTextAlignmentsToSnappySequence = new CommandConvertTextAlignmentsToSnappySequence();
         jc.addCommand("convertTextAlignmentsToSnappySequence", convertTextAlignmentsToSnappySequence);
+
+        CommandExportAlignmentsFromHDFS commandExportAlignmentsFromHDFS = new CommandExportAlignmentsFromHDFS();
+        jc.addCommand("exportAlignmentsFromHDFS", commandExportAlignmentsFromHDFS);
+
+        CommandSortGMMResults commandSortGMMResults = new CommandSortGMMResults();
+        jc.addCommand("sortGMMResults", commandSortGMMResults);
 
         jc.setProgramName("Cloudbreak");
         return jc;

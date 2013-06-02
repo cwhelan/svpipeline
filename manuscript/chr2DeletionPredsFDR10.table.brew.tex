@@ -1,0 +1,19 @@
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{rrrrrr}
+  \hline
+ & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+ Total Number & <%= totals['40-100bp'] %> &  <%= totals['101-250bp'] %> & <%= totals['251-500bp'] %> &  <%= totals['501-1000bp'] %> & <%= totals['> 1000bp'] %>\\ 
+  \hline
+  Cloudbreak  & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'Cloudbreak', '> 1000bp') %> \\ 
+  Breakdancer & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'Breakdancer', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'Breakdancer', '> 1000bp') %> \\ 
+  GASVPro     & <%= printPredTableCell(preds, exPreds, 'GASVPro', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'GASVPro', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'GASVPro', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'GASVPro', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'GASVPro', '> 1000bp') %> \\ 
+  DELLY-RP       & <%= printPredTableCell(preds, exPreds, 'DELLY-RP', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'DELLY-RP', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'DELLY-RP', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'DELLY-RP', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'DELLY-RP', '> 1000bp') %> \\ 
+  DELLY-SR       & <%= printPredTableCell(preds, exPreds, 'DELLY-SR', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'DELLY-SR', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'DELLY-SR', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'DELLY-SR', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'DELLY-SR', '> 1000bp') %> \\ 
+  Pindel      & <%= printPredTableCell(preds, exPreds, 'Pindel', '40-100bp') %>  & <%= printPredTableCell(preds, exPreds, 'Pindel', '101-250bp') %> &  <%= printPredTableCell(preds, exPreds, 'Pindel', '251-500bp') %> & <%= printPredTableCell(preds, exPreds, 'Pindel', '501-1000bp') %> & <%= printPredTableCell(preds, exPreds, 'Pindel', '> 1000bp') %>\\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
+\label{chr2DeletionPredsFDR10}
+\end{table}

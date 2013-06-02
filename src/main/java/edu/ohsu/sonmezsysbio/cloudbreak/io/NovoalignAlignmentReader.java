@@ -11,6 +11,11 @@ import edu.ohsu.sonmezsysbio.cloudbreak.ReadPairAlignments;
  * Time: 1:56 PM
  */
 public class NovoalignAlignmentReader extends BaseAlignmentReader {
+
+    public AlignmentRecord parseRecord(String alignmentRecord) {
+        return parseRecord(alignmentRecord.split("\t"));
+    }
+
     public AlignmentRecord parseRecord(String[] fields) {
         NovoalignNativeRecord record = new NovoalignNativeRecord();
         record.setReadId(fields[0]);
@@ -32,7 +37,7 @@ public class NovoalignAlignmentReader extends BaseAlignmentReader {
         return record;
     }
 
-    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2) {
+    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
         return probabilityMappingIsCorrect(NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record1).getPosteriorProb()),
                 NovoalignNativeRecord.decodePosterior(((NovoalignNativeRecord) record2).getPosteriorProb()));
     }
@@ -44,6 +49,4 @@ public class NovoalignAlignmentReader extends BaseAlignmentReader {
         return endPosterior1 + endPosterior2;
     }
 
-    public void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments) {
-    }
 }

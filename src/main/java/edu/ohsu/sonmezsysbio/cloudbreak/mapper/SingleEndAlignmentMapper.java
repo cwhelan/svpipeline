@@ -4,6 +4,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
@@ -15,20 +16,34 @@ import java.util.zip.GZIPOutputStream;
  * Time: 5:27 PM
  */
 public abstract class SingleEndAlignmentMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+
+    private static org.apache.log4j.Logger logger = Logger.getLogger(SingleEndAlignmentMapper.class);
+
     private String localDir;
     protected Writer s1FileWriter;
     protected File s1File;
     protected OutputCollector<Text, Text> output;
     protected Reporter reporter;
 
+    protected boolean getCompressTempReadFile() {
+        return true;
+    }
+
     @Override
     public void configure(JobConf job) {
         super.configure(job);
         this.localDir = job.get("mapred.child.tmp");
         try {
-            s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
-            s1File.createNewFile();
-            s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+            if (getCompressTempReadFile()) {
+                s1File = new File(localDir + "/temp1_sequence.fastq.gz").getAbsoluteFile();
+                s1File.createNewFile();
+                s1FileWriter = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(s1File)));
+            } else {
+                s1File = new File(localDir + "/temp1_sequence.fastq").getAbsoluteFile();
+                s1File.createNewFile();
+                s1FileWriter = new OutputStreamWriter(new FileOutputStream(s1File));
+
+            }
 
 
         } catch (IOException e) {
@@ -51,19 +66,19 @@ public abstract class SingleEndAlignmentMapper extends MapReduceBase implements 
         splitRead(key, reads[1]);
 
         reporter.progress();
-        //System.out.println("Done with map method, real work will happen in close");
+        logger.debug("Done with map method, real work will happen in close");
     }
 
     private void splitRead(LongWritable key, String line) throws IOException {
         String[] fields = line.split("\t");
 
         if (fields[1].length() != fields[3].length()) {
-            System.err.println("Warning; mismatching seq and qual lengths in record " + key.toString() + "!");
-            System.err.println("Seq:");
-            System.err.println(fields[1]);
-            System.err.println("Qual:");
-            System.err.println(fields[3]);
-            System.err.println("DONE WARNING");
+            logger.warn("Warning; mismatching seq and qual lengths in record " + key.toString() + "!");
+            logger.warn("Seq:");
+            logger.warn(fields[1]);
+            logger.warn("Qual:");
+            logger.warn(fields[3]);
+            logger.warn("DONE WARNING");
         }
         s1FileWriter.write(fields[0] + "\n");
         s1FileWriter.write(fields[1] + "\n");

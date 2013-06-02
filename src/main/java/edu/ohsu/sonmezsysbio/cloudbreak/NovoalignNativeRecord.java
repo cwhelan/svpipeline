@@ -16,6 +16,11 @@ public class NovoalignNativeRecord implements AlignmentRecord {
     String readId;
     String sequence;
 
+    // todo: not implemented
+    public int getAlignmentScore() {
+        return 0;
+    }
+
     public boolean isMapped() {
         return "U".equals(getMappingStatus()) || "R".equals(getMappingStatus());
     }
@@ -119,4 +124,16 @@ public class NovoalignNativeRecord implements AlignmentRecord {
         return codedPosterior == 0 ? 0.0001 : 1 - Math.pow(10.0, codedPosterior / -10.0);
     }
 
+    @Override
+    public String toString() {
+        return "NovoalignNativeRecord{" +
+                "chromosomeName='" + chromosomeName + '\'' +
+                ", position=" + position +
+                ", mappingStatus='" + mappingStatus + '\'' +
+                ", posteriorProb=" + posteriorProb +
+                ", forward=" + forward +
+                ", readId='" + readId + '\'' +
+                ", sequence='" + sequence + '\'' +
+                '}';
+    }
 }

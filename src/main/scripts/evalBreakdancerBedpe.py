@@ -18,11 +18,10 @@ breakdancer_file.close()
 unique_score_values = list(set(score_values))
 unique_score_values.sort()
 
-print "\t".join(["Thresh", "Calls", "TP", "Long", "TPR", "WrongType"])
+print "\t".join(["Thresh", "Calls", "TP", "TPR", "WrongType"])
 for v in unique_score_values:
     calls_gte_threshold = []
     breakdancer_file = open(breakdancer_filename, "r")
-    long_calls = 0
     wrong_type = 0
     for line in breakdancer_file:
         fields = line.split("\t")
@@ -33,9 +32,6 @@ for v in unique_score_values:
                 wrong_type += 1
                 continue
             sv_len = int(fields[5]) - int(fields[1])
-            if sv_len > 25000:
-                long_calls += 1
-                continue
             calls_gte_threshold.append(line)
     bedtoolsProcess = subprocess.Popen(["pairToBed", "-type", "ispan",  "-a", "stdin", "-b", truth_filename], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     bedpe_lines = ""
@@ -49,6 +45,6 @@ for v in unique_score_values:
         #print line
         matches += 1
     bedtoolsProcess.stdout.close()
-    print "\t".join(map(str, [v, long_calls + len(calls_gte_threshold), matches, long_calls, float(matches) / (long_calls + len(calls_gte_threshold)), wrong_type]))
+    print "\t".join(map(str, [v, len(calls_gte_threshold), matches, float(matches) / (len(calls_gte_threshold)), wrong_type]))
     
     

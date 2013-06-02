@@ -1,0 +1,97 @@
+% Seventh M.I.T. Conference on Computational Fluid and Solid Mechanics
+% One-Page Abstract Template
+% 20081222PA
+\documentclass[11pt,a4paper]{article}
+
+% Page settings
+%\usepackage{times}
+%\usepackage{amsmath}
+%
+\usepackage{url}
+\setlength{\voffset}{-1in}
+\setlength{\topmargin}{1in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{9in}
+%
+\setlength{\hoffset}{-1in}
+\setlength{\oddsidemargin}{1in}
+\setlength{\evensidemargin}{1in}
+\setlength{\textwidth}{6.5in}
+%
+\setlength{\parskip}{0.175in}
+\setlength{\parindent}{0in}
+
+\begin{document}
+\thispagestyle{empty}
+%
+\begin{center}
+%%%
+%%% Enter title in between the brackets and in lower case
+%%%
+\textbf{Cloudbreak: A MapReduce Algorithm for Detecting Genomic Structural Variation}
+\end{center}
+
+\begin{center}
+%%%
+%%% Enter your name
+%%%
+Christopher W. Whelan$^1$ and Kemal S\"onmez$^{1,2}$
+\\
+%%%
+%%% Enter your affiliation
+%%%
+$^1$Institute on Development and Disability, Center for Spoken Language Understanding \\
+$^2$Department of Medical Informatics \& Clinical Epidemiology \\
+Oregon Health \& Science University, Portland, OR, USA \\
+%%%
+%%% Enter your e-mail address
+%%%
+\texttt{cwhelan@gmail.com}, \texttt{sonmezk@ohsu.edu}
+
+\end{center}
+
+%%%
+%%% Enter the text of your abstract
+%%%
+The detection of genomic structural variations remains one of the the most difficult challenges in analyzing high-throughput sequencing data. Recent approaches have demonstrated that considering multiple mappings of all reads, rather than only uniquely mapped discordant fragments, can improve the performance of read-pair based detection methods. However, the computational requirements for storing and processing data sets with multiple mappings can be formidable. Meanwhile, the growing size and number of sequencing data sets have led to intense interest in distributing computation to cloud or commodity servers. 
+
+MapReduce, via its Hadoop implementation, is becoming a standard
+architecture for distributing processing across such compute
+clusters. In this work we describe a novel conceptual
+framework for structural variation detection in
+MapReduce/Hadoop based on computing local features along the
+genome. Our framework uses Hadoop to take advantage of distributed
+computing to find all possible read alignments using modern short-read
+aligners run with sensitive settings. We then provide an architecture
+to first compute features for each
+genomic location from the relevant alignments, and
+then to call structural variants from the set of all features across
+the genome.
+
+In this framework, we have developed and evaluated a distributed
+deletion-finding algorithm based on fitting a Gaussian mixture model
+(GMM) to the distribution of mapped insert sizes spanning each
+location in the genome. A similar method was used in MoDIL[1];
+however, our algorithm and the Hadoop framework drastically reduce
+the runtime requirements and overall difficulty of using this approach.
+
+On simulated and real data sets of paired-end reads, our algorithm achieves performance
+similar to or better than a variety of popular structural variation
+detection algorithms, including read-pair, split-read, and hybrid
+approaches. Cloudbreak performs well on both small and medium size
+deletions, and in our simulations has greater sensitivity at most fixed levels of
+specificity. We also show increased performance
+in repetitive areas of the genome, identifying more deletions that
+overlap repeats than other approaches in both simulated and real data.
+
+In addition, our algorithm can accurately genotype heterozygous and
+homozygous deletions from diploid samples. Using the parameters
+computed in fitting the GMM and a simple thresholding procedure, we were able to achieve 88.0\% and 94.9\% accuracy in predicting the genotype of the true positive deletions we detected in simulated and real data sets, respectively.
+
+Finally, we have recently added the ability to detect insertions to
+Cloudbreak. Our implementation and source code are available at \url{https://github.com/cwhelan/cloudbreak}.
+
+[1] Lee, S. et al., 2009. MoDIL: detecting small indels from clone-end
+sequencing with mixtures of distributions. {\it Nat. Methods}, 6(7), pp.473–474.
+\end{document}

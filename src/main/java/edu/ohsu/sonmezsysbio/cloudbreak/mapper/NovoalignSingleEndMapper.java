@@ -5,6 +5,7 @@ import edu.ohsu.sonmezsysbio.cloudbreak.io.NovoalignAlignmentReader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.Arrays;
@@ -18,6 +19,8 @@ import java.util.zip.GZIPInputStream;
  */
 public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
 
+    private static Logger logger = Logger.getLogger(NovoalignSingleEndMapper.class);
+
     private OutputCollector<Text, Text> output;
     private String localDir;
     private String reference;
@@ -29,7 +32,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
     public void configure(JobConf job) {
         super.configure(job);
 
-        System.err.println("Current dir: " + new File(".").getAbsolutePath());
+        logger.info("Current dir: " + new File(".").getAbsolutePath());
 
         this.localDir = job.get("mapred.child.tmp");
         reference = job.get("novoalign.reference");
@@ -46,22 +49,22 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
         s1FileWriter.close();
 
         if (! s1File.exists()) {
-            System.err.println("file does not exist: " + s1File.getPath());
+            logger.error("file does not exist: " + s1File.getPath());
         } else {
-            System.err.println("read file length: " + s1File.length());
+            logger.info("read file length: " + s1File.length());
         }
 
         File indexFile = new File(reference);
         if (! indexFile.exists()) {
-            System.err.println("index file does not exist: " + indexFile.getPath());
+            logger.error("index file does not exist: " + indexFile.getPath());
         } else {
-            System.err.println("index file length: " + indexFile.length());
+            logger.info("index file length: " + indexFile.length());
         }
 
         String[] commandLine = buildCommandLine(novoalignExecutable, reference, s1File.getPath(), threshold, baseQualityFormat);
-        System.err.println("Executing command: " + Arrays.toString(commandLine));
+        logger.info("Executing command: " + Arrays.toString(commandLine));
         Process p = Runtime.getRuntime().exec(commandLine);
-        System.err.println("Exec'd");
+        logger.debug("Exec'd");
 
         BufferedReader stdInput = new BufferedReader(new
                          InputStreamReader(p.getInputStream()));
@@ -73,9 +76,8 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
         String outLine;
         NovoalignAlignmentReader alignmentReader = new NovoalignAlignmentReader();
         while ((outLine = stdInput.readLine()) != null) {
-            // System.err.println("LINE: " + outLine);
             if (outLine.startsWith("#"))  {
-                System.err.println("COMMENT LINE: " + outLine);
+                logger.info("COMMENT LINE: " + outLine);
                 continue;
             }
             if (outLine.startsWith("Novoalign") || outLine.startsWith("Exception")) {
@@ -84,7 +86,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
             }
 
             String readPairId = outLine.substring(0,outLine.indexOf('\t')-2);
-            AlignmentRecord alignment = alignmentReader.parseRecord(outLine.split("\t"));
+            AlignmentRecord alignment = alignmentReader.parseRecord(outLine);
 
             if (! alignment.isMapped()) {
                 continue;
@@ -97,7 +99,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
         String errLine;
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
         while ((errLine = errorReader.readLine()) != null) {
-            System.err.println("ERROR: " + errLine);
+            logger.error("ERROR: " + errLine);
         }
     }
 
@@ -107,7 +109,7 @@ public class NovoalignSingleEndMapper extends SingleEndAlignmentMapper {
         String firstErrorLine = null;
         while ((outLine = stdErr.readLine()) != null) {
             if (firstErrorLine == null) firstErrorLine = outLine;
-            System.err.println(outLine);
+            logger.error(outLine);
         }
         return firstErrorLine;
     }

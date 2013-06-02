@@ -7,6 +7,10 @@ import edu.ohsu.sonmezsysbio.cloudbreak.file.WigFileHelper;
 import org.apache.hadoop.conf.Configuration;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -36,22 +40,47 @@ public class CommandExtractPositiveRegionsFromWig implements CloudbreakCommand {
     @Parameter(names = {"--medianFilterWindow"})
     int medianFilterWindow = 1;
 
+    @Parameter(names = {"--muFile"})
+    String muFile = null;
+
+    @Parameter(names = {"--extraWigFilesToAverage"})
+    List<String> extraWigFilesToAverage = new ArrayList<String>();
+
     public void run(Configuration conf) throws Exception {
         FaidxFileHelper faidx = new FaidxFileHelper(faidxFileName);
 
-        BufferedReader wigFileReader;
-        if (inputWigFile.endsWith(".gz")) {
-            wigFileReader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(new File(inputWigFile)))));
-        } else {
-            wigFileReader = new BufferedReader(new FileReader(new File(inputWigFile)));
+        BufferedReader wigFileReader = openReader(inputWigFile);
+
+        BufferedReader muFileReader = null;
+        if (muFile != null) {
+            muFileReader = openReader(muFile);
         }
+
+        Map<String, BufferedReader> extraWigFileReaders = new HashMap<String, BufferedReader>();
+        for (String extraWigFileToAverage : extraWigFilesToAverage) {
+            BufferedReader extraWigFileReader = openReader(extraWigFileToAverage);
+            extraWigFileReaders.put(extraWigFileToAverage, extraWigFileReader);
+        }
+
         BufferedWriter bedFileWriter = new BufferedWriter(new FileWriter(new File(outputBedFile)));
+
         try {
-            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow);
+            WigFileHelper.exportRegionsOverThresholdFromWig(name, wigFileReader, bedFileWriter, threshold, faidx, medianFilterWindow,
+                    muFile, muFileReader, extraWigFilesToAverage, extraWigFileReaders);
         } finally {
             wigFileReader.close();
             bedFileWriter.close();
         }
 
+    }
+
+    private BufferedReader openReader(String extraWigFileToAverage) throws IOException {
+        BufferedReader extraWigFileReader;
+        if (extraWigFileToAverage.endsWith(".gz")) {
+            extraWigFileReader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(new File(extraWigFileToAverage)))));
+        } else {
+            extraWigFileReader = new BufferedReader(new FileReader(new File(extraWigFileToAverage)));
+        }
+        return extraWigFileReader;
     }
 }

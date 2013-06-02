@@ -10,8 +10,11 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.SnappyCodec;
+import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -24,6 +27,8 @@ import java.util.zip.GZIPOutputStream;
 @Parameters(separators = "=", commandDescription = "Load paired fastq files into HDFS")
 public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
+    private static org.apache.log4j.Logger log = Logger.getLogger(CommandReadPairedEndFilesIntoHDFS.class);
+
     @Parameter(names = {"--HDFSDataDir"}, required = true)
     String hdfsDataDir;
 
@@ -34,12 +39,19 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
     String readFile2;
 
     @Parameter(names = {"--outFileName"})
-    String outFileName = "reads.txt";
+    String outFileName = "reads";
 
     @Parameter(names = {"--compress"})
-    String compress = "none";
+    String compress = "snappy";
+
+    @Parameter(names = {"--clipReadIdsAtWhitespace"})
+    boolean clipReadIdsAtWhitespace = true;
+
+    @Parameter(names = {"--trigramEntropyFilter"})
+    Double trigramEntropyFilter = -1.0;
 
     private long numRecords;
+    private long numFilteredRecords;
 
     public void copyReadFilesToHdfs() throws IOException {
         Configuration config = new Configuration();
@@ -77,10 +89,10 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
         numRecords = 0;
         try {
-            String convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
+            String convertedFastqLine = readFastqEntries(inputReader1, inputReader2, trigramEntropyFilter);
             while (convertedFastqLine != null) {
-                writer.write(numRecords, convertedFastqLine);
-                convertedFastqLine = readFastqEntries(inputReader1, inputReader2);
+                writer.write(new LongWritable(numRecords), convertedFastqLine);
+                convertedFastqLine = readFastqEntries(inputReader1, inputReader2, trigramEntropyFilter);
                 numRecords++;
             }
         } finally {
@@ -98,45 +110,88 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
         return inputReader1;
     }
 
-    private String readFastqEntries(BufferedReader inputReader1, BufferedReader inputReader2) throws IOException {
-        String read1 = inputReader1.readLine();
-        if (read1 == null) {
-            return null;
+    private String readFastqEntries(BufferedReader inputReader1, BufferedReader inputReader2, Double trigramEntropyFilter) throws IOException {
+        StringBuffer lineBuffer;
+        while (true) {
+            String read1 = inputReader1.readLine();
+            if (read1 == null) {
+                return null;
+            }
+
+            String seq1 = inputReader1.readLine();
+            String sep1 = inputReader1.readLine();
+            String qual1 = inputReader1.readLine();
+
+            String read2 = inputReader2.readLine();
+            if (read2 == null) {
+                return null;
+            }
+
+            String seq2 = inputReader2.readLine();
+            String sep2 = inputReader2.readLine();
+            String qual2 = inputReader2.readLine();
+
+            if (clipReadIdsAtWhitespace) {
+                read1 = read1.split("\\s+")[0];
+                read2 = read2.split("\\s+")[0];
+            }
+
+            String readPrefix = greatestCommonPrefix(read1, read2);
+
+            if (! (passesEntropyFilter(seq1, trigramEntropyFilter) && passesEntropyFilter(seq2, trigramEntropyFilter))) {
+                log.debug("Skipping read pair " + readPrefix + " because seqs " + seq1 + ", " + seq2 + " don't pass entropy filter.");
+                numFilteredRecords++;
+                continue;
+            }
+
+            lineBuffer = new StringBuffer();
+
+            lineBuffer.append(readPrefix);
+            lineBuffer.append("/1");
+            lineBuffer.append("\t").append(seq1).append("\t").append(sep1).append("\t").append(qual1);
+            lineBuffer.append("\n");
+
+            lineBuffer.append(readPrefix);
+            lineBuffer.append("/2");
+            lineBuffer.append("\t").append(seq2).append("\t").append(sep2).append("\t").append(qual2);
+            lineBuffer.append("\n");
+            break;
         }
-
-        String seq1 = inputReader1.readLine();
-        String sep1 = inputReader1.readLine();
-        String qual1 = inputReader1.readLine();
-
-        String read2 = inputReader2.readLine();
-        if (read2 == null) {
-            return null;
-        }
-
-        String seq2 = inputReader2.readLine();
-        String sep2 = inputReader2.readLine();
-        String qual2 = inputReader2.readLine();
-
-        String readPrefix = greatestCommonPrefix(read1, read2);
-
-        StringBuffer lineBuffer = new StringBuffer();
-
-        lineBuffer.append(readPrefix);
-        lineBuffer.append("/1");
-        lineBuffer.append("\t").append(seq1).append("\t").append(sep1).append("\t").append(qual1);
-        lineBuffer.append("\n");
-
-        lineBuffer.append(readPrefix);
-        lineBuffer.append("/2");
-        lineBuffer.append("\t").append(seq2).append("\t").append(sep2).append("\t").append(qual2);
-        lineBuffer.append("\n");
 
         return lineBuffer.toString();
     }
 
+    private boolean passesEntropyFilter(String seq, Double trigramEntropyFilter) {
+        if (trigramEntropyFilter < 0) {
+            return true;
+        } else {
+            return trigramEntropy(seq) > trigramEntropyFilter;
+        }
+    }
+
+    protected Double trigramEntropy(String seq) {
+        Map<String, Double> counts = new HashMap<String, Double>();
+        for (int i = 2; i < seq.length(); i++) {
+            String trigram = seq.substring(i - 2, i);
+            if (counts.containsKey(trigram)) {
+                counts.put(trigram, counts.get(trigram) + 1);
+            } else {
+                counts.put(trigram, 1.0);
+            }
+        }
+        Double entropy = 0.0;
+        for (String trigram : counts.keySet()) {
+            double normalizedCount = counts.get(trigram) / (seq.length() - 2);
+            entropy += normalizedCount * Math.log(normalizedCount);
+        }
+        return -1 * entropy;
+    }
+
     protected static String greatestCommonPrefix(String read1, String read2) {
         int i = 0;
-        while (i < Math.max(read1.length(), read2.length()) && read1.charAt(i) == read2.charAt(i)) {
+        // find the greatest common prefix, ignoring the '/1' and '/2' at the end of older fastq reads
+        while (i < Math.max(read1.length(), read2.length()) && read1.charAt(i) == read2.charAt(i) &&
+                (! ((read1.charAt(i) == '/') && (read2.charAt(i) == '/')))) {
             i = i + 1;
         }
         return read1.substring(0,i);
@@ -144,28 +199,9 @@ public class CommandReadPairedEndFilesIntoHDFS implements CloudbreakCommand {
 
     public void run(Configuration conf) throws Exception {
         copyReadFilesToHdfs();
-        System.out.println("Loaded " + numRecords + " records.");
+        log.info("Loaded " + numRecords + " records.");
+        log.info("Filtered " + numFilteredRecords + " records due to trigram entropy filter.");
     }
 
-    static class HDFSWriter {
-        public BufferedWriter textFileWriter;
-        public SequenceFile.Writer seqFileWriter;
-
-        public void write(long recordNum, String line) throws IOException {
-            if (textFileWriter != null) {
-                textFileWriter.write(line);
-            } else {
-                seqFileWriter.append(new LongWritable(recordNum), new Text(line));
-            }
-        }
-
-        public void close() throws IOException {
-            if (textFileWriter != null) {
-                textFileWriter.close();
-            } else {
-                seqFileWriter.close();
-            }
-        }
-    }
 }
 

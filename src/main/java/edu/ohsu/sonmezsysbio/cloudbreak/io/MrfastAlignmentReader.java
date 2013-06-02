@@ -17,6 +17,10 @@ public class MrfastAlignmentReader extends BaseAlignmentReader {
     private Double read1AlignmentNormalization;
     private Double read2AlignmentNormalization;
 
+    public AlignmentRecord parseRecord(String alignmentRecord) {
+        return parseRecord(alignmentRecord.split("\t"));
+    }
+
     public AlignmentRecord parseRecord(String[] fields) {
         MrfastAlignmentRecord record = new MrfastAlignmentRecord();
 
@@ -35,9 +39,9 @@ public class MrfastAlignmentReader extends BaseAlignmentReader {
         return field.substring(0, field.indexOf(" "));
     }
 
-    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2) {
-        double record1Score = alignmentScore(record1) / read1AlignmentNormalization;
-        double record2Score = alignmentScore(record2) / read2AlignmentNormalization;
+    public double probabilityMappingIsCorrect(AlignmentRecord record1, AlignmentRecord record2, ReadPairAlignments readPairAlignments) {
+        double record1Score = alignmentScore(record1) / computeAlignmentNormalization(readPairAlignments.getRead1Alignments());
+        double record2Score = alignmentScore(record2) / computeAlignmentNormalization(readPairAlignments.getRead2Alignments());
         return Math.log(record1Score) + Math.log(record2Score);
     }
 
@@ -57,8 +61,4 @@ public class MrfastAlignmentReader extends BaseAlignmentReader {
         return Math.pow(length - mismatches, 1 / (mismatches + 1));
     }
 
-    public void resetForReadPairAlignemnts(ReadPairAlignments readPairAlignments) {
-        read1AlignmentNormalization = computeAlignmentNormalization(readPairAlignments.getRead1Alignments());
-        read2AlignmentNormalization = computeAlignmentNormalization(readPairAlignments.getRead2Alignments());
-    }
 }

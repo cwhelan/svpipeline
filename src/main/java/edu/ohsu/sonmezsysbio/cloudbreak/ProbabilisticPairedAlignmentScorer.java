@@ -2,6 +2,7 @@ package edu.ohsu.sonmezsysbio.cloudbreak;
 
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,6 +11,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
  * Time: 3:11 PM
  */
 public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
+    private static org.apache.log4j.Logger logger = Logger.getLogger(ProbabilisticPairedAlignmentScorer.class);
     @Override
     public double computeDeletionScore(int insertSize, Double targetIsize, Double targetIsizeSD, Double pMappingCorrect) {
         // calculate:
@@ -55,23 +57,22 @@ public class ProbabilisticPairedAlignmentScorer extends PairedAlignmentScorer {
         double likelihoodRatio = pDeletionNew
                                 - pNoDeletionNew;
 
-//        System.out.println("-----");
-//        System.out.println("pMappingCorrect:\t" + pMappingCorrect);
-//        System.out.println("pMappingIncorrect:\t" + pMappingIncorrect);
-//        System.out.println("pISgivenDeletion:\t" + pISgivenDeletion);
-//        System.out.println("pISgivenNoDeletion:\t" + pISgivenNoDeletion);
-//        System.out.println("pDeletionGivenIS:\t" + pDeletionGivenIS);
-//        System.out.println("pNoDeletionGivenIS:\t" + pNoDeletionGivenIS);
-//        System.out.println("pDeletion:\t" + pDeletion);
-//        System.out.println("pNoDeletion:\t" + pNoDeletion);
-//
-//        System.out.println("pDeletionGivenIS + pMappingCorrect:\t" + (pDeletionGivenIS + pMappingCorrect));
-//        System.out.println("pNoDeletionGivenIS + pMappingCorrect:\t" + (pNoDeletionGivenIS + pMappingCorrect));
-//
-//        System.out.println("pDeletionNew:\t" + pDeletionNew);
-//        System.out.println("pNoDeletionNew:\t" + pNoDeletionNew);
-//        System.out.println("likelihoodRatio:\t" + likelihoodRatio);
-//        System.out.println("-----");
+        logger.debug("-----");
+        logger.debug("pMappingCorrect:\t" + pMappingCorrect);
+        logger.debug("pMappingIncorrect:\t" + pMappingIncorrect);
+        logger.debug("pISgivenDeletion:\t" + pISgivenDeletion);
+        logger.debug("pISgivenNoDeletion:\t" + pISgivenNoDeletion);
+        logger.debug("pDeletionGivenIS:\t" + pDeletionGivenIS);
+        logger.debug("pNoDeletionGivenIS:\t" + pNoDeletionGivenIS);
+        logger.debug("pDeletion:\t" + pDeletion);
+        logger.debug("pNoDeletion:\t" + pNoDeletion);
+
+        logger.debug("pDeletionGivenIS + pMappingCorrect:\t" + (pDeletionGivenIS + pMappingCorrect));
+        logger.debug("pNoDeletionGivenIS + pMappingCorrect:\t" + (pNoDeletionGivenIS + pMappingCorrect));
+
+        logger.debug("pDeletionNew:\t" + pDeletionNew);
+        logger.debug("pNoDeletionNew:\t" + pNoDeletionNew);
+        logger.debug("-----");
 
         return likelihoodRatio;
     }

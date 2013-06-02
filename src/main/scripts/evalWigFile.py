@@ -16,11 +16,14 @@ truth_filename = sys.argv[2]
 faidx_filename = sys.argv[3]
 medianFilterWindow = sys.argv[4]
 lower_threshold = float(sys.argv[5])
+mu_filename = sys.argv[6]
+
+cbhome = sys.argv[7]
 
 def open_file(wig_filename):
     if (wig_filename.endswith("gz")):
         sys.stderr.write("opening with subprocess\n")
-        p = subprocess.Popen(["zcat",wig_filename], 
+        p = subprocess.Popen(["gzcat",wig_filename],
                              stdout = subprocess.PIPE)
         wig_file = p.stdout
     else:
@@ -48,7 +51,7 @@ sys.stderr.write("values above threshold: " + str(len(values_above_threshold)) +
 values_above_threshold = list(set(values_above_threshold))
 values_above_threshold.sort()
 
-num_quantiles = 200
+num_quantiles = 50
 quantiles = [0] * (num_quantiles + 1)
 q_num = 0
 
@@ -67,22 +70,23 @@ sys.stderr.write(str(quantiles))
 sys.stderr.write("\n")
 
 def process_quantile(q):
-    eval_at_q_cmd = ['condor_run', 'python', '/l2/users/whelanch/gene_rearrange/svpipeline/src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow]
+    eval_at_q_cmd = ['python', cbhome + 'src/main/scripts/evalWigFileAtThreshold.py', str(q), wig_filename, truth_filename, faidx_filename, medianFilterWindow, mu_filename, cbhome + 'target/']
     #print eval_at_q_cmd
     result = subprocess.Popen(eval_at_q_cmd, stdout=subprocess.PIPE).communicate()[0]
     result_fields = result.split()
     num_predictions = int(result_fields[1])
-    predicted_region = int(result_fields[2])
-    num_matches = int(result_fields[3])
+    num_matches = int(result_fields[2])
+    num_short_calls = int(result_fields[5])
+    tpr = float(result_fields[6])
     if num_predictions == 0:
         print "Warning: zero predictions in line: " + result
-        return (q, 0, 0, 0, 0)
+        return (q, 0, 0, 0, 0, 0)
     else:
-        return (q, num_predictions, predicted_region, num_matches, float(num_matches) / num_predictions)
+        return (q, num_predictions, num_matches, 0, num_short_calls,tpr)
     
-p=Pool(50)
+p=Pool(3)
 results = p.map(process_quantile, quantiles)
 
-print "\t".join(["Thresh", "Calls", "Region", "TP", "TPR"])
+print "\t".join(["Thresh", "Calls", "TP", "Wrong Type", "Short", "TPR"])
 for q in results:
     print "\t".join(map(str, q))
