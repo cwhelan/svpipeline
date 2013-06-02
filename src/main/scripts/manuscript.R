@@ -26,12 +26,12 @@ rocLineTypes <- function(numLines) {
   seq(1,numLines)
 }
 
-plotROC <- function(perfs, perfNames, totalDels, main, sim=TRUE, maxTP=NA, legendLoc="bottomright",legendCex=.9) {
+plotROC <- function(perfs, perfNames, totalDels, main, sim=TRUE, maxTP=NA, legendLoc="bottomright",legendCex=.9,...) {
   maxFP <- totalDels
   if (is.na(maxTP)) {
     maxTP <- totalDels
   }
-  plot(0, type="n", ylim=c(0, maxTP), xlim=c(0,maxFP), xlab=ifelse(sim, "False Positives", "Novel Predictions"), ylab="True Positives", main=main)
+  plot(0, type="n", ylim=c(0, maxTP), xlim=c(0,maxFP), xlab=ifelse(sim, "False Positives", "Novel Predictions"), ylab="True Positives", main=main, ...)
   perfCols <- rocColors(length(perfs))
   lineTypes <- rocLineTypes(length(perfs))
   mapply(drawPerfLine, perfs, perfCols, lineTypes, MoreArgs=list(maxFP=maxFP))  
@@ -243,8 +243,17 @@ perfsListDelsChr2 <- list(cloudbreak=cloudbreakChr2DeletionPerf, breakdancer=bre
 pdf(chr2DeletionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsListDelsChr2, 
-        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY_RP", "DELLY-SR"), 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
         totalDelsChr2, "Deletions in Venter diploid chr2 simulation",legendLoc=xy.coords(425,200), maxTP=350)
+dev.off()
+
+perfsListDelsChr2 <- list(cloudbreak=cloudbreakChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
+cairo_pdf("~/Documents/svpipeline/figures/chr2_del_roc_cairo.pdf", width=10, height=7)
+par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
+plotROC(perfsListDelsChr2, 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
+        totalDelsChr2, "Deletions",legendLoc=xy.coords(425,250), maxTP=350,
+        cex.main=1.5, cex.axis=1.5, cex.lab=1.5, legendCex=1.5)
 dev.off()
 
 # reports comparison
@@ -402,6 +411,15 @@ par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsListInsertionsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
         totalInsertionsChr2, "Insertions in Venter diploid chr2 simulation",legendLoc=xy.coords(85,50), maxTP=80)
+dev.off()
+
+perfsListInsertionsChr2 <- list(cloudbreak=cloudbreakChr2InsertionPerfSmoothed, breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf)
+cairo_pdf("~/Documents/svpipeline/figures/chr2_ins_roc_cairo.pdf", width=10, height=7)
+par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
+plotROC(perfsListInsertionsChr2, 
+        c("Cloudbreak", "Breakdancer","Pindel"), 
+        totalInsertionsChr2, "Insertions",legendLoc=xy.coords(85,50), maxTP=80,
+        cex.main=1.5,cex.axis=1.5,cex.lab=1.5,legendCex=1.5)
 dev.off()
 
 pdf(chr2ROCsOutputFile, width=15)
@@ -569,6 +587,15 @@ plotROC(perfsListDelsNA18507, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", 
         "Deletions in NA18507", legendLoc=xy.coords(15750,1250), maxTP=2000, sim=FALSE)
 dev.off()
 
+cairo_pdf("~/Documents/svpipeline/figures/NA18507_del_roc_cairo.pdf", width=10, height=7)
+par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
+plotROC(perfsListDelsNA18507, 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
+        totalDelsNA18507, "Deletions",legendLoc=xy.coords(15750,1250), maxTP=2000, sim=FALSE,
+        cex.main=1.5, cex.axis=1.5, cex.lab=1.5, legendCex=1.5)
+dev.off()
+
+
 # break down predictons
 
 totalCloudbreakNA18507DelPredictions <- dim(read.table(cloudbreakNA18507DelPredictionsFile, skip=1))[1]
@@ -656,6 +683,15 @@ plotROC(perfsListInsertionsNA18507,
 dev.off()
 
 
+cairo_pdf("~/Documents/svpipeline/figures/NA18507_ins_roc_cairo.pdf", width=10, height=7)
+par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
+plotROC(perfsListInsertionsNA18507, 
+        c("Cloudbreak", "Breakdancer","Pindel"), 
+        totalInsertionsNA18507, "Insertions",legendLoc=xy.coords(8500,100), maxTP=300, sim=FALSE,
+        cex.main=1.5,cex.axis=1.5,cex.lab=1.5,legendCex=1.5)
+dev.off()
+
+
 pdf(NA18507ROCsOutputFile, width=15)
 par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,5))
 plotROC(perfsListDelsNA18507, 
@@ -683,6 +719,7 @@ perfCols <- rocColors(length(perfsListDelsNA18507))
 lineTypes <- rocLineTypes(length(perfsListDelsNA18507))
 legend(xy.coords(9750,250), legend=c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), col=perfCols, lty=lineTypes, lwd=3)
 dev.off()
+
 
 # analyze predictions at a given threshold
 
@@ -878,3 +915,22 @@ pdf(runtimeByNumberOfNodesOutputFile)
 ggplot(aes(x=nodes,y=featureCompTimes), data=runtimeDF) + geom_line() + xlab("Nodes") + ylab("Feature Computation Time (seconds)") + labs(title="Runtime by Number of Nodes in Cluster")
 dev.off()
 
+bestChr2Runtimes <- data.frame(name=c('Cloudbreak', 'Breakdancer', 'Pindel','GASVPro','DELLY' ), runtimes=c(308,653,4885,3339,1964))
+palette <- rocColors(5)
+
+cairo_pdf('~/Documents/svpipeline/figures/chr2BestRuntimes.pdf', height=6.5, width=3)
+ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  scale_colour_manual(values=palette[order(bestChr2Runtimes$runtimes)]) + xlab("") + 
+  ylab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+  theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
+  theme(panel.border=element_rect(colour="black"))
+dev.off()
+
+bestNA18507Runtimes <- data.frame(name=c('Cloudbreak', 'Breakdancer', 'Pindel','GASVPro','DELLY' ), runtimes=c(2310,5586,28587,52385,20224))
+cairo_pdf('~/Documents/svpipeline/figures/NA18507BestRuntimes.pdf', height=6.5, width=3)
+ggplot(bestNA18507Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  scale_colour_manual(values=palette[order(bestNA18507Runtimes$runtimes)]) + xlab("") + 
+  ylab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+  theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
+  theme(panel.border=element_rect(colour="black"))
+dev.off()
