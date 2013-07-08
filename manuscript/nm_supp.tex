@@ -30,7 +30,7 @@
 
 \begin{document}
 
-\title{Fast, Accurate, and Scalable Genomic Structural Variation Detection on the Cloud: MapReduce based {\em Cloudbreak} \\
+\title{{\em Cloudbreak}: Accurate and Scalable Genomic Structural Variation Detection in the Cloud with MapReduce \\
 Supplementary Material}
 
 \author[1,5]{Christopher W. Whelan \thanks{whelanch@ohsu.edu}}
@@ -44,24 +44,24 @@ Supplementary Material}
 \affil[3]{Program in Molecular and Cellular Biosciences}
 \affil[4]{Behavioral Neuroscience Department}
 \affil[5]{Oregon Health \& Science University, Portland, OR, USA}
-\affil[6]{Department of Genetics and Microbiology, University of Bari, Bari, Italy}
+\affil[6]{Department of Biology, University of Bari ``Aldo Moro'', Via G. Amendola 165/A, 70126, Bari, Italy}
 
 \maketitle
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=1\textwidth]{../figures/cloudbreak_mapred_diagram.pdf}
-\caption{An example of the Cloudbreak MapReduce algorithm. A) In the first MapReduce job, mappers scan input reads in FASTQ format and execute an alignment program in either paired-end or single-ended mode to generate read mappings. Reducers gather all alignments for both reads in each pair. B) In the second MapReduce job, mappers first emit information about each read pair (in this case the insert size and quality) under keys indicating the genomic location spanned by that pair. Only one genomic location is diagrammed here for simplicity. Reducers then compute features for each location on the genome by fitting a GMM to the distribution of spanning insert sizes. C) Mappers group all emitted features by their chromosome, and reducers find contiguous blocks of features that indicate the presence of a deletion.}
-\label{algorithm_example}
-\end{figure}
-
-\clearpage
 
 \begin{figure}
 \centering
 \includegraphics[width=1\textwidth]{../figures/insert_size_mixtures.pdf}
 \caption{Illustration of insert size mixtures at individual genomic locations. A) There is no variant present at the location indicated by the vertical line (left), so the mix of insert sizes (right) follows the expected distribution of the library centered at 200bp, with a small amount of noise coming from low-quality mappings. B) A homozygous deletion of 50bp at the location has shifted the distribution of observed insert sizes. C) A heterozygous deletion at the location causes a mixture of normal and long insert sizes to be detected. D) A heterozygous small insertion shifts a portion of the mixture to have lower insert sizes.}
 \label{insert_size_mixes}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\textwidth]{../figures/cloudbreak_mapred_diagram.pdf}
+\caption{An example of the Cloudbreak MapReduce algorithm. A) In the first MapReduce job, mappers scan input reads in FASTQ format and execute an alignment program in either paired-end or single-ended mode to generate read mappings. Reducers gather all alignments for both reads in each pair. B) In the second MapReduce job, mappers first emit information about each read pair (in this case the insert size and quality) under keys indicating the genomic location spanned by that pair. Only one genomic location is diagrammed here for simplicity. Reducers then compute features for each location on the genome by fitting a GMM to the distribution of spanning insert sizes. C) Mappers group all emitted features by their chromosome, and reducers find contiguous blocks of features that indicate the presence of a deletion.}
+\label{algorithm_example}
 \end{figure}
 
 \clearpage
@@ -252,7 +252,7 @@ Supplementary Material}
 
 We have developed a conceptual algorithmic framework for SV detection in MapReduce, which is outlined in Supplementary Algorithm \ref{cb_algo}. As described in the main text, this framework divides processing into three separate MapReduce jobs: an alignment job, a feature computation job, and an SV calling job. 
 
-The alignment job uses sensitive mapping tools and settings to discover mapping locations for each read pair. Aligners can be executed to report multiple possible mapings for each read, or only the best possible mapping. Given a set of read pairs, each of which consists of a read pair identifier $rpid$ and two sets of sequence and quality scores $<s,q>$, each mapper aligns each pair end set $<s,q>$ in either single- or paired end mode and emits possible mapping locations under the $rpid$ key. Reducers then collect the alignments for each paired end, making them available under one key for the next job. Our implementation contains wrappers to execute the aligners BWA, GEM \autocite{MarcoSola:2012hm}, Novoalign\footnote{\url{http://wwww.novocraft.com}}, RazerS 3 \autocite{Weese:2012by}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
+The alignment job uses sensitive mapping tools and settings to discover mapping locations for each read pair. Aligners can be executed to report multiple possible mappings for each read, or only the best possible mapping. Given a set of read pairs, each of which consists of a read pair identifier $rpid$ and two sets of sequence and quality scores $<s,q>$, each mapper aligns each pair end set $<s,q>$ in either single- or paired end mode and emits possible mapping locations under the $rpid$ key. Reducers then collect the alignments for each paired end, making them available under one key for the next job. Our implementation contains wrappers to execute the aligners BWA, GEM \autocite{MarcoSola:2012hm}, Novoalign\footnote{\url{http://wwww.novocraft.com}}, RazerS 3 \autocite{Weese:2012by}, mrFAST \autocite{Alkan:2009cr}, and Bowtie 2 \autocite{Langmead:2012jh}, as well as the ability to import a pre-aligned BAM file directly to HDFS.
 
 In the second job, we compute a set of features for each location in the genome. To begin, we tile the genome with small fixed-width, non-overlapping intervals. For the experiments reported in this paper we use an interval size of 25bp. Let $L = \left\{l_1,l_2,\ldots,l_N\right\}$ be the set of intervals covering the entire genome. Let $R^1 = \left\{r^{1}_{1},r^{1}_{2},\ldots,r^{1}_{M}\right\}$ and $R^2 = \left\{r^{2}_{1},r^{2}_{2},\ldots,r^{2}_{M}\right\}$ be the input set of paired reads. Let $A^1 = \left\{a^{1}_{m,1},a^{1}_{m,2},\ldots,a^{1}_{m,K}\right\}$ and $A^2 = \left\{a^{2}_{m,1},a^{2}_{m,2},\ldots,a^{2}_{m,L}\right\}$ be the set of alignments for the left and right reads from read pair $m$. For any given pair of alignments of the two reads in a read pair, $a^{1}_{m,i}$ and $a^{2}_{m,j}$, let the $\textrm{ReadPairInfo } rpi_{m,i,j}$ be information about the pair relevant to detecting SVs, e.g. the fragment size implied by the alignments and the likelihood the alignments are correct. We then leave two functions to be implemented depending on the application:
 \begin{flalign*}
@@ -266,7 +266,7 @@ Finally, the third MapReduce job is responsible for making SV calls based on the
 
 \subsection{Cloudbreak: An Implementation of the MapReduce SV Detection Framework}
 
-Our Cloudbreak software package can be seen as an implementation of the general framework defined above. In particular, Cloudbreak implements the two user-defined function described above as follows:
+Our Cloudbreak software package can be seen as an implementation of the general framework defined above. In particular, Cloudbreak implements the three user-defined function described above as follows:
 
 \begin{description}
 \item[\sc{Loci}] Because we are detecting deletions and short insertions, we map ReadPairInfos from each possible alignment to the genomic locations overlapped by the implied internal insert between the reads. For efficiency, we define a maximum detectable deletion size of 25,000bp, and therefore alignment pairs in which the ends are more than 25kb apart, or in the incorrect orientation, map to no genomic locations.
@@ -282,7 +282,7 @@ We fit the parameters of the GMM using the Expectation-Maximization algorithm. L
 
 The features generated for each location $l$ include the log-likelihood ratio of the filtered observed data points under the fit GMM to their likelihood under the distribution $N(\mu,\sigma)$, the final value of the mixing parameter $\alpha$, and $\mu'$, the estimated mean of the second GMM component.
 
-\item[\sc{PostProcess}] We convert our features along the genome to insertion and deletion calls by first extracting contiguous genomic loci where the log-likelihood ratio of the two models is greater than a given threshold. To eliminate noise we apply a median filter with window size 5. We end regions when $\mu'$ changes by more than 60bp ($2\sigma$), and discard regions where the average value of $\mu'$ is less than $\mu$ or where the length of the region differs from $\mu'$ by more than $\mu$.
+\item[\sc{PostProcess}] We convert our features along each chromosome to insertion and deletion calls by first extracting contiguous genomic loci where the log-likelihood ratio of the two models is greater than a given threshold. To eliminate noise we apply a median filter with window size 5. We end regions when $\mu'$ changes by more than 60bp ($2\sigma$), and discard regions where the average value of $\mu'$ is less than $\mu$ or where the length of the region differs from $\mu'$ by more than $\mu$.
 \end{description}
 
 \subsection{Runtime Analysis}
@@ -293,6 +293,670 @@ In Supplementary Table \ref{runtimes} we display a comparison of runtimes on the
 
 In parallel execution, the total time to execute is bounded by the runtime of the longest-running process. In the case of chromosome-parallelizable tools including Breakdancer, Pindel, and DELLY, this is typically the process working on the largest chromosome.\footnote{We note that one Breakdancer process, handling an unplaced contig in the hg19 reference genome, never completed in our runs and had to be killed manually; we exclude that process from our results.} In the case of MoDIL's run on the simulated data, we found that the different processes varied widely in their execution times, likely caused by regions of high coverage or with many ambiguously mapped reads. Cloudbreak mitigates this problem during the time-consuming feature generation process by using Hadoop partitioners to randomly assign each genomic location to one of the set of reducers, ensuring that the work is evenly distributed across all processes. This distribution of processing across the entire cluster also serves to protect against server slowdowns and hardware failures - for example, we were still able to complete processing of the NA18507 data set during a run where one of the compute nodes was rebooted midway through the feature generation job.
 
-\printbibliography
+\printbibliography[title=Supplementary References]
+
+\newpage
+
+\section{Cloudbreak User Manual}
+\label{cloudbreak}
+
+Cloudbreak is a Hadoop-based structural variation (SV) caller for Illumina
+paired-end DNA sequencing data. Currently Cloudbreak calls genomic insertions
+and deletions; we are working on adding support for other types of SVs.
+
+Cloudbreak contains a full pipeline for aligning your data in the form of FASTQ
+files using alignment pipelines that generate many possible mappings for every
+read, in the Hadoop framework. It then contains Hadoop jobs for computing
+genomic features from the alignments, and for calling insertion and deletion
+variants from those features.
+
+You can get Cloudbreak by downloading a pre-packaged release from the ``releases''
+tab in the GitHub repository, or by building from source as described below.
+
+\subsection{Building From Source}
+\label{buildingfromsource}
+
+To build the latest version of Cloudbreak, clone the GitHub repository. You'll
+need to install Maven to build the executables. (http:/\slash maven.apache.org\slash )
+Enter the top level directory of the Cloudbreak repository and type the command:
+
+\texttt{mvn package}
+
+This should compile the code, execute tests, and create a distribution file,
+ \texttt{cloudbreak-\$VERSION-dist.tar.gz} in the \texttt{target\slash } directory. You can then copy
+ that distribution file to somewhere else on your system, unpack it with
+ \texttt{tar -xzvf cloudbreak-\$VERSION-dist.tar.gz} and access the Cloudbreak jar file
+ and related scripts and properties files.
+
+\subsection{Dependencies}
+\label{dependencies}
+
+Cloudbreak requires a cluster Hadoop 0.20.2 or Cloudera CDH3 to run (the older
+mapreduce API). If you don't have a Hadoop cluster, Cloudbreak can also use the
+Apache Whirr API to automatically provision a cluster on the Amazon Elastic
+Compute Cloud (EC2). See the section on using WHIRR below.
+
+If you wish to run alignments using Cloudbreak, you will need one of the following
+supported aligners:
+
+\begin{itemize}
+\item BWA (Recommended): http:/\slash bio-bwa.sourceforge.net\slash 
+
+\item GEM: http:/\slash algorithms.cnag.cat\slash wiki\slash The\_GEM\_library
+
+\item RazerS 3: http:/\slash www.seqan.de\slash projects\slash razers\slash 
+
+\item Bowtie2: http:/\slash bowtie-bio.sourceforge.net\slash bowtie2\slash index.shtml
+
+\item Novoalign: http:/\slash www.novocraft.com
+
+\end{itemize}
+
+\subsection{User Guide}
+\label{userguide}
+
+You can use Cloudbreak in several different ways, depending on whether you want
+to start with FASTQ files and use Hadoop to help parallelize your alignments, or if you already
+have an aligned BAM file and just want to use Cloudbreak to call variants. In addition,
+the workflow is slightly different depending on whether you want to run on a local
+hadoop cluster or want to run using a cloud provider like Amazon EC2. Later in this
+file, we've listed a set of scenarios to describe options for running the Cloudbreak
+pipeline. Find the scenario that best fits your use case for more details on how to
+run that workflow. For each scenario, we have created a template script that contains
+all of the steps and parameters you need, which you can modify for your particular data set.
+
+\subsection{Running on a cloud provider like Amazon EC2 with Whirr}
+\label{runningonacloudproviderlikeamazonec2withwhirr}
+
+Cloudbreak has support for automatically deploying a Hadoop cluster on
+cloud providers such as Amazon EC2, transferring your data there, running the Cloudbreak algorithm, and
+downloading the results.
+
+Of course, renting compute time on EC2 or other clouds costs money, so please be
+familiar with the appropriate usage and billing policies of your cloud provider
+before attempting this.
+
+WE ARE NOT RESPONSIBLE FOR UNEXPECTED CHARGES THAT YOU MIGHT INCUR ON EC2 OR
+OTHER CLOUD PROVIDERS.
+
+Many properties that affect the cluster created can be set in the file
+\texttt{cloudbreak-whirr.properties} in this distribution. You will need to edit this file
+to set your AWS access key and secret access key (or your credentials for other
+cloud provider services), and to tell it the location of the public and
+private SSH keys to use to access the cluster. You can also control the number
+and type of nodes to include in the cluster. The default settings in the file
+create 15 nodes of type m1.xlarge, which is sufficient to fully process a 30X
+simulation of human chromosome 2, including read alignment and data transfer time,
+in under an hour. We have only tested this capability using EC2; other cloud providers
+may not work as well. You can also direct Whirr to use Amazon EC2's spot instances, which are
+dramatically cheaper than on-demand instances, although they carry the risk of
+being terminated if your price is out-bid. Using recent spot pricing, it cost
+us about \$5 to run the aforementioned chromosome 2 simulation. We recommend
+setting your spot bid price to be the on demand price for the instance type you
+are using to minimize the chance of having your instances terminated.
+
+Please consult Amazon's EC2 documentation and the documentation for Whirr for
+more information on how to configure and deploy clusters in the cloud.
+
+\subsection{Running on a Small Example Data Set}
+\label{runningonasmallexampledataset}
+
+To facilitate testing of Cloudbreak, we have publicly hosted the reads from the simulated
+data example described in the Cloudbreak manuscript on a bucket in Amazon's S3 storage
+ service at s3:/\slash cloudbreak-example\slash . We have also provided an example script that creates
+ a cluster in Amazon EC2, copies the data to the cluster, runs the full Cloudbreak
+ workflow including alignments with BWA, and copies the variant calls back to the
+ local machine before destroying the cluster. The script, called \texttt{Cloudbreak-EC2-whirr-example.sh}
+ is in the scripts directory of the Cloudbreak distribution. Of course, you will still
+ need to edit the \texttt{cloudbreak-whirr.properties} file with your EC2 credentials, and verify
+ that the cluster size, instance types, and spot price are to your liking before
+ executing the example.
+
+\subsubsection{Scenario 1: Compute alignments in Hadoop, using a local Hadoop cluster}
+\label{scenario1:computealignmentsinhadoopusingalocalhadoopcluster}
+
+To install aligner dependencies for use by Cloudbreak, first generate the index
+for the genome reference you would like to run against. Then, copy all of the
+required index files, and the executable files for the aligner into HDFS using
+the \texttt{hadoop dfs -copyFromLocal} command. For BWA you will need all of the index files
+created by running \texttt{bwa index}. You will also need an `fai' file for the reference,
+containing chromosome names and lengths, generated by \texttt{samtools faidx}.
+
+If your reference file is \texttt{reference.fa}, and \texttt{bwa aln} has created the files
+
+\begin{verbatim}
+reference.fa.amb
+reference.fa.ann
+reference.fa.bwt
+reference.fa.pac
+reference.fa.sa
+\end{verbatim}
+
+and \texttt{reference.fa.fai} as described above, issue the following
+commands to load the necessary files into HDFS:
+
+\begin{verbatim}
+hdfs -mkdir indices/
+hdfs -mkdir executables/
+hdfs -copyFromLocal reference.fa.amb indices/
+hdfs -copyFromLocal reference.fa.ann indices/
+hdfs -copyFromLocal reference.fa.bwt indices/
+hdfs -copyFromLocal reference.fa.pac indices/
+hdfs -copyFromLocal reference.fa.sa indices/
+hdfs -copyFromLocal reference.fa.fai indices/
+hdfs -copyFromLocal /path/to/bwa/executables/bwa executables/
+hdfs -copyFromLocal /path/to/bwa/executables/xa2multi.pl executables/
+\end{verbatim}
+
+The basic workflow is:
+
+\begin{enumerate}
+\item Load the FASTQ files into HDFS
+
+\item Run one of the Cloudbreak alignment commands to align your reads
+
+\item Create a readGroup file to describe the location and insert size characteristics of your reads, and copy it into HDFS.
+
+\item Run the GMM fitting feature generation step of the Cloudbreak process.
+
+\item Extract deletion calls from the features created in step 4.
+
+\item Copy the deletion calls from HDFS to a local directory.
+
+\item Extract insertion calls from the features created in step 4.
+
+\item Copy the insertion calls from HDFS to a local directory.
+
+\item Optionally, export the alignments back into a BAM file in your local filesystem.
+
+\end{enumerate}
+
+We have created a script to run through the full process of executing the
+Cloudbreak pipeline from FASTQ files to insertion and deletion calls. The
+script is named \texttt{Cloudbreak-full.sh} and can be found in the scripts directory
+of the Cloudbreak distribution. To customize the script for your needs, copy
+it to a new location and edit the variables in the first three sections:
+``EXPERIMENT DETAILS'', ``LOCAL FILES AND DIRECTORIES'', and
+``HDFS FILES AND DIRECTORIES''.
+
+\subsubsection{Scenario 2: Call variants on existing alignments, using a local Hadoop cluster}
+\label{scenario2:callvariantsonexistingalignmentsusingalocalhadoopcluster}
+
+For this scenario you don't need to worry about having an aligner executable or
+aligner-generated reference in HDFS. You will however, need a chromosome length
+`fai' file, which you can generate by running \texttt{samtools faidx} on your reference
+FASTA files and then copying to HDFS:
+
+\begin{verbatim}
+hdfs -copyFromLocal reference.fa.fai indices/
+\end{verbatim}
+
+After that, the workflow is:
+
+\begin{enumerate}
+\item Load your BAM file into HDFS and prepare it for Cloudbreak
+
+\item Create a readGroup file to describe the location and insert size characteristics of your reads.
+
+\item Run the GMM fitting feature generation step of the Cloudbreak process.
+
+\item Extract deletion calls from the features created in step 3.
+
+\item Copy the deletion calls from HDFS to a local directory.
+
+\item Extract insertion calls from the features created in step 3.
+
+\item Copy the insertion calls from HDFS to a local directory.
+
+\end{enumerate}
+
+To prepare alignments for Cloudbreak, they must be sorted by read name. You can then use the
+ \texttt{readSAMFileIntoHDFS} Cloudbreak command.
+
+A templates for this scenario is available in the script \texttt{Cloudbreak-variants-only.sh}
+located in the scripts directory of the Cloudbreak distribution.
+
+\subsubsection{Scenario 3: Compute alignments in Hadoop, using a cloud provider like EC2}
+\label{scenario3:computealignmentsinhadoopusingacloudproviderlikeec2}
+
+First, see the section ``Running on a Cloud Provider like Amazon EC2 with Whirr'' above, and modify the file
+\texttt{cloudbreak-whirr.properties} to include your access credentials and the appropriate cluster
+specifications. After that, the workflow is similar to the workflow described for scenario \#1
+above, with the additional first steps of copying your reads and dependency files to the cloud and
+creating a cluster before processing begins, and then destroying the cluster after processing has
+completed.
+
+You can see an example workflow involving EC2 by examining the script
+\texttt{Cloudbreak-EC2-whirr.sh}. This begins by transferring your reads to Amazon S3. It then
+uses Apache Whirr to launch an EC2 Hadoop cluster, copies the necessary executable files
+to EC2, and runs the algorithm.
+
+\subsubsection{Scenario 4: Call variants on existing alignments, using a cloud provider like EC2}
+\label{scenario4:callvariantsonexistingalignmentsusingacloudproviderlikeec2}
+
+Again, please read the section ``Running on a Cloud Provider like Amazon EC2 with Whirr'' above to learn how to
+update the \texttt{cloudbreak-whirr.properties} file with your credentials and cluster specifications. After that,
+follow the template in the script \texttt{Cloudbreak-EC2-whirr-variants-only.sh} to create a workflow
+involving calling variants in the cloud.
+
+\subsection{Output Files}
+\label{outputfiles}
+
+The output from running Cloudbreak using one of the scripts above will be found in the files named
+
+\begin{verbatim}
+READ_GROUP_LIBRARY_dels_genotyped.bed
+READ_GROUP_LIBRARY_ins_genotyped.bed
+\end{verbatim}
+
+where READ\_GROUP and LIBRARY are the names of the reads in your experiment. The
+format of the files is tab-delimited with the following columns:
+
+\begin{itemize}
+\item CHROMOSOME: The chromosome of the deletion call
+
+\item START: The start coordinate of the deletion call
+
+\item END: The end coordinate of the deletion call
+
+\item NUMBER: The cloudbreak identifier of the deletion call
+
+\item LR: The likelihood ratio of the deletion (higher indicates a call more likely to be true)
+
+\item TYPE: Either ``INS'' or ``DEL''
+
+\item W: The average weight of the estimated GMM mixing parameter alpha, used in genotyping
+
+\item GENOTYPE: The predicted genotype of the call
+
+\end{itemize}
+
+\subsection{Contact information}
+\label{contactinformation}
+
+Please contact cwhelan at gmail.com with any questions on running cloudbreak.
+
+\subsection{Reference Guide}
+\label{referenceguide}
+
+All of Cloudbreak's functionality is contained in the executable jar file in the
+directory where you unpacked the Cloudbreak distribution. Use the `hadoop'
+command to run the jar file to ensure that the necessary Hadoop dependencies
+are available to Cloudbreak.
+
+To invoke any Cloudbreak command, use a command line in this format:
+
+\texttt{hadoop cloudbreak-\$\{project.version\}.jar [options] [command] [command options]}
+
+Where \texttt{command} is the name of the command, \texttt{command options} are the arguments specific
+to that command, and \texttt{options} are general options, including options for how to run
+Hadoop jobs. For example, if you'd like to specify 50 reduce tasks
+for one of your commands, pass in \texttt{-Dmapred.reduce.tasks=50} as one of the general options. 
+
+Each command is detailed below and its options are listed below. You can view this information by typing
+\texttt{hadoop jar cloudbreak-\$\{project.version\}.jar} without any additional parameters.
+
+\begin{verbatim}
+    readPairedEndFilesIntoHDFS      Load paired FASTQ files into HDFS
+      Usage: readPairedEndFilesIntoHDFS [options]
+  Options:
+        *     --HDFSDataDir                  HDFS directory to load reads into
+              --clipReadIdsAtWhitespace      Whether to clip all readnames at
+                                             the first whitespace (prevents trouble
+                                             with some aligners)
+                                             Default: true
+              --compress                     Compression codec to use on the
+                                             reads stored in HDFS
+                                             Default: snappy
+        *     --fastqFile1                   File containing the first read in
+                                             each pair
+        *     --fastqFile2                   File containing the second read in
+                                             each pair
+              --filesInHDFS                  Use this flag if the BAM file has
+                                             already been copied into HDFS
+                                             Default: false
+              --filterBasedOnCasava18Flags   Use the CASAVA 1.8 QC filter to
+                                             filter out read pairs
+                                             Default: false
+              --outFileName                  Filename of the prepped reads in
+                                             HDFS
+                                             Default: reads
+              --trigramEntropyFilter         Filter out read pairs where at
+                                             least one read has a trigram entropy less
+                                             than this value. -1 = no filter
+                                             Default: -1.0
+
+    readSAMFileIntoHDFS      Load a SAM/BAM file into HDFS
+      Usage: readSAMFileIntoHDFS [options]
+  Options:
+        *     --HDFSDataDir   HDFS Directory to hold the alignment data
+              --compress      Compression codec to use for the data
+                              Default: snappy
+              --outFileName   Filename to give the file in HDFS
+                              Default: alignments
+        *     --samFile       Path to the SAM/BAM file on the local filesystem
+
+    bwaPairedEnds      Run a BWA paired-end alignment
+      Usage: bwaPairedEnds [options]
+  Options:
+        *     --HDFSAlignmentsDir    HDFS directory to hold the alignment data
+        *     --HDFSDataDir          HDFS directory that holds the read data
+        *     --HDFSPathToBWA        HDFS path to the bwa executable
+              --HDFSPathToXA2multi   HDFS path to the bwa xa2multi.pl executable
+        *     --maxProcessesOnNode   Ensure that only a max of this many BWA
+                                     processes are running on each node at once.
+                                     Default: 6
+              --numExtraReports      If > 0, set -n and -N params to bwa sampe,
+                                     and use xa2multi.pl to report multiple hits
+                                     Default: 0
+        *     --referenceBasename    HDFS path of the FASTA file from which the
+                                     BWA index files were generated.
+
+    novoalignSingleEnds      Run a Novoalign alignment in single ended mode
+      Usage: novoalignSingleEnds [options]
+  Options:
+        *     --HDFSAlignmentsDir            HDFS directory to hold the
+                                             alignment data
+        *     --HDFSDataDir                  HDFS directory that holds the read
+                                             data
+        *     --HDFSPathToNovoalign          HDFS path to the Novoalign
+                                             executable
+              --HDFSPathToNovoalignLicense   HDFS path to the Novoalign license
+                                             filez
+              --qualityFormat                Quality score format of the FASTQ
+                                             files
+                                             Default: ILMFQ
+        *     --reference                    HDFS path to the Novoalign
+                                             reference index file
+        *     --threshold                    Quality threshold to use for the -t
+                                             parameter
+
+    bowtie2SingleEnds      Run a bowtie2 alignment in single ended mode
+      Usage: bowtie2SingleEnds [options]
+  Options:
+        *     --HDFSAlignmentsDir       HDFS directory to hold the alignment
+                                        data
+        *     --HDFSDataDir             HDFS directory that holds the read data
+        *     --HDFSPathToBowtieAlign   HDFS path to the bowtie2 executable
+        *     --numReports              Max number of alignment hits to report
+                                        with the -k option
+        *     --reference               HDFS path to the bowtie 2 fasta
+                                        reference file
+
+    gemSingleEnds      Run a GEM alignment
+      Usage: gemSingleEnds [options]
+  Options:
+        *     --HDFSAlignmentsDir     HDFS directory to hold the alignment data
+        *     --HDFSDataDir           HDFS directory that holds the read data
+        *     --HDFSPathToGEM2SAM     HDFS path to the gem-2-sam executable
+        *     --HDFSPathToGEMMapper   HDFS path to the gem-mapper executable
+        *     --editDistance          Edit distance parameter (-e) to use in the
+                                      GEM mapping
+                                      Default: 0
+        *     --maxProcessesOnNode    Maximum number of GEM mapping processes to
+                                      run on one node simultaneously
+                                      Default: 6
+        *     --numReports            Max number of hits to report from GEM
+        *     --reference             HDFS path to the GEM reference file
+              --strata                Strata parameter (-s) to use in the GEM
+                                      mapping
+                                      Default: all
+
+    razerS3SingleEnds      Run a razerS3 alignment
+      Usage: razerS3SingleEnds [options]
+  Options:
+        *     --HDFSAlignmentsDir   HDFS directory to hold the alignment data
+        *     --HDFSDataDir         HDFS directory that holds the read data
+        *     --HDFSPathToRazerS3   HDFS path to the razers3 executable file
+        *     --numReports          Max number of alignments to report for each
+                                    read
+        *     --pctIdentity         RazerS 3 percent identity parameter (-i)
+                                    Default: 0
+        *     --reference           HDFS path to the reference (FASTA) file for
+                                    the RazerS 3 mapper
+        *     --sensitivity         RazerS 3 sensitivity parameter (-rr)
+                                    Default: 0
+
+    mrfastSingleEnds      Run a novoalign mate pair alignment
+      Usage: mrfastSingleEnds [options]
+  Options:
+        *     --HDFSAlignmentsDir   HDFS directory to hold the alignment data
+        *     --HDFSDataDir         HDFS directory that holds the read data
+        *     --HDFSPathToMrfast    HDFS path to the mrfast executable file
+        *     --reference           HDFS path to the mrfast reference index file
+              --threshold           MrFAST threshold parameter (-e)
+                                    Default: -1
+
+    exportAlignmentsFromHDFS      Export alignments in SAM format
+      Usage: exportAlignmentsFromHDFS [options]
+  Options:
+              --aligner        Format of the alignment records
+                               (sam|mrfast|novoalign)
+                               Default: sam
+        *     --inputHDFSDir   HDFS path to the directory holding the alignment
+                               reccords
+
+    GMMFitSingleEndInsertSizes      Compute GMM features in each bin across the genome
+      Usage: GMMFitSingleEndInsertSizes [options]
+  Options:
+              --aligner                            Format of the alignment
+                                                   records (sam|mrfast|novoalign)
+                                                   Default: sam
+              --chrFilter                          If filter params are used,
+                                                   only consider alignments in the
+                                                   region
+                                                   chrFilter:startFilter-endFilter
+              --endFilter                          See chrFilter
+              --excludePairsMappingIn              HDFS path to a BED file. Any
+                                                   reads mapped within those intervals
+                                                   will be excluded from the
+                                                   processing
+        *     --faidx                              HDFS path to the chromosome
+                                                   length file for the reference genome
+        *     --inputFileDescriptor                HDFS path to the directory
+                                                   that holds the alignment records
+              --legacyAlignments                   Use data generated with an
+                                                   older version of Cloudbreak
+                                                   Default: false
+              --mapabilityWeighting                HDFS path to a BigWig file
+                                                   containing genome uniqness scores. If
+                                                   specified, Cloudbreak will weight reads
+                                                   by the uniqueness of the regions
+                                                   they mapped to
+              --maxInsertSize                      Maximum insert size to
+                                                   consider (= max size of deletion
+                                                   detectable)
+                                                   Default: 25000
+              --maxLogMapqDiff                     Adaptive quality score cutoff
+                                                   Default: 5.0
+              --maxMismatches                      Max number of mismatches
+                                                   allowed in an alignment; all other
+                                                   will be ignored
+                                                   Default: -1
+              --minCleanCoverage                   Minimum number of spanning
+                                                   read pairs for a bin to run the
+                                                   GMM fitting procedure
+                                                   Default: 3
+              --minScore                           Minimum alignment score (SAM
+                                                   tag AS); all reads with lower AS
+                                                   will be ignored
+                                                   Default: -1
+        *     --outputHDFSDir                      HDFS path to the directory
+                                                   that will hold the output of the
+                                                   GMM procedure
+              --resolution                         Size of the bins to tile the
+                                                   genome with
+                                                   Default: 25
+              --startFilter                        See chrFilter
+              --stripChromosomeNamesAtWhitespace   Clip chromosome names from
+                                                   the reference at the first
+                                                   whitespace so they match with alignment
+                                                   fields
+                                                   Default: false
+
+    extractDeletionCalls      Extract deletion calls into a BED file
+      Usage: extractDeletionCalls [options]
+  Options:
+        *     --faidx                Chromosome length file for the reference
+        *     --inputHDFSDir         HDFS path to the GMM fit feature results
+              --medianFilterWindow   Use a median filter of this size to clean
+                                     up the results
+                                     Default: 5
+        *     --outputHDFSDir        HDFS Directory to store the variant calls
+                                     in
+              --resolution           Size of the bins to tile the genome with
+                                     Default: 25
+        *     --targetIsize          Mean insert size of the library
+                                     Default: 0
+        *     --targetIsizeSD        Standard deviation of the insert size of
+                                     the library
+                                     Default: 0
+              --threshold            Likelihood ratio threshold to call a
+                                     variant
+                                     Default: 1.68
+
+    extractInsertionCalls      Extract insertion calls into a BED file
+      Usage: extractInsertionCalls [options]
+  Options:
+        *     --faidx                Chromosome length file for the reference
+        *     --inputHDFSDir         HDFS path to the GMM fit feature results
+              --medianFilterWindow   Use a median filter of this size to clean
+                                     up the results
+                                     Default: 5
+              --noCovFilter          filter out calls next to a bin with no
+                                     coverage - recommend on for BWA alignments, off for
+                                     other aligners
+                                     Default: true
+        *     --outputHDFSDir        HDFS Directory to store the variant calls
+                                     in
+              --resolution           Size of the bins to tile the genome with
+                                     Default: 25
+        *     --targetIsize          Mean insert size of the library
+                                     Default: 0
+        *     --targetIsizeSD        Standard deviation of the insert size of
+                                     the library
+                                     Default: 0
+              --threshold            Likelihood ratio threshold to call a
+                                     variant
+                                     Default: 1.68
+
+    copyToS3      Upload a file to Amazon S3 using multi-part upload
+      Usage: copyToS3 [options]
+  Options:
+        *     --S3Bucket   S3 Bucket to upload to
+        *     --fileName   Path to the file to be uploaded on the local
+                           filesystem
+
+    launchCluster      Use whirr to create a new cluster in the cloud using 
+                       whirr/cloudbreak-whirr.properties
+      Usage: launchCluster [options]
+
+    runScriptOnCluster      Execute a script on one node of the currently running 
+                            cloud cluster
+      Usage: runScriptOnCluster [options]
+  Options:
+        *     --fileName   Path on the local filesystem of the script to run
+
+    destroyCluster      Destroy the currently running whirr cluster
+      Usage: destroyCluster [options]
+
+    summarizeAlignments      Gather statistics about a set of alignments: number of reads, 
+                             number of mappings, and total number of mismatches
+      Usage: summarizeAlignments [options]
+  Options:
+              --aligner        Format of the alignment records
+                               (sam|mrfast|novoalign)
+                               Default: sam
+        *     --inputHDFSDir   HDFS path of the directory that holds the
+                               alignments
+
+    exportGMMResults      Export wig files that contain the GMM features across 
+                          the entire genome
+      Usage: exportGMMResults [options]
+  Options:
+        *     --faidx          Local path to the chromosome length file
+        *     --inputHDFSDir   HDFS path to the directory holding the GMM
+                               features
+        *     --outputPrefix   Prefix of the names of the files to create
+              --resolution     Bin size that the GMM features were computed for
+                               Default: 25
+
+    dumpReadsWithScores      Dump all read pairs that span the given region with their 
+                             deletion scores to BED format (debugging)
+      Usage: dumpReadsWithScores [options]
+  Options:
+              --aligner                            Format of the alignment
+                                                   records (sam|mrfast|novoalign)
+                                                   Default: sam
+        *     --inputFileDescriptor                HDFS path to the directory
+                                                   that holds the alignment records
+              --maxInsertSize                      Maximum possible insert size
+                                                   to consider
+                                                   Default: 500000
+              --minScore                           Minimum alignment score (SAM
+                                                   tag AS); all reads with lower AS
+                                                   will be ignored
+                                                   Default: -1
+        *     --outputHDFSDir                      HDFS path to the directory
+                                                   that will hold the output
+        *     --region                             region to find read pairs
+                                                   for, in chr:start-end format
+              --stripChromosomeNamesAtWhitespace   Clip chromosome names from
+                                                   the reference at the first
+                                                   whitespace so they match with alignment
+                                                   fields
+                                                   Default: false
+
+    debugReadPairInfo      Compute the raw data that goes into the GMM fit procedure for 
+                           each bin (use with filter to debug a particular locus)
+      Usage: debugReadPairInfo [options]
+  Options:
+              --aligner                 Format of the alignment records
+                                        (sam|mrfast|novoalign)
+                                        Default: sam
+        *     --chrFilter               Print info for alignments in the region
+                                        chrFilter:startFilter-endFilter
+        *     --endFilter               see chrFilter
+              --excludePairsMappingIn   HDFS path to a BED file. Any reads
+                                        mapped within those intervals will be excluded
+                                        from the processing
+        *     --faidx                   HDFS path to the chromosome length file
+                                        for the reference genome
+        *     --inputFileDescriptor     HDFS path to the directory that holds
+                                        the alignment records
+              --mapabilityWeighting     HDFS path to a BigWig file containing
+                                        genome uniqness scores. If specified,
+                                        Cloudbreak will weight reads by the uniqueness of
+                                        the regions they mapped to
+              --maxInsertSize           Maximum insert size to consider (= max
+                                        size of deletion detectable)
+                                        Default: 500000
+              --minScore                Minimum alignment score (SAM tag AS);
+                                        all reads with lower AS will be ignored
+                                        Default: -1
+        *     --outputHDFSDir           HDFS directory to hold the output
+              --resolution              Size of the bins to tile the genome with
+                                        Default: 25
+        *     --startFilter             see chrFilter
+
+    findAlignment      Find an alignment record that matches the input string
+      Usage: findAlignment [options]
+  Options:
+        *     --HDFSAlignmentsDir   HDFS path to the directory that stores the
+                                    alignment data
+        *     --outputHDFSDir       HDFS path to the directory in which to put
+                                    the results
+        *     --read                Read name or portion of the read name to
+                                    search for
+
+    sortGMMResults      Sort and merge GMM Results (use with one reducer to get all GMM feature 
+                        results into a single file
+      Usage: sortGMMResults [options]
+  Options:
+        *     --inputHDFSDir    HDFS path to the directory holding the GMM
+                                features
+        *     --outputHDFSDir   Directory in which to put the results
+\end{verbatim}
+
 
 \end{document}
