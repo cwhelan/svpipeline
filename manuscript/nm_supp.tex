@@ -140,28 +140,6 @@ Supplementary Material}
 
 \begin{table}[h]
 \begin{center}
-\begin{tabular}{rrrrrr}
-  \hline
- & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
- Total Number & 224 &  84 & 82 &  31 & 26\\ 
-  \hline
-  Cloudbreak  & \textbf{68} (17)  & \textbf{67} (\textbf{10}) &  \textbf{56} (\textbf{5}) & \textbf{11} (\textbf{3}) & \textbf{15} (\textbf{0}) \\ 
-  Breakdancer & 52 (8)  & 49 (2) &  49 (0) & 7 (0) & 14 (\textbf{0}) \\ 
-  GASVPro     & 35 (2)  & 26 (0) &  26 (0) & 2 (0) & 6 (\textbf{0}) \\ 
-  DELLY-RP       & 22 (1)  & 56 (1) &  40 (0) & 8 (0) & 12 (\textbf{0}) \\ 
-  DELLY-SR       & 0 (0)  & 2 (0) &  28 (0) & 2 (0) & 10 (\textbf{0}) \\ 
-  Pindel      & 60 (\textbf{32})  & 16 (0) &  41 (2) & 1 (0) & 12 (\textbf{0})\\ 
-   \hline
-\end{tabular}
-\end{center}
-\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
-\label{chr2DeletionPredsFDR10}
-\end{table}
-
-\clearpage
-
-\begin{table}[h]
-\begin{center}
 \begin{tabular}{r|r|rrr|rrr}
 \multicolumn{2}{c}{}  & \multicolumn{3}{c}{Simulated Data} & \multicolumn{3}{c}{NA18507} \\
 \hline
@@ -178,6 +156,28 @@ Supplementary Material}
 \end{center}
 \caption{Runtimes (elapsed) on both data sets of each tool tested, in single-processor and parallel mode. For parallel runs, Proc. is the maximum number of simultaneously running processes or threads. All times are in seconds. The types of variants detected by each program are listed with the abbreviations: D - deletion; I - insertion; V - Inversion; P - duplication; T - translocation. Interchromosomal translocations are only detected by Breakdancer in single CPU mode. }
 \label{runtimes}
+\end{table}
+
+\clearpage
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{rrrrrr}
+  \hline
+ & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+ Total Number & 224 &  84 & 82 &  31 & 26\\ 
+  \hline
+  Cloudbreak  & \textbf{68} (17)  & \textbf{67} (\textbf{10}) &  \textbf{56} (\textbf{5}) & \textbf{11} (\textbf{3}) & \textbf{15} (\textbf{0}) \\ 
+  Breakdancer & 52 (8)  & 49 (2) &  49 (0) & 7 (0) & 14 (\textbf{0}) \\ 
+  GASVPro     & 35 (2)  & 26 (0) &  26 (0) & 2 (0) & 6 (\textbf{0}) \\ 
+  DELLY-RP       & 22 (1)  & 56 (1) &  40 (0) & 8 (0) & 12 (\textbf{0}) \\ 
+  DELLY-SR       & 0 (0)  & 2 (0) &  28 (0) & 2 (0) & 10 (\textbf{0}) \\ 
+  Pindel      & 60 (\textbf{32})  & 16 (0) &  41 (2) & 1 (0) & 12 (\textbf{0})\\ 
+   \hline
+\end{tabular}
+\end{center}
+\caption{The number of simulated deletions in the 30X diploid chromosome 2 with Venter indels found by each tool at a 10\% FDR, as well as the number of those deletions that were discovered exclusively by each tool (in parentheses). The total number of deletions in each size class in the true set of deletions is shown in the second row of the header.}
+\label{chr2DeletionPredsFDR10}
 \end{table}
 
 \newpage 
@@ -322,11 +322,13 @@ Enter the top level directory of the Cloudbreak repository and type the command:
 
 \texttt{mvn package}
 
-This should compile the code, execute tests, and create a distribution file,
- \texttt{cloudbreak-\$VERSION-dist.tar.gz} in the \texttt{target\slash } directory. You can then copy
- that distribution file to somewhere else on your system, unpack it with
- \texttt{tar -xzvf cloudbreak-\$VERSION-dist.tar.gz} and access the Cloudbreak jar file
- and related scripts and properties files.
+This should compile the code, execute tests, and create a distribution file, \linebreak
+ \texttt{cloudbreak-\$VERSION-dist.tar.gz}, in the \texttt{target\slash } directory. You can then copy
+ that distribution file to somewhere else on your system, unpack it with:
+
+ \texttt{tar -xzvf cloudbreak-\$VERSION-dist.tar.gz} 
+
+and access the Cloudbreak jar file and related scripts and properties files.
 
 \subsection{Dependencies}
 \label{dependencies}
@@ -949,8 +951,8 @@ Each command is detailed below and its options are listed below. You can view th
         *     --read                Read name or portion of the read name to
                                     search for
 
-    sortGMMResults      Sort and merge GMM Results (use with one reducer to get all GMM feature 
-                        results into a single file
+    sortGMMResults      Sort and merge GMM Results (use with one reducer to get all
+                        GMM feature results into a single file
       Usage: sortGMMResults [options]
   Options:
         *     --inputHDFSDir    HDFS path to the directory holding the GMM
