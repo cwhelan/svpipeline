@@ -152,6 +152,9 @@ dellyChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_
 dellyBRChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_br.perf.txt'
 pindelChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40.perf.txt'
 
+# bwa mem meappings
+breakdancerBWAMEMChr2DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_mem_human_b36_male_chr2_venterindels_c15_i100_s30_rl100_breakdancer.dels.perf.txt'
+
 cloudbreakGEMChr2DeletionPredictionsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gem_del_calls_gt2p29.bed'
 cloudbreakBWAChr2DeletionPredictionsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_del_1p98.bed'
 
@@ -202,14 +205,16 @@ pindelChr2LAInsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_c
 
 cloudbreakGEMChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gem_ins_calls_gt0p26.bed'
 cloudbreakBWAChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins_0p26.bed'
-cloudbreakBWATweakChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins_tweak_0p26.bed'
+#cloudbreakBWATweakChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins_tweak_0p26.bed'
+cloudbreakBWATweakChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/ins_test.bed'
 modilChr2InsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.bed'
 
 chr2MaxSensitivityInsCutoffs=list(cloudbreakGEM=0.26, breakdancer=2, Pindel=4, MoDIL=1, cloudbreakBWA=0.26, cloudbreakBWATweak=0.26)
 
 cloudbreakGEMChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gem_ins_calls_gt0p26.hits.txt'
 cloudbreakBWAChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins_0p26.hits.txt'
-cloudbreakBWATweakChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins_tweak_0p26.hits.txt'
+#cloudbreakBWATweakChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins_tweak_0p26.hits.txt'
+cloudbreakBWATweakChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/ins_test.hits.txt'
 breakdancerChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/human_b36_male_chr2_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.ins_gte40.gt2.hits.txt'
 pindelChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.gte40.gt4.hits.txt'
 modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.hits.txt'
@@ -226,12 +231,14 @@ dellyBRNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507
 pindelNA18507DeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.new1KGCalls.perf.txt'
 
 cloudbreakGEMNA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_del_calls_gt2p82.bed'
-cloudbreakBWANA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_del_calls_gt2p44.bed'
+#cloudbreakBWANA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_del_calls_gt2p44.bed'
+cloudbreakBWANA18507DelPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_del_calls_sparseves_gt2p44.bed'
 
 NA18507delCutoffs=list(cloudbreakGEM=2.82, breakdancer=4.9, GASVPro=13.6, DELLY=8.6, DELLYSR=13.6, Pindel=16.03, cloudbreakBWA=2.44)
 
 cloudbreakGEMNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_del_calls_gt2p82.new1KGCalls.hits.txt'
-cloudbreakBWANA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_del_calls_gt2p44.hits.txt'
+#cloudbreakBWANA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_del_calls_gt2p44.hits.txt'
+cloudbreakBWANA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_del_calls_sparseves_gt2p44.hits.txt'
 breakdancerNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3_singlecpu_gte40.gt4p9.new1KGCalls.hits.txt'
 gasvProNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gasvpro.gte40.gt13p6.new1KGCalls.hits.txt'
 dellyNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.gt8p6.new1KGCalls.hits.txt'
@@ -254,12 +261,14 @@ pindelNA18507LAInsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18
 NA18507insertionCutoffs=list(cloudbreakGEM=1.08, breakdancer=2, Pindel=4, cloudbreakBWATweak=1.16)
 
 cloudbreakGEMNA18507InsertionPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_ins_calls_gt1p08.hits.txt'
+# cloudbreakBWATweakNA18507InsertionPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_gt1p16.bed'
 cloudbreakBWATweakNA18507InsertionPredictionsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_gt1p16.bed'
 
 cloudbreakGEMNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_ins_calls_gt1p08.hits.txt'
 breakdancerNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507_35_2_3.bd_out.ins.gte2.hits.txt'
 pindelNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/pindel_insertions.gte4.hits.txt'
-cloudbreakBWATweakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_gt1p16.hits.txt'
+#cloudbreakBWATweakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_gt1p16.hits.txt'
+cloudbreakBWATweakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_sparseve_gt1p16.hits.txt'
 
 genotypingAlphaCutoff <- .35
 
@@ -269,6 +278,7 @@ repMask <- import.bed('~/genomes/1kg/hg18/repeatmasker_b36_merged.bed.gz', asRan
 # output files
 
 chr2DeletionsROCOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_DELS_ROC.pdf'
+chr2DeletionsBWAMEMROCOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_BWAMEM_DELS_ROC.pdf'
 chr2InsertionsROCOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_INS_ROC.pdf'
 chr2LAInsertionsROCOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_INS_ROC_LA.pdf'
 chr2ROCsOutputFile <- '~/Documents/svpipeline/figures/CHR2SIM_ROC_COMBINED_ROCS.pdf'
@@ -289,6 +299,7 @@ cloudbreakGEMChr2DeletionPerf <- read.table(cloudbreakGEMChr2DeletionPerfFile, h
 cloudbreakBWAChr2DeletionPerf <- read.table(cloudbreakBWAChr2DeletionPerfFile, header=TRUE, sep="\t")
 cloudbreakBWAXAChr2DeletionPerf <- read.table(cloudbreakBWAXAChr2DeletionPerfFile, header=TRUE, sep="\t")
 breakdancerChr2DeletionPerf <- read.table(breakdancerChr2DeletionPerfFile, header=TRUE)
+breakdancerBWAMEMChr2DeletionPerf <- read.table(breakdancerBWAMEMChr2DeletionPerfFile, header=TRUE)
 gasvChr2DeletionPerf <- read.table(gasvProChr2DeletionPerfFile, header=TRUE)
 dellyChr2DeletionPerf <- read.table(dellyChr2DeletionPerfFile, header=TRUE)
 dellyBRChr2DeletionPerf <- read.table(dellyBRChr2DeletionPerfFile, header=TRUE)
@@ -298,7 +309,7 @@ perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=
 
 perfsListDelsMultimapChr2 <- list(breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf, cloudbreakBWA=cloudbreakBWAChr2DeletionPerf, cloudbreakBWAM=cloudbreakBWAXAChr2DeletionPerf, cloudbreakGEM=cloudbreakGEMChr2DeletionPerf)
 
-myColLtyMapping <- getColLtyMapping(c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"))
+myColLtyMapping <- getColLtyMapping(c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM", "Breakdancer-BWAMEM"))
 
 pdf(chr2DeletionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
@@ -309,7 +320,7 @@ plotROC(perfsListDelsChr2,
 dev.off()
 
 perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
-cairo_pdf("~/Documents/svpipeline/figures/chr2_del_roc_cairo.pdf", width=10, height=7)
+cairo_ps("~/Documents/svpipeline/figures/chr2_del_roc_cairo.ps", width=10, height=7)
 par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
 plotROC(perfsListDelsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
@@ -341,6 +352,15 @@ plotROC(perfsListDelsChr2CompareReports,
         totalDelsChr2, "Performance on Venter diploid chr2 simulation by number of mappings considered",legendLoc=xy.coords(425,200), maxTP=350)
 dev.off()
 
+# breakdancer BWA vs BWA-MEM
+perfsListDelsChr2BWAMEM <- list(breakdancer=breakdancerChr2DeletionPerf, breakdancerBWAMEM=breakdancerBWAMEMChr2DeletionPerf)
+pdf(chr2DeletionsBWAMEMROCOutputFile, width=10)
+par(xpd=T, mar=par()$mar+c(0,0,0,10))
+plotROC(perfsListDelsChr2BWAMEM, 
+        c("Breakdancer","Breakdancer-BWAMEM"), 
+        totalDelsChr2, "Deletions in Venter diploid chr2 simulation",legendLoc=xy.coords(425,200), maxTP=350, 
+        colLtyMapping=myColLtyMapping)
+dev.off()
 
 # analyze predictions at a given threshold
 
@@ -508,7 +528,7 @@ plotROC(perfsListInsertionsChr2LA,
 dev.off()
 
 perfsListInsertionsChr2 <- list(cloudbreak=cloudbreakBWATweakChr2InsertionPerfSmoothed, breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf)
-cairo_pdf("~/Documents/svpipeline/figures/chr2_ins_roc_cairo.pdf", width=10, height=7)
+cairo_ps("~/Documents/svpipeline/figures/chr2_ins_roc_cairo.ps", width=10, height=7)
 par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
 plotROC(perfsListInsertionsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
@@ -555,6 +575,7 @@ plotROC(perfsListInsertionsMultimapChr2,
 perfNames <- c("Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM")
 legend(xy.coords(totalInsertionsChr2 * 1.1,100), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.9)
 dev.off()
+
 
 # analyze predictions at a given threshold
 
@@ -628,7 +649,6 @@ cbInsertionPredsWithExtraDataMaxSensitivity <- merge(as.data.frame(cbInsertionsM
 insertionHapCMMaxSensitivity <- table(cbInsertionPredsWithExtraDataMaxSensitivity$haps, cbInsertionPredsWithExtraDataMaxSensitivity$minW < genotypingAlphaCutoff)
 print((insertionHapCMMaxSensitivity[1,1] + insertionHapCMMaxSensitivity[2,2]) / sum(insertionHapCMMaxSensitivity))
 
-
 # NA18507
 
 trueDelsNA18507 <- import.bed('~/Documents/gene_rearrange/svpipeline/NA18507/MillsDIP1KG_merged.bed', asRangedData=FALSE)
@@ -694,7 +714,7 @@ plotROC(perfsListDelsNA18507, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", 
         "Deletions in NA18507", legendLoc=xy.coords(15750,1250), maxTP=2000, sim=FALSE, colLtyMapping=myColLtyMapping)
 dev.off()
 
-cairo_pdf("~/Documents/svpipeline/figures/NA18507_del_roc_cairo.pdf", width=10, height=7)
+cairo_ps("~/Documents/svpipeline/figures/NA18507_del_roc_cairo.ps", width=10, height=7)
 par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
 plotROC(perfsListDelsNA18507, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
@@ -750,6 +770,9 @@ exBySizeNA18507 <- table(allpredsNA18507[which(allpredsNA18507$discoveries == 1)
 
 predsByRepMaskNA18507 <- table(allpredsNA18507[,c('name','repMask')])
 exByRepMaskNA18507 <- table(allpredsNA18507[which(allpredsNA18507$discoveries == 1),c('name','repMask')])
+
+predsByHapNA18507 <- table(allpredsNA18507[,c('name','hap')])
+exByHapNA18507 <- table(allpredsNA18507[which(allpredsNA18507$discoveries == 1),c('name','hap')])
 
 # genotyping 
 
@@ -816,7 +839,7 @@ plotROC(perfsListLAInsertionsNA18507,
 dev.off()
 
 
-cairo_pdf("~/Documents/svpipeline/figures/NA18507_ins_roc_cairo.pdf", width=10, height=7)
+cairo_ps("~/Documents/svpipeline/figures/NA18507_ins_roc_cairo.ps", width=10, height=7)
 par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
 plotROC(perfsListInsertionsNA18507, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
@@ -1048,18 +1071,54 @@ dev.off()
 bestChr2Runtimes <- data.frame(name=c('Cloudbreak', 'Breakdancer', 'Pindel','GASVPro','DELLY' ), runtimes=c(290,653,4885,3339,1964))
 palette <- rocColors(5)
 
+renameColorNames <- function(names, nameMap=list()) {
+  lapply(as.character(bestChr2Runtimes$name), function(x) { if (x %in% names(nm)) { nm[[x]] } else { x } })
+}
+
+colorsByRuntime <- function(runtimes, colLtyMapping, nameMap=list()) {
+  runtimes$name <- renameColorNames(runtimes$name, nameMap)
+  unname(unlist(lapply(colLtyMapping[as.character(runtimes[order(runtimes$runtimes, runtimes$name), 'name'])], function(x) {x[1]})))
+}
+
+bestChr2Runtimes$colorNames <- renameColorNames(bestChr2Runtimes$name, nameMap=list(DELLY="DELLY-RP"))
+
 cairo_pdf('~/Documents/svpipeline/figures/chr2BestRuntimes.pdf', height=6.5, width=3)
 ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
-  scale_colour_manual(values=palette[order(bestChr2Runtimes$runtimes)]) + xlab("") + 
+  scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + 
+  xlab("") + 
   ylab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
   theme(panel.border=element_rect(colour="black"))
 dev.off()
 
 bestNA18507Runtimes <- data.frame(name=c('Cloudbreak', 'Breakdancer', 'Pindel','GASVPro','DELLY' ), runtimes=c(824,5586,28587,52385,20224))
+bestNA18507Runtimes$colorNames <- renameColorNames(bestNA18507Runtimes$name, nameMap=list(DELLY="DELLY-RP"))
+
 cairo_pdf('~/Documents/svpipeline/figures/NA18507BestRuntimes.pdf', height=6.5, width=3)
 ggplot(bestNA18507Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
-  scale_colour_manual(values=palette[order(bestNA18507Runtimes$runtimes)]) + xlab("") + 
+  scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + xlab("") + 
+  ylab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+  theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
+  theme(panel.border=element_rect(colour="black"))
+dev.off()
+
+library(grid)
+setEPS()
+postscript('~/Documents/svpipeline/figures/test_chr2.eps', width=20)
+layout(c(1,2,3), c(4,4,2))
+par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,6))
+plotROC(perfsListDelsMultimapChr2, 
+        c("Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", 
+          "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
+        totalDelsChr2, "Deletions",legendLoc=NULL, maxTP=350, colLtyMapping=myColLtyMapping)
+par(mar=par()$mar+c(0,0,0,12))
+plotROC(perfsListInsertionsMultimapChr2, 
+        c("Breakdancer","Pindel", "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
+        totalInsertionsChr2, "Insertions",legendLoc=NA,  maxTP=totalInsertionsChr2, colLtyMapping=myColLtyMapping)
+perfNames <- c("Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM")
+legend(xy.coords(totalInsertionsChr2 * 1.1,100), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.9)
+ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  scale_colour_manual(values=palette[order(bestChr2Runtimes$runtimes)]) + xlab("") + 
   ylab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
   theme(panel.border=element_rect(colour="black"))
