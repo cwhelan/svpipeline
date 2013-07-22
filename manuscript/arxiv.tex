@@ -99,7 +99,7 @@ There is no available test set of real Illumina sequencing data from a sample th
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{chr2_sim_rocs_runtime.pdf}
+\includegraphics[width=1\textwidth]{chr2_rocs_runtimes_journal.pdf}
 \caption{Accuracy and runtime performance on a simulated data set. (a) Receiver Operating Characteristic (ROC) curves showing the specificity and sensitivity of each tool to deletions larger than 40bp on a simulated set of reads giving diploid coverage of 30X on human chromosome 2. Deletions from the Venter genome were randomly added to one or both haplotypes. Each point on a curve represents a different threshold on the confidence of predictions made by that tool. Thresholds vary by: Cloudbreak - likelihood ratio; BreakDancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score. (b) ROC curves for insertion predictions. (c) Runtimes for each tool, not including alignment time, parallelized when possible (see Supplementary Material).}
 \label{chr2CombinedRoc}
 \end{figure}
@@ -148,7 +148,7 @@ We downloaded a set of reads from Yoruban individual NA18507, experiment ERX0096
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{NA18507_rocs_runtime.pdf}
+\includegraphics[width=1\textwidth]{na18507_rocs_runtimes_journal.pdf}
 \caption{Accuracy and performance on the 37X NA18507 sample. (a) ROC curve for deletion prediction performance, tested against the combined gold standard sets of deletions taken from \textcite{Kidd:2008p926}, \textcite{Mills:2011fi}, and \textcite{GenomesProjectConsortium:2012co}. (b) ROC curve for insertion prediction performance. (c) Runtimes for each tool, not including alignment time, parallelized when possible (see Supplementary Material). }
 \label{NA18507CombinedRoc}
 \end{figure}
