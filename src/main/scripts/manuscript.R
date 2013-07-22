@@ -319,8 +319,16 @@ plotROC(perfsListDelsChr2,
         colLtyMapping=myColLtyMapping)
 dev.off()
 
+postscript("~/Documents/svpipeline/figures/CHR2SIM_DELS_ROC.eps", horizontal = FALSE, onefile = FALSE, paper = "special", height = 10, width = 12)
+par(xpd=T, mar=par()$mar+c(0,0,0,7))
+plotROC(perfsListDelsChr2, 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
+        totalDelsChr2, "Deletions in Venter diploid chr2 simulation",legendLoc=xy.coords(425,200), maxTP=350, 
+        colLtyMapping=myColLtyMapping)
+dev.off()
+
 perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
-cairo_ps("~/Documents/svpipeline/figures/chr2_del_roc_cairo.ps", width=10, height=7)
+cairo_ps("~/Documents/svpipeline/figures/chr2_del_roc_cairo.ps", width=1, height=7)
 par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
 plotROC(perfsListDelsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
@@ -502,6 +510,14 @@ perfsListInsertionsMultimapChr2 <- list(breakdancer=breakdancerChr2InsertionPerf
                                         cloudbreakBWA=cloudbreakBWATweakChr2InsertionPerfSmoothed, cloudbreakBWAM=cloudbreakBWAXATweakChr2InsertionPerfSmoothed, cloudbreakGEM=cloudbreakGEMChr2InsertionPerfSmoothed)
 
 pdf(chr2InsertionsROCOutputFile, width=10)
+par(xpd=T, mar=par()$mar+c(0,0,0,8))
+plotROC(perfsListInsertionsChr2, 
+        c("Cloudbreak", "Breakdancer","Pindel"), 
+        totalInsertionsChr2, "Insertions in Venter diploid chr2 simulation",
+        legendLoc=xy.coords(totalInsertionsChr2 * 1.05,50), maxTP=totalInsertionsChr2, colLtyMapping=myColLtyMapping)
+dev.off()
+
+postscript("~/Documents/svpipeline/figures/CHR2SIM_INS_ROC.eps", horizontal = FALSE, onefile = FALSE, paper = "special", height = 10, width = 12)
 par(xpd=T, mar=par()$mar+c(0,0,0,8))
 plotROC(perfsListInsertionsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
@@ -1072,7 +1088,7 @@ bestChr2Runtimes <- data.frame(name=c('Cloudbreak', 'Breakdancer', 'Pindel','GAS
 palette <- rocColors(5)
 
 renameColorNames <- function(names, nameMap=list()) {
-  lapply(as.character(bestChr2Runtimes$name), function(x) { if (x %in% names(nm)) { nm[[x]] } else { x } })
+  lapply(as.character(bestChr2Runtimes$name), function(x) { if (x %in% names(nameMap)) { nameMap[[x]] } else { x } })
 }
 
 colorsByRuntime <- function(runtimes, colLtyMapping, nameMap=list()) {
@@ -1082,7 +1098,7 @@ colorsByRuntime <- function(runtimes, colLtyMapping, nameMap=list()) {
 
 bestChr2Runtimes$colorNames <- renameColorNames(bestChr2Runtimes$name, nameMap=list(DELLY="DELLY-RP"))
 
-cairo_pdf('~/Documents/svpipeline/figures/chr2BestRuntimes.pdf', height=6.5, width=3)
+cairo_ps('~/Documents/svpipeline/figures/chr2BestRuntimes.eps', height=10, width=5)
 ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
   scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + 
   xlab("") + 
@@ -1090,6 +1106,16 @@ ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point
   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
   theme(panel.border=element_rect(colour="black"))
 dev.off()
+
+postscript('~/Documents/svpipeline/figures/chr2BestRuntimes2.eps', horizontal = FALSE, onefile = FALSE, paper = "special")
+ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + 
+  xlab("") + 
+  ylab("Runtime (s)") + theme_bw(base_family= 'Helvetica')  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+  theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
+  theme(panel.border=element_rect(colour="black"))
+dev.off()
+
 
 bestNA18507Runtimes <- data.frame(name=c('Cloudbreak', 'Breakdancer', 'Pindel','GASVPro','DELLY' ), runtimes=c(824,5586,28587,52385,20224))
 bestNA18507Runtimes$colorNames <- renameColorNames(bestNA18507Runtimes$name, nameMap=list(DELLY="DELLY-RP"))
