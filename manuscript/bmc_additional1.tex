@@ -115,15 +115,6 @@
 
 \clearpage
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=1\textwidth]{../figures/cloudbreak_mapred_diagram.pdf}
-\caption{An example of the Cloudbreak MapReduce algorithm. A) In the first MapReduce job, mappers scan input reads in FASTQ format and execute an alignment program in either paired-end or single-ended mode to generate read mappings. Reducers gather all alignments for both reads in each pair. B) In the second MapReduce job, mappers first emit information about each read pair (in this case the insert size and quality) under keys indicating the genomic location spanned by that pair. Only one genomic location is diagrammed here for simplicity. Reducers then compute features for each location on the genome by fitting a GMM to the distribution of spanning insert sizes. C) Mappers group all emitted features by their chromosome, and reducers find contiguous blocks of features that indicate the presence of a deletion.}
-\label{algorithm_example}
-\end{figure}
-
-\clearpage
-
 \begin{figure}
 \centering
 \includegraphics[width=1\textwidth]{../figures/CHR2SIM_ROCS_MULTIPLE_MAPPINGS.pdf}
