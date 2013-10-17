@@ -219,6 +219,51 @@ breakdancerChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/sv
 pindelChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/pindel_insertions.gte40.gt4.hits.txt'
 modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/modil_ins_gte1.hits.txt'
 
+# # JCVI SIM WGS
+# 
+# # deletions
+# cloudbreakBWAWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/_allindels_100bp_dip/bwa_del.perf.txt'
+# breakdancerWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.perf.txt'
+# gasvProWGSDeletionPerfFile <-  '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/gasvpro_gte40.perf.txt'
+# dellyWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40.perf.txt'
+# dellyBRWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_br.perf.txt'
+# pindelWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40.perf.txt'
+# 
+# cloudbreakBWAWGSDeletionPredictionsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_del_1p98.bed'
+# 
+# cloudbreakBWAWGSDeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_dels_1p98.hits.txt'
+# breakdancerWGSDeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.gt4_gte40.hits.txt'
+# gasvProWGSDeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/gasvpro_gte40_gt11.hits.txt'
+# dellyWGSDeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40_gt7.hits.txt'
+# dellyBRWGSDeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_br_gt11.hits.txt'
+# pindelWGSDeletionHitsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40_gt13.hits.txt'
+# 
+# WGSMaxSensitivityDelCutoffs=list(cloudbreakGEM=0.85, breakdancer=2, GASVPro=4, DELLY=2, DELLYSR=2, Pindel=4, cloudbreakBWA=0.8)
+# 
+# cloudbreakBWAWGSDeletionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_dels_0p8.bed'
+# 
+# cloudbreakBWAWGSDeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_dels_0p8.hits.txt'
+# breakdancerWGSDeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.gt2_gte40.hits.txt'
+# gasvProWGSDeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/gasvpro_gte40_gt4.hits.txt'
+# dellyWGSDeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40_gt2.hits.txt'
+# dellyBRWGSDeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_br_gt2.hits.txt'
+# pindelWGSDeletionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40_gt4.hits.txt'
+# 
+# # insertions
+# cloudbreakBWAWGSInsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_ins.perf.txt'
+# breakdancerWGSInsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.ins_gte40.perf.txt'
+# pindelWGSInsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/pindel_insertions.gte40.perf.txt'
+# 
+# cloudbreakBWAWGSInsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_ins_0p26.bed'
+# #cloudbreakBWATweakWGSInsertionPredictionsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_ins_tweak_0p26.bed'
+# 
+# WGSMaxSensitivityInsCutoffs=list(cloudbreakGEM=0.26, breakdancer=2, Pindel=4, MoDIL=1, cloudbreakBWA=0.26, cloudbreakBWATweak=0.26)
+# 
+# cloudbreakBWAWGSInsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_ins_0p26.hits.txt'
+# #cloudbreakBWATweakWGSInsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_ins_tweak_0p26.hits.txt'
+# breakdancerWGSInsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.ins_gte40.gt2.hits.txt'
+# pindelWGSInsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/pindel_insertions.gte40.gt4.hits.txt'
+
 # NA18507
 
 # Deletions
@@ -315,7 +360,7 @@ pindelChr2DeletionPerf <- read.table(pindelChr2DeletionPerfFile, header=TRUE)
 
 perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
 
-perfsListDelsMultimapChr2 <- list(breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf, cloudbreakBWA=cloudbreakBWAChr2DeletionPerf, cloudbreakBWAM=cloudbreakBWAXAChr2DeletionPerf, cloudbreakGEM=cloudbreakGEMChr2DeletionPerf)
+perfsListDelsMultimapChr2 <- list(cloudbreakBWA=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf, cloudbreakBWAM=cloudbreakBWAXAChr2DeletionPerf, cloudbreakGEM=cloudbreakGEMChr2DeletionPerf)
 
 pdf(chr2DeletionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
@@ -512,8 +557,8 @@ pindelChr2InsertionPerf <- read.table(pindelChr2InsertionPerfFile, header=TRUE)
 
 perfsListInsertionsChr2 <- list(cloudbreak=cloudbreakBWATweakChr2InsertionPerfSmoothed, breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf)
 
-perfsListInsertionsMultimapChr2 <- list(breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf, 
-                                        cloudbreakBWA=cloudbreakBWATweakChr2InsertionPerfSmoothed, cloudbreakBWAM=cloudbreakBWAXATweakChr2InsertionPerfSmoothed, cloudbreakGEM=cloudbreakGEMChr2InsertionPerfSmoothed)
+perfsListInsertionsMultimapChr2 <- list(cloudbreakBWA=cloudbreakBWATweakChr2InsertionPerfSmoothed, breakdancer=breakdancerChr2InsertionPerf, pindel=pindelChr2InsertionPerf, 
+                                        cloudbreakBWAM=cloudbreakBWAXATweakChr2InsertionPerfSmoothed, cloudbreakGEM=cloudbreakGEMChr2InsertionPerfSmoothed)
 
 pdf(chr2InsertionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,8))
@@ -563,12 +608,12 @@ par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,5))
 plotROC(perfsListDelsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
         totalDelsChr2, "Deletions in Venter diploid chr2 simulation",legendLoc=NULL, maxTP=350, colLtyMapping=myColLtyMapping)
-par(mar=par()$mar+c(0,0,0,6))
+par(mar=par()$mar+c(0,0,0,8))
 plotROC(perfsListInsertionsChr2, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
         totalInsertionsChr2, "Insertions in Venter diploid chr2 simulation",legendLoc=NA, maxTP=totalInsertionsChr2)
 perfNames <- c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR")
-legend(xy.coords(85,50), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.9)
+legend(xy.coords(165,85), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.9)
 dev.off()
 
 pdf(chr2ROCsPosterOutputFile, width=18)
@@ -581,20 +626,20 @@ plotROC(perfsListInsertionsChr2,
         c("Cloudbreak", "Breakdancer","Pindel"), 
         totalInsertionsChr2, "Insertions - Chr2 Simulation",legendLoc=NA, maxTP=totalInsertionsChr2, colLtyMapping=myColLtyMapping)
 perfNames <- c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR")       
-legend(xy.coords(95,70), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3)
+legend(xy.coords(170,120), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3)
 dev.off()
 
 pdf(chr2ROCsMultipleMappingsFile, width=20)
 par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,6))
 plotROC(perfsListDelsMultimapChr2, 
-        c("Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", 
-          "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
+        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", 
+          "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
         totalDelsChr2, "Deletions",legendLoc=NULL, maxTP=350, colLtyMapping=myColLtyMapping)
 par(mar=par()$mar+c(0,0,0,12))
 plotROC(perfsListInsertionsMultimapChr2, 
-        c("Breakdancer","Pindel", "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
+        c("Cloudbreak", "Breakdancer","Pindel", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
         totalInsertionsChr2, "Insertions",legendLoc=NA,  maxTP=totalInsertionsChr2, colLtyMapping=myColLtyMapping)
-perfNames <- c("Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM")
+perfNames <- c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM")
 legend(xy.coords(totalInsertionsChr2 * 1.1,100), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.9)
 dev.off()
 
@@ -887,11 +932,11 @@ pdf(NA18507ROCsPosterOutputFile, width=18)
 par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,3), cex=1.8)
 plotROC(perfsListDelsNA18507, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
-        totalDelsNA18507, "Deletions - NA18507",legendLoc=NULL, maxTP=2000, sim=FALSE)
+        totalDelsNA18507, "Deletions - NA18507",legendLoc=NULL, maxTP=2000, sim=FALSE, colLtyMapping=myColLtyMapping)
 par(mar=par()$mar+c(0,0,0,8))
 plotROC(perfsListInsertionsNA18507, 
         c("Cloudbreak", "Breakdancer","Pindel"), 
-        totalInsertionsNA18507, "Insertions - NA18507",legendLoc=NA, maxTP=300, sim=FALSE)
+        totalInsertionsNA18507, "Insertions - NA18507",legendLoc=NA, maxTP=300, sim=FALSE, colLtyMapping=myColLtyMapping)
 legend(xy.coords(9750,250), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3)
 dev.off()
 
