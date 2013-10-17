@@ -244,6 +244,7 @@ gasvProNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507
 dellyNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_del_gte40.gt8p6.new1KGCalls.hits.txt'
 dellyBRNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/NA18507.delly_q0_c5_br_del_gte40.gt13p6.new1KGCalls.hits.txt'
 pindelNA18507DeletionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_pindel_D_st40_gte40.gt16.new1KGCalls.hits.txt'
+cloudbreakCRFNA18507DeletionHitsFile <- '~/Documents/crf_data/NA18507/crf_merge_fp6_0e304d_DelInsFP_deletions.hits.txt'
 
 # insertions
 cloudbreakGEMNA18507InsertionsPerfFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/gem_gmm_300reducers_ins_perf.txt'
@@ -270,6 +271,10 @@ pindelNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507
 #cloudbreakBWATweakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_gt1p16.hits.txt'
 cloudbreakBWATweakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_sparseve_gt1p16.hits.txt'
 
+# cloud crf
+cloudbreakCRFNA18507DeletionPerfFile <- '~/Documents/crf_data/NA18507/crf_merge_fp6_0e304d_DelInsFP_deletions.perf.txt'
+
+
 genotypingAlphaCutoff <- .35
 
 # reference files
@@ -293,6 +298,9 @@ chr2DelReportsComparisonROCOutputFile <- '~/Documents/svpipeline/figures/CHR2_SI
 breakpointResolutionOutputFile <- '~/Documents/svpipeline/figures/breakpoint_resolution.pdf'
 runtimeByNumberOfNodesOutputFile <- '~/Documents/svpipeline/figures/runtimeByNodes.pdf'
 
+myColLtyMapping <- getColLtyMapping(c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM", "Breakdancer-BWAMEM", "Cloudbreak-CRF"))
+
+
 #chr2 100bp diploid deletions
 totalDelsChr2 <- 400
 cloudbreakGEMChr2DeletionPerf <- read.table(cloudbreakGEMChr2DeletionPerfFile, header=TRUE, sep="\t")
@@ -308,8 +316,6 @@ pindelChr2DeletionPerf <- read.table(pindelChr2DeletionPerfFile, header=TRUE)
 perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
 
 perfsListDelsMultimapChr2 <- list(breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf, cloudbreakBWA=cloudbreakBWAChr2DeletionPerf, cloudbreakBWAM=cloudbreakBWAXAChr2DeletionPerf, cloudbreakGEM=cloudbreakGEMChr2DeletionPerf)
-
-myColLtyMapping <- getColLtyMapping(c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM", "Breakdancer-BWAMEM"))
 
 pdf(chr2DeletionsROCOutputFile, width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,7))
@@ -1149,3 +1155,31 @@ ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point
   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
   theme(panel.border=element_rect(colour="black"))
 dev.off()
+
+# Roc for Cloudbreak/CRF
+NA18507cloudbreakCRFDelsPerf <- read.table(cloudbreakCRFNA18507DeletionPerfFile, header=TRUE, sep="\t")
+
+perfsListDelsNA18507 <- list(cloudbreak=NA18507cloudbreakBWADelsPerf, breakdancer=NA18507breakdancerDelsPerf, pindel=NA18507pindelDelsPerf, gasv=NA18507gasvDelsPerf, delly=NA18507dellyDelsPerf, dellyBR=NA18507dellyBRDelsPerf, cloudCRF=NA18507cloudbreakCRFDelsPerf)
+par(xpd=T, mar=par()$mar+c(0,0,0,8))
+plotROC(perfsListDelsNA18507, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-CRF"), 3500, 
+        "Deletions in NA18507", legendLoc=xy.coords(3750,600), maxTP=850, sim=FALSE, colLtyMapping=myColLtyMapping)
+
+# breakpoint resolution on NA81507 with CRF
+cbNA18507 <- processDeletionPredictions("Cloudbreak", cloudbreakBWANA18507DeletionHitsFile, trueDelsNA18507)
+cbCRFNA18507 <- processDeletionPredictions("Cloudbreak-CRF", cloudbreakCRFNA18507DeletionHitsFile, trueDelsNA18507)
+bdNA18507 <- processDeletionPredictions('Breakdancer', breakdancerNA18507DeletionHitsFile, trueDelsNA18507)
+gasvNA18507 <- processDeletionPredictions('GASVPro', gasvProNA18507DeletionHitsFile, trueDelsNA18507)
+dellyRPNA18507 <- processDeletionPredictions('DELLY-RP', dellyNA18507DeletionHitsFile, trueDelsNA18507)
+dellyBRNA18507 <- processDeletionPredictions('DELLY-SR', dellyBRNA18507DeletionHitsFile, trueDelsNA18507)
+pindelNA18507 <- processDeletionPredictions('Pindel', pindelNA18507DeletionHitsFile, trueDelsNA18507)
+allpredsNA18507 <- rbind(as.data.frame(cbNA18507),as.data.frame(cbCRFNA18507),as.data.frame(bdNA18507),as.data.frame(gasvNA18507),as.data.frame(dellyNA18507),as.data.frame(dellyBRNA18507),as.data.frame(pindelNA18507))
+allpredsNA18507 <- ddply(allpredsNA18507, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
+
+pdf(breakpointResolutionOutputFile)
+
+allpredsNA18507$lendiff <- with(allpredsNA18507, abs((predend - predstart) - (trueend - truestart)))
+ggplot(aes(y=lendiff,x=name),data=allpredsNA18507) + geom_boxplot() + xlab("") + ylab("Difference in length")
+
+dev.off()
+
