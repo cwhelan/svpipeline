@@ -1,0 +1,17 @@
+\begin{table}
+\begin{center}
+\begin{tabular}{r|rrrrr}
+ \hline
+ Window Size & Calls & True Positives & Precision & Recall & F \\ 
+ \hline
+   <%= formatNumber(windowTable[1,'Resolution']) %> & <%= formatNumber(windowTable[1,'Calls']) %> & <%= formatNumber(windowTable[1,'TP']) %> & <%= formatNumber(windowTable[1,'Precision']) %> & <%= formatNumber(windowTable[1,'Recall']) %> & <%= formatNumber(windowTable[1,'F']) %> \\ 
+   <%= formatNumber(windowTable[2,'Resolution']) %> & <%= formatNumber(windowTable[2,'Calls']) %> & <%= formatNumber(windowTable[2,'TP']) %> & <%= formatNumber(windowTable[2,'Precision']) %> & <%= formatNumber(windowTable[2,'Recall']) %> & <%= formatNumber(windowTable[2,'F']) %> \\ 
+   <%= formatNumber(windowTable[3,'Resolution']) %> & <%= formatNumber(windowTable[3,'Calls']) %> & <%= formatNumber(windowTable[3,'TP']) %> & <%= formatNumber(windowTable[3,'Precision']) %> & <%= formatNumber(windowTable[3,'Recall']) %> & <%= formatNumber(windowTable[3,'F']) %> \\ 
+   <%= formatNumber(windowTable[4,'Resolution']) %> & <%= formatNumber(windowTable[4,'Calls']) %> & <%= formatNumber(windowTable[4,'TP']) %> & <%= formatNumber(windowTable[4,'Precision']) %> & <%= formatNumber(windowTable[4,'Recall']) %> & <%= formatNumber(windowTable[4,'F']) %> \\ 
+   <%= formatNumber(windowTable[5,'Resolution']) %> & <%= formatNumber(windowTable[5,'Calls']) %> & <%= formatNumber(windowTable[5,'TP']) %> & <%= formatNumber(windowTable[5,'Precision']) %> & <%= formatNumber(windowTable[5,'Recall']) %> & <%= formatNumber(windowTable[5,'F']) %> \\ 
+   <%= formatNumber(windowTable[6,'Resolution']) %> & <%= formatNumber(windowTable[6,'Calls']) %> & <%= formatNumber(windowTable[6,'TP']) %> & <%= formatNumber(windowTable[6,'Precision']) %> & <%= formatNumber(windowTable[6,'Recall']) %> & <%= formatNumber(windowTable[6,'F']) %> \\  
+\end{tabular}
+\end{center}
+\caption{Accuracy measures for Cloudbreak on the Chromosome 2 simulated data set using different choices of window size. For each window size the same Cloudbreak score threshold was used (1.98).}
+\label{chr2AccuracyByWindowSize}
+\end{table}
