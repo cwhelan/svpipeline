@@ -189,6 +189,13 @@ cloudbreakGEMChr2Perf5000ReportPerfFile <- '~/Documents/gene_rearrange/svpipelin
 cloudbreakGEMChr2Perf50000ReportPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gem_e6_s2_del_d50000.perf.txt'
 cloudbreakGEMChr2Perf100000ReportPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gem_e6_s2_del_d100000.perf.txt'
 
+cloudbreakRes1PerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_1_del.perf.txt'
+cloudbreakRes5PerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_5_del.perf.txt'
+cloudbreakRes10PerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_10_del.perf.txt'
+cloudbreakRes25PerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_25_del.perf.txt'
+cloudbreakRes50PerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_50_del.perf.txt'
+cloudbreakRes100PerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_100_del.perf.txt'
+
 # insertions
 cloudbreakGEMChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/gem_e6_s2_ins.perf.txt'
 cloudbreakBWAChr2InsertionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/bwa_ins.perf.txt'
@@ -317,7 +324,7 @@ pindelNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507
 cloudbreakBWATweakNA18507InsertionHitsFile <- '~/Documents/gene_rearrange/svpipeline/NA18507/bwa_instweak_calls_sparseve_gt1p16.hits.txt'
 
 # cloud crf
-cloudbreakCRFNA18507DeletionPerfFile <- '~/Documents/crf_data/NA18507/crf_merge_fp6_0e304d_DelInsFP_deletions.perf.txt'
+cloudbreakCRFNA18507DeletionPerfFile <- '~/Documents/crf_data/NA18507/crf_merge_fp6_0e304d_DelInsFP_lrprod_deletions.perf.txt'
 
 
 genotypingAlphaCutoff <- .35
@@ -343,7 +350,7 @@ chr2DelReportsComparisonROCOutputFile <- '~/Documents/svpipeline/figures/CHR2_SI
 breakpointResolutionOutputFile <- '~/Documents/svpipeline/figures/breakpoint_resolution.pdf'
 runtimeByNumberOfNodesOutputFile <- '~/Documents/svpipeline/figures/runtimeByNodes.pdf'
 
-myColLtyMapping <- getColLtyMapping(c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM", "Breakdancer-BWAMEM", "Cloudbreak-CRF"))
+myColLtyMapping <- getColLtyMapping(c("Cloudbreak", "Breakdancer","foo", "Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM", "Breakdancer-BWAMEM", "Cloudbreak-CRF"))
 
 
 #chr2 100bp diploid deletions
@@ -378,14 +385,14 @@ plotROC(perfsListDelsChr2,
         colLtyMapping=myColLtyMapping)
 dev.off()
 
-perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
-cairo_ps("~/Documents/svpipeline/figures/chr2_del_roc_cairo.ps", width=1, height=7)
-par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
-plotROC(perfsListDelsChr2, 
-        c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
-        totalDelsChr2, "Deletions",legendLoc=xy.coords(425,250), maxTP=350,
-        cex.main=1.5, cex.axis=1.5, cex.lab=1.5, legendCex=1.5, colLtyMapping=myColLtyMapping)
-dev.off()
+# perfsListDelsChr2 <- list(cloudbreak=cloudbreakBWAChr2DeletionPerf, breakdancer=breakdancerChr2DeletionPerf, pindel=pindelChr2DeletionPerf, gasv=gasvChr2DeletionPerf, delly=dellyChr2DeletionPerf, dellyBR=dellyBRChr2DeletionPerf)
+# cairo_ps("~/Documents/svpipeline/figures/chr2_del_roc_cairo.ps", width=1, height=7)
+# par(xpd=T, mar=par()$mar+c(.5,.5,.5,13))
+# plotROC(perfsListDelsChr2, 
+#         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR"), 
+#         totalDelsChr2, "Deletions",legendLoc=xy.coords(425,250), maxTP=350,
+#         cex.main=1.5, cex.axis=1.5, cex.lab=1.5, legendCex=1.5, colLtyMapping=myColLtyMapping)
+# dev.off()
 
 # reports comparison
 cloudbreakGEMChr2DelPerf1Report <- read.table(cloudbreakGEMChr2Perf1ReportPerfFile, header=TRUE, sep="\t")
@@ -409,6 +416,28 @@ par(xpd=T, mar=par()$mar+c(0,0,0,7))
 plotROC(perfsListDelsChr2CompareReports, 
         c("1 Mapping", "10 Mappings","100 Mappings", "1000 Mappings", "5000 Mappings", "50000 Mappings", "100000 Mappings"), 
         totalDelsChr2, "Performance on Venter diploid chr2 simulation by number of mappings considered",legendLoc=xy.coords(425,200), maxTP=350)
+dev.off()
+
+# resolution comparison
+cloudbreakRes1 <- read.table(cloudbreakRes1PerfFile, header=TRUE, sep="\t")
+cloudbreakRes5 <- read.table(cloudbreakRes5PerfFile, header=TRUE, sep="\t")
+cloudbreakRes10 <- read.table(cloudbreakRes10PerfFile, header=TRUE, sep="\t")
+cloudbreakRes25 <- read.table(cloudbreakRes25PerfFile, header=TRUE, sep="\t")
+cloudbreakRes50 <- read.table(cloudbreakRes50PerfFile, header=TRUE, sep="\t")
+cloudbreakRes100 <- read.table(cloudbreakRes100PerfFile, header=TRUE, sep="\t")
+
+perfsListDelsChr2CompareResolutions <- list(cloudbreak1=cloudbreakRes1, 
+                                        cloudbreak10=cloudbreakRes5, 
+                                        cloudbreak100=cloudbreakRes10, 
+                                        cloudbreak1000=cloudbreakRes25, 
+                                        cloudbreak5000=cloudbreakRes50, 
+                                        cloudbreak50000=cloudbreakRes100)
+
+pdf('~/Documents/svpipeline/figures/chr2_dels_resolution_comparison_rocs.pdf', width=10)
+par(xpd=T, mar=par()$mar+c(0,0,0,7))
+plotROC(perfsListDelsChr2CompareResolutions, 
+        c("Cloudbreak-R1", "Cloudbreak-R5","Cloudbreak-R10", "Cloudbreak-R25", "Cloudbreak-R50", "Cloudbreak-R100"), 
+        totalDelsChr2, "Performance on Venter diploid chr2 simulation by resolution",legendLoc=xy.coords(425,200), maxTP=350)
 dev.off()
 
 # breakdancer BWA vs BWA-MEM
@@ -453,13 +482,24 @@ trueDelRepmask <- table(trueDelsGte40$repMask)
 
 # load true positive predictions
 cbFDR10 <- processDeletionPredictions("Cloudbreak", cloudbreakBWAChr2DeletionHitsFileFDR10, trueDels)
+cbGEMFDR10 <- processDeletionPredictions("Cloudbreak-GEM", cloudbreakGEMChr2DeletionHitsFileFDR10, trueDels)
 bdFDR10 <- processDeletionPredictions('Breakdancer', breakdancerChr2DeletionHitsFileFDR10, trueDels)
 gasvFDR10 <- processDeletionPredictions('GASVPro', gasvProChr2DeletionHitsFileFDR10, trueDels)
 dellyFDR10 <- processDeletionPredictions('DELLY-RP', dellyChr2DeletionHitsFileFDR10, trueDels)
 dellyBRFDR10 <- processDeletionPredictions('DELLY-SR', dellyBRChr2DeletionHitsFileFDR10, trueDels)
 pindelFDR10 <- processDeletionPredictions('Pindel', pindelChr2DeletionHitsFileFDR10, trueDels)
-allpredsFDR10 <- rbind(as.data.frame(cbFDR10),as.data.frame(bdFDR10),as.data.frame(gasvFDR10),as.data.frame(dellyFDR10),as.data.frame(dellyBRFDR10),as.data.frame(pindelFDR10))
+allpredsFDR10 <- rbind(as.data.frame(cbFDR10),as.data.frame(cbGEMFDR10),as.data.frame(bdFDR10),as.data.frame(gasvFDR10),as.data.frame(dellyFDR10),as.data.frame(dellyBRFDR10),as.data.frame(pindelFDR10))
 allpredsFDR10 <- ddply(allpredsFDR10, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
+#res preds
+cbRes1 <- processDeletionPredictions("1", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_1_dels_gt198.hits.txt", trueDels)
+cbRes5 <- processDeletionPredictions("5", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_5_dels_gt198.hits.txt", trueDels)
+cbRes10 <- processDeletionPredictions("10", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_10_dels_gt198.hits.txt", trueDels)
+cbRes25 <- processDeletionPredictions("25", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_25_dels_gt198.hits.txt", trueDels)
+cbRes50 <- processDeletionPredictions("50", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_50_dels_gt198.hits.txt", trueDels)
+cbRes100 <- processDeletionPredictions("100", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_100_dels_gt198.hits.txt", trueDels)
+resPreds <- rbind(as.data.frame(cbRes1),as.data.frame(cbRes5),as.data.frame(cbRes10),as.data.frame(cbRes25),as.data.frame(cbRes50),as.data.frame(cbRes100))
+resPreds <- ddply(resPreds, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
 
 # tabulate against true deletion data
 predsBySizeFDR10 <- table(allpredsFDR10[,c('name','sizeclasses')])
@@ -793,14 +833,15 @@ dev.off()
 # break down predictons
 
 totalCloudbreakNA18507DelPredictions <- dim(read.table(cloudbreakBWANA18507DelPredictionsFile, skip=1))[1]
-
+totalCloudbreakGEMNA18507DelPredictions <- dim(read.table(cloudbreakGEMNA18507DelPredictionsFile, skip=1))[1]
 totalBreakdancerNA18507DelPredictions <- numPredictionsAtLevel(NA18507breakdancerDelsPerf, NA18507delCutoffs['breakdancer'])
 totalGASVProNA18507DelPredictions <- numPredictionsAtLevel(NA18507gasvDelsPerf, NA18507delCutoffs['GASVPro'])
 totalDELLYNA18507DelPredictions <- numPredictionsAtLevel(NA18507dellyDelsPerf, NA18507delCutoffs['DELLY'])
 totalDELLYBRNA18507DelPredictions <- numPredictionsAtLevel(NA18507dellyBRDelsPerf, NA18507delCutoffs['DELLYSR'])
 totalPindelNA18507DelPredictions <- numPredictionsAtLevel(NA18507pindelDelsPerf, NA18507delCutoffs['Pindel'])
 
-totalNA18507DelPredictions <- list(Cloudbreak=totalCloudbreakNA18507DelPredictions, 
+totalNA18507DelPredictions <- list(Cloudbreak=totalCloudbreakNA18507DelPredictions,
+                                   CloudbreakGEM=totalCloudbreakGEMNA18507DelPredictions,
                                    Breakdancer=totalBreakdancerNA18507DelPredictions, 
                                    GASVPro=totalGASVProNA18507DelPredictions, 
                                    DELLY=totalDELLYNA18507DelPredictions, 
@@ -808,13 +849,17 @@ totalNA18507DelPredictions <- list(Cloudbreak=totalCloudbreakNA18507DelPredictio
                                    Pindel=totalPindelNA18507DelPredictions)
 
 cbHitsNA18507 <- processDeletionPredictions("Cloudbreak", cloudbreakBWANA18507DeletionHitsFile, trueDelsNA18507)
+
+cbGEMHitsNA18507 <- processDeletionPredictions("Cloudbreak-GEM", cloudbreakGEMNA18507DeletionHitsFile, trueDelsNA18507)
+
 bdHitsNA18507 <- processDeletionPredictions('Breakdancer', breakdancerNA18507DeletionHitsFile, trueDelsNA18507)
 gasvHitsNA18507 <- processDeletionPredictions('GASVPro', gasvProNA18507DeletionHitsFile, trueDelsNA18507)
 dellyHitsNA18507 <- processDeletionPredictions('DELLY-RP', dellyNA18507DeletionHitsFile, trueDelsNA18507)
 dellyBRHitsNA18507 <- processDeletionPredictions('DELLY-SR', dellyBRNA18507DeletionHitsFile, trueDelsNA18507)
 pindelHitsNA18507 <- processDeletionPredictions('Pindel', pindelNA18507DeletionHitsFile, trueDelsNA18507)
 
-totalNumNA18507DeletionHits <- list(list(Cloudbreak=dim(cbHitsNA18507)[1], 
+totalNumNA18507DeletionHits <- list(list(Cloudbreak=dim(cbHitsNA18507)[1],
+                                         CloudbreakGEM=dim(cbGEMHitsNA18507)[1], 
                                          Breakdancer=dim(bdHitsNA18507)[1], 
                                          GASVPro=dim(gasvHitsNA18507)[1], 
                                          DELLY=dim(dellyHitsNA18507)[1], 
@@ -825,6 +870,7 @@ NA18507DelPrecision <- unlist(totalNumNA18507DeletionHits) / unlist(totalNA18507
 NA18507DelRecall <- unlist(totalNumNA18507DeletionHits) / length(trueDelsNA18507Gte40)
 
 allpredsNA18507 <- rbind(as.data.frame(cbHitsNA18507),
+                         as.data.frame(cbGEMHitsNA18507),
                          as.data.frame(bdHitsNA18507),
                          as.data.frame(gasvHitsNA18507),
                          as.data.frame(dellyHitsNA18507),
@@ -1038,6 +1084,7 @@ assign("preds", predsBySizeMaxSensitivity, envir=tableEnv)
 assign("exPreds", exBySizeMaxSensitivity, envir=tableEnv)
 assign("precision", chr2MaxSensitivityDelPrecision, envir=tableEnv)
 assign("recall", chr2MaxSensitivityDelRecall, envir=tableEnv)
+assign("f1", fMeasure(chr2MaxSensitivityDelPrecision, chr2MaxSensitivityDelRecall), envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/chr2DeletionPredsMaxSensitivity.table.brew.tex', env=tableEnv)
 
 # chr 2 Insertions by size
@@ -1056,11 +1103,13 @@ assign("delPreds", predsBySizeMaxSensitivity, envir=tableEnv)
 assign("exDelPreds", exBySizeMaxSensitivity, envir=tableEnv)
 assign("delPrecision", chr2MaxSensitivityDelPrecision, envir=tableEnv)
 assign("delRecall", chr2MaxSensitivityDelRecall, envir=tableEnv)
+assign("delf1", fMeasure(chr2MaxSensitivityDelPrecision, chr2MaxSensitivityDelRecall), envir=tableEnv)
 assign("totalIns", trueInsertionsSizes, envir=tableEnv)
 assign("insPreds", insertionPredsBySizeMaxSensitivity, envir=tableEnv)
 assign("exInsPreds", insertionExBySizeMaxSensitivity, envir=tableEnv)
 assign("insPrecision", chr2MaxSensitivityInsPrecision, envir=tableEnv)
 assign("insRecall", chr2MaxSensitivityInsRecall, envir=tableEnv)
+assign("insf1", fMeasure(chr2MaxSensitivityInsPrecision, chr2MaxSensitivityInsRecall), envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/chr2DeletionAndInsertionPredsMaxSensitivity.table.brew.tex', env=tableEnv)
 
 # NA18507 Deletions by size
@@ -1086,11 +1135,13 @@ tableEnv = new.env()
 assign("totalDels", trueDelsNA18507Sizes, envir=tableEnv)
 assign("delPrecision", NA18507DelPrecision, envir=tableEnv)
 assign("delRecall", NA18507DelRecall, envir=tableEnv)
+assign("delf1", fMeasure(NA18507DelPrecision, NA18507DelRecall), envir=tableEnv)
 assign("delPreds", predsBySizeNA18507, envir=tableEnv)
 assign("exDelPreds", exBySizeNA18507, envir=tableEnv)
 assign("totalIns", trueInsertionsNA18507Sizes, envir=tableEnv)
 assign("insPrecision", NA18507InsertionPrecision, envir=tableEnv)
 assign("insRecall", NA18507InsertionRecall, envir=tableEnv)
+assign("insf1", fMeasure(NA18507InsertionPrecision, NA18507InsertionRecall), envir=tableEnv)
 assign("insPreds", NA18507insertionPredsBySize, envir=tableEnv)
 assign("exInsPreds", NA18507insertionExPredsBySize, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/NA18507DeletionAndInsertionPredsBySize.table.brew.tex', env=tableEnv)
@@ -1127,6 +1178,38 @@ allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueen
 ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot() + xlab("") + ylab("Difference in length")
 dev.off()
 
+fMeasure <- function(p, r) {
+  (2 * p * r) / (p + r) 
+}
+  
+resolutionResults <- data.frame(rbind(c(1, 4760.3, 274, 228),
+                           c(5, 974.4, 268, 228),
+                           c(10, 519.4, 258, 223),
+                           c(25, 177, 240, 217),
+                           c(50, 143, 215, 194),
+                           c(100, 125.6, 162, 141)))
+names(resolutionResults) <- c("Resolution", "Runtime", "Calls", "TP")
+resolutionResults$Precision <- resolutionResults$TP / resolutionResults$Calls
+resolutionResults$Recall <- resolutionResults$TP / totalDelsChr2
+resolutionResults$F <- fMeasure(resolutionResults$Precision, resolutionResults$Recall)
+
+resPreds$lendiff <- with(resPreds, abs((predend - predstart) - (trueend - truestart)))
+
+resolutionResults$lendiff <- tapply(resPreds$lendiff, resPreds$name, mean)
+
+pdf("~/Documents/svpipeline/figures/breakpoint_resolution_by_windowSize.pdf")
+ggplot(aes(y=lendiff,x=name),data=resPreds) + geom_boxplot() + xlab("") + ylab("Difference in length") + xlab("Window Size")
+dev.off()
+
+pdf("~/Documents/svpipeline/figures/runtime_by_windowSize.pdf")
+ggplot(aes(y=Runtime,x=factor(Resolution)),data=resolutionResults) + geom_bar(stat = "identity") + ylab("Runtime(S)") + xlab("Window Size")
+dev.off()
+
+tableEnv = new.env()
+assign("windowTable", resolutionResults, envir=tableEnv)
+brew('~/Documents/svpipeline/manuscript/chr2AccuracyByWindowSize.table.brew.tex', env=tableEnv)
+
+
 # plot EC2 runtimes on chr2 features with different numbers of reducers
 nodes <- c(5,10,20,30,40)
 featureCompTimes <- c(1491,1049,552,412,458)
@@ -1158,13 +1241,22 @@ ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point
   theme(panel.border=element_rect(colour="black"))
 dev.off()
 
-postscript('~/Documents/svpipeline/figures/chr2BestRuntimes2.eps', horizontal = FALSE, onefile = FALSE, paper = "special")
-ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+# postscript('~/Documents/svpipeline/figures/chr2BestRuntimes2.eps', horizontal = FALSE, onefile = FALSE, paper = "special")
+# ggplot(bestChr2Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+#   scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + 
+#   xlab("") + 
+#   ylab("Runtime (s)") + theme_bw(base_family= 'Helvetica')  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+#   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
+#   theme(panel.border=element_rect(colour="black"))
+# dev.off()
+
+cairo_pdf('~/Documents/svpipeline/figures/chr2BestRuntimes_horizontal.pdf', height=3, width=8)
+ggplot(bestChr2Runtimes, aes(y=reorder(name,runtimes), x=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
   scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + 
-  xlab("") + 
-  ylab("Runtime (s)") + theme_bw(base_family= 'Helvetica')  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+  ylab("") + 
+  xlab("Runtime (s)") + theme_bw(base_family= 'Helvetica')  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
-  theme(panel.border=element_rect(colour="black"))
+  theme(panel.border=element_rect(colour="black")) + ggtitle("Best runtimes for simulated Chromosome 2 data set")
 dev.off()
 
 
@@ -1177,6 +1269,14 @@ ggplot(bestNA18507Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_po
   ylab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
   theme(panel.grid.major.x=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
   theme(panel.border=element_rect(colour="black"))
+dev.off()
+
+cairo_pdf('~/Documents/svpipeline/figures/NA18507BestRuntimes_horizontal.pdf', height=3, width=8)
+ggplot(bestNA18507Runtimes, aes(y=reorder(name,runtimes), x=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + ylab("") + 
+  xlab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
+  theme(panel.grid.major.y=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
+  theme(panel.border=element_rect(colour="black")) + ggtitle("Best runtimes for NA18507 dataset")
 dev.off()
 
 library(grid)
@@ -1205,9 +1305,12 @@ dev.off()
 NA18507cloudbreakCRFDelsPerf <- read.table(cloudbreakCRFNA18507DeletionPerfFile, header=TRUE, sep="\t")
 
 perfsListDelsNA18507 <- list(cloudbreak=NA18507cloudbreakBWADelsPerf, breakdancer=NA18507breakdancerDelsPerf, pindel=NA18507pindelDelsPerf, gasv=NA18507gasvDelsPerf, delly=NA18507dellyDelsPerf, dellyBR=NA18507dellyBRDelsPerf, cloudCRF=NA18507cloudbreakCRFDelsPerf)
+
+pdf('~/Documents/svpipeline/figures/NA18507_DELS_ROC_with_CRF.pdf', width=10)
 par(xpd=T, mar=par()$mar+c(0,0,0,8))
 plotROC(perfsListDelsNA18507, c("Cloudbreak", "Breakdancer","Pindel","GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-CRF"), 3500, 
-        "Deletions in NA18507", legendLoc=xy.coords(3750,600), maxTP=850, sim=FALSE, colLtyMapping=myColLtyMapping)
+        "Deletions - NA18507", legendLoc=xy.coords(3750,600), maxTP=850, sim=FALSE, colLtyMapping=myColLtyMapping)
+dev.off()
 
 # breakpoint resolution on NA81507 with CRF
 cbNA18507 <- processDeletionPredictions("Cloudbreak", cloudbreakBWANA18507DeletionHitsFile, trueDelsNA18507)
@@ -1217,14 +1320,17 @@ gasvNA18507 <- processDeletionPredictions('GASVPro', gasvProNA18507DeletionHitsF
 dellyRPNA18507 <- processDeletionPredictions('DELLY-RP', dellyNA18507DeletionHitsFile, trueDelsNA18507)
 dellyBRNA18507 <- processDeletionPredictions('DELLY-SR', dellyBRNA18507DeletionHitsFile, trueDelsNA18507)
 pindelNA18507 <- processDeletionPredictions('Pindel', pindelNA18507DeletionHitsFile, trueDelsNA18507)
-allpredsNA18507 <- rbind(as.data.frame(cbNA18507),as.data.frame(cbCRFNA18507),as.data.frame(bdNA18507),as.data.frame(gasvNA18507),as.data.frame(dellyNA18507),as.data.frame(dellyBRNA18507),as.data.frame(pindelNA18507))
+allpredsNA18507 <- rbind(as.data.frame(cbNA18507),as.data.frame(cbCRFNA18507),as.data.frame(bdNA18507),as.data.frame(gasvNA18507),as.data.frame(dellyRPNA18507),as.data.frame(dellyBRNA18507),as.data.frame(pindelNA18507))
 allpredsNA18507 <- ddply(allpredsNA18507, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
-
-
-pdf(breakpointResolutionOutputFile)
-
 allpredsNA18507$lendiff <- with(allpredsNA18507, abs((predend - predstart) - (trueend - truestart)))
-ggplot(aes(y=lendiff,x=name),data=allpredsNA18507) + geom_boxplot() + xlab("") + ylab("Difference in length")
 
+pdf("~/Documents/svpipeline/figures/breakpointResolutionNA18507.pdf", width=10)
+ggplot(aes(y=lendiff,x=name),data=allpredsNA18507[allpredsNA18507$name!="Cloudbreak-CRF",]) + geom_boxplot() + xlab("") +
+  ylab("Difference in length between prediction and gold standard") + ggtitle("NA18507 Deletion Breakpoint Resolution")
+dev.off()
+
+pdf("~/Documents/svpipeline/figures/breakpointResolutionNA18507_withCRF.pdf", width=10)
+ggplot(aes(y=lendiff,x=name),data=allpredsNA18507) + geom_boxplot() + xlab("") + 
+  ylab("Difference in length between prediction and gold standard") + ggtitle("NA18507 Deletion Breakpoint Resolution")
 dev.off()
 
