@@ -265,27 +265,27 @@ It should be noted that the methods tested here vary in their breakpoint resolut
 \begin{center}
 %\resizebox{\textwidth}{!}{
 \footnotesize
-\begin{tabular}{r|rrr|rrrrr}
-  \cline{2-9}
-   &                     & Prec. & Recall & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+\begin{tabular}{r|rrrr|rrrrr}
+  \cline{2-10}
+   &                     & Prec. & Recall & F1 & 40-100bp  & 101-250bp  & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
 \hline
-\multirow{7}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number &          &           & 224 &  84 & 82 &  31 & 26\\ 
+\multirow{7}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number &          &           &  &  224 &  84 & 82 &  31 & 26\\ 
   \hline
-\cline{2-9}
-&  Cloudbreak    &  0.638 & \textbf{0.678} & \textbf{153} (9)  & 61 (0) &  62 (0) & 12 (0) & 15 (0) \\ 
-&  BreakDancer   &  0.356 & 0.49 & 89 (0)  & 54 (0) &  53 (0) & 8 (0) & 15 (0) \\ 
-&  GASVPro        & 0.146 & 0.432 & 83 (2)  & 32 (0) &  55 (0) & 8 (0) & 15 (0) \\ 
-&  DELLY-RP           & 0.457 & 0.613 & 114 (3)  & \textbf{68} (0) &  \textbf{66} (0) & 9 (1) & 17 (0) \\ 
-&  DELLY-SR           & \textbf{0.679} & 0.166 & 0 (0)  & 3 (0) &  49 (0) & 6 (0) & 16 (0) \\ 
-&  Pindel           & 0.462 & 0.421 & 96 (\textbf{11})  & 24 (0) &  48 (0) & 5 (0) & 15 (0)\\ 
-&  MoDIL           & 0.132  & 0.66 & 123 (6)  & 66 (\textbf{3}) &  \textbf{66} (\textbf{11}) & \textbf{17} (\textbf{7}) & \textbf{23} (\textbf{8})\\ 
+\cline{2-10}
+&  Cloudbreak    &  0.638 & \textbf{0.678} & \textbf{0.657} & \textbf{153} (9)  & 61 (0) &  62 (0) & 12 (0) & 15 (0) \\ 
+&  BreakDancer   &  0.356 & 0.49 & 0.412 & 89 (0)  & 54 (0) &  53 (0) & 8 (0) & 15 (0) \\ 
+&  GASVPro        & 0.146 & 0.432 & 0.218 & 83 (2)  & 32 (0) &  55 (0) & 8 (0) & 15 (0) \\ 
+&  DELLY-RP           & 0.457 & 0.613 & 0.613 & 114 (3)  & \textbf{68} (0) &  \textbf{66} (0) & 9 (1) & 17 (0) \\ 
+&  DELLY-SR           & \textbf{0.679} & 0.166 &  0.266 & 0 (0)  & 3 (0) &  49 (0) & 6 (0) & 16 (0) \\ 
+&  Pindel           & 0.462 & 0.421 &  0.44 & 96 (\textbf{11})  & 24 (0) &  48 (0) & 5 (0) & 15 (0)\\ 
+&  MoDIL           & 0.132  & 0.66 & 0.22 & 123 (6)  & 66 (\textbf{3}) &  \textbf{66} (\textbf{11}) & \textbf{17} (\textbf{7}) & \textbf{23} (\textbf{8})\\ 
    \hline
-\multirow{5}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number &          &           & 199 &  83 & 79 &  21 & 21\\ 
-\cline{2-9}
-&  Cloudbreak   &0.451 & \textbf{0.305}  & \textbf{79} (\textbf{32})  & \textbf{32} (\textbf{18}) &  \textbf{11} (8) & 1 (0) & 0 (0) \\ 
-&  BreakDancer & 0.262 & 0.0968  & 23 (5)  & 14 (5) &  2 (1) & 0 (0) & 0 (0) \\ 
-&  Pindel          & \textbf{0.572} & 0.196 & 52 (25)  & 5 (1) &  10 (\textbf{9}) & \textbf{3} (\textbf{2}) & \textbf{9} (\textbf{9})\\ 
-&  MoDIL          & 0.186 & 0.0521 & 14 (1)  & 4 (0) &  1 (0) & 2 (\textbf{2}) & 0 (0)\\ 
+\multirow{5}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number &          &           & & 199 &  83 & 79 &  21 & 21\\ 
+\cline{2-10}
+&  Cloudbreak   &0.451 & \textbf{0.305}  & \textbf{0.364}  & \textbf{79} (\textbf{32})  & \textbf{32} (\textbf{18}) &  \textbf{11} (8) & 1 (0) & 0 (0) \\ 
+&  BreakDancer & 0.262 & 0.0968  & 0.141  & 23 (5)  & 14 (5) &  2 (1) & 0 (0) & 0 (0) \\ 
+&  Pindel          & \textbf{0.572} & 0.196 &  0.292 & 52 (25)  & 5 (1) &  10 (\textbf{9}) & \textbf{3} (\textbf{2}) & \textbf{9} (\textbf{9})\\ 
+&  MoDIL          & 0.186 & 0.0521 &  0.0814 & 14 (1)  & 4 (0) &  1 (0) & 2 (\textbf{2}) & 0 (0)\\ 
 \hline
 \end{tabular}
 %}
@@ -313,25 +313,25 @@ Given the high number of novel predictions made by all tools at maximum sensitiv
 \begin{center}
 %\resizebox{\textwidth}{!}{
 \footnotesize
-\begin{tabular}{r|rrr|rrrrr}
-  \cline{2-9}
-&  & Prec. & Recall & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
+\begin{tabular}{r|rrrr|rrrrr}
+  \cline{2-10}
+&  & Prec. & Recall & F1 & 40-100bp & 101-250bp & 251-500bp & 501-1000bp & $>$ 1000bp \\ 
 \hline
-\multirow{6}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number & & & 7,462 & 240 & 232 & 147 & 540 \\
+\multirow{6}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number & & & & 7,462 & 240 & 232 & 147 & 540 \\
   \hline
-\cline{2-9}
-& Cloudbreak & 0.0943 & \textbf{0.17} & \textbf{573} (\textbf{277})  & \textbf{176} (\textbf{30}) &  \textbf{197} (\textbf{18}) & \textbf{121} (\textbf{6}) & \textbf{399} (\textbf{24}) \\ 
-& BreakDancer & 0.137 & 0.123 & 261 (29)  & 136 (3) &  178 (0) & 114 (0) & 371 (0) \\  
-&  GASVPro & 0.147 & 0.0474 & 120 (21)  & 40 (2) &  85 (0) & 36 (0) & 128 (0) \\ 
-&  DELLY-RP & 0.0931 & 0.1 & 143 (6)  & 128 (3) &  167 (1) & 103 (0) & 323 (1) \\ 
-&  DELLY-SR & 0.153 & 0.0485 & 0 (0)  & 26 (0) &  123 (0) & 66 (0) & 203 (0) \\ 
-&  Pindel & \textbf{0.179} & 0.0748 & 149 (8)  & 61 (0) &  149 (0) & 69 (1) & 217 (0) \\ 
+\cline{2-10}
+& Cloudbreak & 0.0943 & \textbf{0.17} & 0.121 & \textbf{573} (\textbf{277})  & \textbf{176} (\textbf{30}) &  \textbf{197} (\textbf{18}) & \textbf{121} (\textbf{6}) & \textbf{399} (\textbf{24}) \\ 
+& BreakDancer & 0.137 & 0.123 &  \textbf{0.13} & 261 (29)  & 136 (3) &  178 (0) & 114 (0) & 371 (0) \\  
+&  GASVPro & 0.147 & 0.0474 &  0.0717 & 120 (21)  & 40 (2) &  85 (0) & 36 (0) & 128 (0) \\ 
+&  DELLY-RP & 0.0931 & 0.1 &  0.0965 & 143 (6)  & 128 (3) &  167 (1) & 103 (0) & 323 (1) \\ 
+&  DELLY-SR & 0.153 & 0.0485 &  0.0736 & 0 (0)  & 26 (0) &  123 (0) & 66 (0) & 203 (0) \\ 
+&  Pindel & \textbf{0.179} & 0.0748 &  0.106 & 149 (8)  & 61 (0) &  149 (0) & 69 (1) & 217 (0) \\ 
 \hline
-\multirow{4}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number & & & 536 & 114 & 45 & 1 & 0 \\
-\cline{2-9}
-& Cloudbreak & 0.0323 & \textbf{0.455} & \textbf{265} (\textbf{104})  & \textbf{49} (\textbf{24}) &  3 (1) & 0 (0)  & 0 (0)  \\ 
-& BreakDancer & 0.0281 & 0.181 & 97 (10)  & 27 (5) &  2 (1) & 0 (0) & 0 (0) \\  
-&  Pindel & \textbf{0.0387} & 0.239 & 144 (45)  & 14 (7) &  \textbf{7} (\textbf{6}) & \textbf{1} (\textbf{1}) &  0 (0) \\ 
+\multirow{4}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number & & & & 536 & 114 & 45 & 1 & 0 \\
+\cline{2-10}
+& Cloudbreak & 0.0323 & \textbf{0.455} &  0.0604 & \textbf{265} (\textbf{104})  & \textbf{49} (\textbf{24}) &  3 (1) & 0 (0)  & 0 (0)  \\ 
+& BreakDancer & 0.0281 & 0.181 &  0.0487 & 97 (10)  & 27 (5) &  2 (1) & 0 (0) & 0 (0) \\  
+&  Pindel & \textbf{0.0387} & 0.239 &  \textbf{0.0666} & 144 (45)  & 14 (7) &  \textbf{7} (\textbf{6}) & \textbf{1} (\textbf{1}) &  0 (0) \\ 
 \hline
 \end{tabular}
 %}
