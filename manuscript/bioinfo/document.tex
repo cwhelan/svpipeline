@@ -67,13 +67,13 @@
 \begin{document}
 \firstpage{1}
 
-\title[Cloudbreak]{{\em Cloudbreak}: Accurate and Scalable Genomic Structural Variation Detection in the Cloud with MapReduce}
+\title[Cloudbreak]{Cloudbreak: Accurate and Scalable Genomic Structural Variation Detection in the Cloud with MapReduce}
 \author[Whelan \textit{et~al}]{Christopher W. Whelan\,$^{1}$, Jeffrey Tyner\,$^{2}$, Alberto L'Abbate\,$^{3}$, Clelia Tiziana Storlazzi,$^{3}$, Lucia Carbone\,$^{4}$, and Kemal S\"onmez\,$^{1,5,*}$\footnote{to whom correspondence should be addressed}}
-\address{$^{1}$Institute on Development and Disability and Center for Spoken Language Understanding, Oregon Health \& Science University, Portland, OR, USA \\
-$^{2}$ Program in Molecular and Cellular Biosciences, Oregon Health \& Science University, Portland, OR, USA \\
+\address{$^{1}$Institute on Development and Disability and Center for Spoken Language Understanding, Oregon Health \& Science University (OHSU), Portland, OR, USA \\
+$^{2}$ Program in Molecular and Cellular Biosciences, OHSU\todo{Oregon Health \& Science University}, Portland, OR, USA \\
 $^{3}$ Department of Biology, University of Bari ``Aldo Moro'', Via G. Amendola 165/A, 70126, Bari, Italy \\
-$^{4}$ Behavioral Neuroscience Department, Oregon Health \& Science University, Portland, OR, USA \\
-$^{5}$ Department of Medical Informatics \& Clinical Epidemiology, Oregon Health \& Science University, Portland, OR, USA 
+$^{4}$ Behavioral Neuroscience Department, OHSU\todo{Oregon Health \& Science University}, Portland, OR, USA \\
+$^{5}$ Department of Medical Informatics \& Clinical Epidemiology, OHSU\todo{Oregon Health \& Science University}, Portland, OR, USA 
 }
 
 \history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
@@ -91,7 +91,9 @@ The detection of genomic structural variations (SV) remains a difficult challeng
 We describe an algorithmic framework for SV detection algorithms in MapReduce based on computing local genomic features, and use it to develop a deletion and insertion detection algorithm, Cloudbreak. On simulated and real data sets, Cloudbreak achieves accuracy improvements over popular SV detection algorithms, and genotypes variants from diploid samples. It provides dramatically shorter runtimes and the ability to scale to big data volumes on large compute clusters. Cloudbreak includes tools to set up and configure MapReduce (Hadoop) clusters on cloud services, enabling on-demand cluster computing.
 
 \section{Availability:}
-Source code, binary releases, example scripts, and a full user manual are available at \url{http://github.com/cwhelan/cloudbreak}
+Source code, binary releases, and user manual are available at \url{http://github.com/cwhelan/cloudbreak}
+
+\section{Supplementary information:} Supplementary material is available at \emph{Bioinformatics} online.
 
 \section{Contact:} \href{sonmezk@ohsu.edu}{sonmezk@ohsu.edu}
 \end{abstract}
@@ -125,7 +127,7 @@ Finally, and quite importantly from a practical point of view, our implementatio
 
 \begin{figure}
 \centering
-\includegraphics[width=.5\textwidth]{../../figures/workflow_with_whirr.png}
+\includegraphics[width=.5\textwidth]{workflow_with_whirr.png}
 \caption{An overview of the Cloudbreak workflow. Reads are first uploaded to a Hadoop cluster from local storage. Cloudbreak then executes three MapReduce jobs to process the data: 1) Mapping with sensitive settings. 2) Computation of features across the genome. 3) Calling structural variations based on the features computed in the previous step. Finally, SV predictions can be downloaded from the Hadoop cluster and examined. Cloudbreak can also use the Apache Whirr library to automatically provision Hadoop clusters on and deploy data to cloud providers such as Amazon Elastic Compute Cloud.}
 \label{cloudbreak_workflow}
 \end{figure}
@@ -194,7 +196,7 @@ This function maps the sets of features for related loci into a set of SV calls 
 
 \subsection{Cloudbreak: Detecting Deletions and Insertions}
 
-We have implemented an RP-based SV detection package, Cloudbreak, in the framework described above. Cloudbreak detects deletions of size 40bp to 25kb, and small insertions. We accomplish this by providing the following implementions of the user-defined functions described above:
+We have implemented an RP-based SV detection package, Cloudbreak, in the framework described above. Cloudbreak detects deletions of size 40bp to 25kb, and small insertions. We accomplish this by providing the following implementations of the user-defined functions described above:
 
 \textbf{\sc{Loci}}: Because we are detecting deletions and short insertions, we map ReadPairInfos from each possible alignment to the genomic locations overlapped by the implied internal insert between the reads. For efficiency, we define a maximum detectable deletion size of 25,000bp, and therefore alignment pairs in which the ends are more than 25kb apart, or in the incorrect orientation, map to no genomic locations.
 
@@ -250,16 +252,16 @@ There is no available test set of real Illumina sequencing data from a sample th
 
 \begin{figure*}[!tpb]
 \centering
-\includegraphics[width=1\textwidth]{../../figures/chr2_rocs_runtimes_journal.pdf}
+\includegraphics[width=1\textwidth]{chr2_rocs_runtimes_journal.pdf}
 \caption{Accuracy and runtime performance on a simulated data set. (a) Receiver Operating Characteristic (ROC) curves showing the specificity and sensitivity of each tool to deletions larger than 40bp on a simulated set of reads giving diploid coverage of 30X on human chromosome 2. Deletions from the Venter genome were randomly added to one or both haplotypes. Each point on a curve represents a different threshold on the confidence of predictions made by that tool. Thresholds vary by: Cloudbreak - likelihood ratio; BreakDancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score. (b) ROC curves for insertion predictions. (c) Runtimes for each tool, not including alignment time, parallelized when possible (see Supplementary Material).}
 \label{chr2CombinedRoc}
 \end{figure*}
 
-Figure \ref{chr2CombinedRoc} shows Receiver Operating Characteristic (ROC) curves of the performance of each algorithm at identifying variants larger than 40bp on the simulated data set, as well as the runtimes of the approaches tested, excluding alignment. See Supplementary Material for a description of how we identified correct predictions. All approaches show high specificity at stringent thresholds in this simulation. Cloudbreak provides the greatest specificity for deletions at higher levels of sensitivity, followed by DELLY. For insertions, Cloudbreak's performance is similar to Pindel, although Cloudbreak can achieve greater sensitivity at the same false positive rate by decreasing its threshold. Cloudbreak's runtime is half that of BreakDancer, the next fastest tool, processing the simulated data in under six minutes. (Of course, Cloudbreak uses many more CPUs as distributed algorithm. See Supplementary Material for a discussion of runtimes and parallelization.) The output which we obtained from MoDIL did not have a threshold that could be varied to correlate with the trade-off between precision and recall and therefore it is not included in ROC curves; in addition, MoDIL ran for 52,547 seconds using 250 CPUs in our cluster. Apart from the alignment phase, which is embarrassingly parallel, the feature generation job is the most computationally intensive part of the Cloudbreak workflow. To test its scalability we measured its runtime on Hadoop clusters made up of varying numbers of nodes and observed that linear speedups can be achieved in this portion of the algorithm by adding additional nodes to the cluster until a point of diminishing returns is reached (Supplementary Fig. \ref{Sscalability}).
+Figure \ref{chr2CombinedRoc} shows Receiver Operating Characteristic (ROC) curves of the performance of each algorithm at identifying variants larger than 40bp on the simulated data set, as well as the runtimes of the approaches tested, excluding alignment. See Supplementary Material for a description of how we identified correct predictions. All approaches show high specificity to deletions at stringent thresholds in this simulation. When specificity is relaxed slightly, Cloudbreak provides the highest levels of sensitivity, followed by DELLY. For insertions, Cloudbreak's performance is similar to Pindel, although Cloudbreak can achieve greater sensitivity at the same false positive rate by decreasing its threshold. Cloudbreak's runtime is half that of BreakDancer, the next fastest tool, processing the simulated data in under six minutes. (Of course, Cloudbreak uses many more CPUs as distributed algorithm. See Supplementary Material for a discussion of runtimes and parallelization.) The output which we obtained from MoDIL did not have a threshold that could be varied to correlate with the trade-off between precision and recall and therefore it is not included in ROC curves; in addition, MoDIL ran for 52,547 seconds using 250 CPUs in our cluster. Apart from the alignment phase, which is embarrassingly parallel, the feature generation job is the most computationally intensive part of the Cloudbreak workflow. To test its scalability we measured its runtime on Hadoop clusters made up of varying numbers of nodes and observed that linear speedups can be achieved in this portion of the algorithm by adding additional nodes to the cluster until a point of diminishing returns is reached (Supplementary Fig. \ref{Sscalability}).
 
 Choosing the correct threshold to set on the output of an SV calling algorithm can be difficult. The use of simulated data and ROC curves allows for some investigation of the performance characteristics of algorithms at varying thresholds. First, we characterized the predictions made by each algorithm at the threshold that gives them maximum sensitivity. \todo{For Cloudbreak we chose an operating point at which marginal improvements in sensitivity became very low.} The results are summarized in Table \ref{chr2DeletionAndInsertionPredsMaxSensitivity}. MoDIL and Cloudbreak exhibited the greatest recall for deletions. Cloudbreak also has high precision at this threshold, and discovers many small variants. For insertions, Cloudbreak has the highest recall, although recall is low for all four approaches. Cloudbreak again identifies many small variants. Pindel is the only tool which can consistently identify large insertions, as insertions larger than the library insert size do not produce mapping signatures detectable by RP mapping. We also used the ROC curves to characterize algorithm performance when a low false discovery rate is required. Supplementary Table \ref{Schr2DeletionPredsFDR10} shows the total number of deletions found when choosing a threshold that gives an FDR closest to 10\% based on the ROC curve. At this more stringent cutoff, Cloudbreak identifies more deletions in every size category than any other tool. Insertion performance never reached an FDR of 10\% for any threshold, so insertion predictions are not included in this table.\todo{ We also examined Cloudbreak's ability to detect events in repetitive regions of the genome, and found that it was similar to the other methods tested (Supplementary Tables \ref{SdeletionRepmaskpreds} and \ref{SinsertionRepmaskpreds}).}
 
-It should be noted that the methods tested here vary in their breakpoint resolution (Supplementary Fig. \ref{Sbreakpoint_resolution}). SR methods have higher resolution than RP methods. Cloudbreak's resolution suffers because the independent calculation of features at each window from the distribution of overlapping insert sizes does not allow the algorithm to keep track of the actual coordinates of the mapped reads from each pair, which other tools use to set bounds on the true breakpoint locations. We believe, however, that it is worth increasing sensitivity and specificity in SV detection tools even at the cost of breakpoint resolution. \todo{It would also be possible to extend our feature set to include information useful for increasing resolution, such as the location of nearby read mappings or soft-clipped alignments. }In addition, several recent pipelines have validated RP calls \emph{in silico} by local assembly, a process that could potentially be parallelized in a subsequent MapReduce job.
+We designed Cloudbreak to optimize for sensitivity and specificity for SV events, as demonstrated in the ROC curves, as opposed to attempting to achieve high levels of breakpoint resolution. Supplementary Fig. \ref{Sbreakpoint_resolution} displays the breakpoint resolution of each of the methods tested on the simulated data set. Cloudbreak's resolution is lower than other methods because the independent calculation of features at each window does not allow the algorithm to keep track of the actual coordinates of the mapped reads from each pair, which other tools use to set bounds on the true breakpoint locations. In practice, RP-based predictions are typically validated using techniques such as targeted split read search, local assembly, or wet-lab methods, processes which refine their breakpoint predictions. Therefore, Cloudbreak attempts to maximize the accurate detection of the presence of SV events.
 
 \begin{table*}[b]
 \begin{center}
@@ -300,7 +302,7 @@ We downloaded a set of reads from Yoruban individual NA18507, experiment ERX0096
 
 \begin{figure*}
 \centering
-\includegraphics[width=1\textwidth]{../../figures/NA18507_rocs_runtimes_journal.pdf}
+\includegraphics[width=1\textwidth]{NA18507_rocs_runtimes_journal.pdf}
 \caption{Accuracy and performance on the 37X NA18507 sample. (a) ROC curve for deletion prediction performance, tested against the combined gold standard sets of deletions taken from~\cite{Kidd:2008p926},~\cite{Mills:2011fi}, and~\cite{GenomesProjectConsortium:2012co}. (b) ROC curve for insertion prediction performance. (c) Runtimes for each tool, not including alignment time, parallelized when possible (see Supplementary Material). }
 \label{NA18507CombinedRoc}
 \end{figure*}
@@ -342,7 +344,7 @@ Given the high number of novel predictions made by all tools at maximum sensitiv
 
 \subsection{Performance on a Low-Coverage Cancer Data Set}
 
-We also tested Cloudbreak on a sequencing data set obtained from a patient with acute myeloid leukemia (AML). This data set consisted of 76bp paired end reads with a mean insert size of 285bp and standard deviation of 50bp, yielding sequence coverage of 5X and physical coverage of 8X. Using a pipeline consisting of Novoalign, BreakDancer, and a set of custom scripts for filtering and annotating candidate SVs, we had previously identified a set of variants present in this sample and validated several using PCR, including 8 deletions. Cloudbreak was able to identify all 8 of the validated deletions, showing that it is still sensitive to variants even when using lower coverage data sets with a greater variance of insert sizes. The variants identified include deletions in the gene CTDSPL/RBPS3, an AML tumor suppressor~\citep{Zheng:2012kk}, and NBEAL1, a gene up-regulated in some cancers~\citep{Chen:2004jo}. We are currently investigating these deletions to determine their functional impact on this patient. 
+We also tested Cloudbreak on a data set obtained from a patient with acute myeloid leukemia (AML). This data consisted of 76bp paired end reads with a mean insert size of 285bp and standard deviation of 50bp, yielding sequence coverage of 5X and physical coverage of 8X. Using a pipeline consisting of Novoalign, BreakDancer, and a set of custom scripts for filtering and annotating candidate SVs, we had previously identified a set of variants present in this sample and validated several using PCR, including 8 deletions. Cloudbreak was able to identify all of the validated deletions, showing that it is still sensitive even when using lower coverage data with a greater variance of insert sizes. The variants identified include deletions in the gene \emph{CTDSPL}/\emph{RBPS3}, an AML tumor suppressor~\citep{Zheng:2012kk}, and NBEAL1, a gene up-regulated in some cancers~\citep{Chen:2004jo}. We are currently investigating these SVs to determine their functional impact on this patient. 
 
 \subsection{Genotyping Deletions}\label{section_results_genotyping}
 
@@ -350,7 +352,7 @@ Because Cloudbreak explicitly models zygosity in its feature generation algorith
 
 \section{Discussion}
 
-Over the next few years, due to advances in sequencing technology, genomics data are expected to increase in volume by several orders of magnitude, expanding into the realm referred to as ``big data''. In addition, the usage of existing information will increase drastically as research in genomics grows and translational applications are developed, and the data sets are reprocessed and integrated into new pipelines. In order to capitalize on this emerging wealth of genome data, novel computational solutions that are capable of scaling with the increasing number and size of these data sets will have to be developed. 
+Over the next few years, due to advances in sequencing technology, genomics data are expected to increase in volume by several orders of magnitude, expanding into the realm referred to as ``big data''. In addition, the usage of existing information will increase drastically as research in genomics grows and translational applications are developed, and data is reprocessed and integrated into new pipelines. In order to capitalize on this emerging wealth of genome data, novel computational solutions that are capable of scaling with the increasing number and size of these data sets will have to be developed. 
 
 Among big data infrastructures, MapReduce is emerging as a standard framework for distributing computation across compute clusters. In this paper, we introduced a novel conceptual framework for SV detection algorithms in MapReduce, based on computing local genomic features. This framework provides a scalable basis for developing SV detection algorithms, as demonstrated by our development of an algorithm for detecting insertions and deletions based on fitting a GMM to the distribution of mapped insert sizes spanning each genomic location.
 
