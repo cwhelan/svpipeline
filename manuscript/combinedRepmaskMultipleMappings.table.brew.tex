@@ -1,0 +1,31 @@
+\begin{table}
+\begin{center}
+\begin{tabular}{r|r|rr|rr}
+  \cline{2-6}
+ & & \multicolumn{2}{c}{Simulated Data} & \multicolumn{2}{c}{NA18507} \\
+\hline
+ & & Non-repeat & Repeat  & Non-repeat & Repeat \\ 
+\multirow{9}{*}{\begin{sideways}Deletions\end{sideways}} & Total Number & <%= chr2DelTotals['0'] %> & <%= chr2DelTotals['1'] %> & <%= NA18507DelTotals['0'] %> & <%= NA18507DelTotals['1'] %> \\ 
+  \cline{2-6}
+&  Cloudbreak  & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Cloudbreak', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Cloudbreak', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Cloudbreak', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Cloudbreak', '1') %> \\ 
+&  Cloudbreak-GEM  & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Cloudbreak-GEM', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Cloudbreak-GEM', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Cloudbreak-GEM', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Cloudbreak-GEM', '1') %> \\ 
+&  BreakDancer & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Breakdancer', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Breakdancer', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Breakdancer', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Breakdancer', '1') %> \\
+&  GASVPro     & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'GASVPro', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'GASVPro', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'GASVPro', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'GASVPro', '1') %> \\
+&  DELLY-RP       & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'DELLY-RP', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'DELLY-RP', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'DELLY-RP', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'DELLY-RP', '1') %> \\
+&  DELLY-SR       & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'DELLY-SR', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'DELLY-SR', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'DELLY-SR', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'DELLY-SR', '1') %> \\
+&  Pindel      & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Pindel', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'Pindel', '1') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Pindel', '0') %> & <%= printPredTableCell(NA18507DelPreds, NA18507ExDelPreds, 'Pindel', '1') %> \\ 
+&  MoDIL      & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'MoDIL', '0') %> & <%= printPredTableCell(chr2DelPreds, chr2ExDelPreds, 'MoDIL', '1') %> & NA & NA \\ 
+   \hline
+\multirow{6}{*}{\begin{sideways}Insertions\end{sideways}} & Total Number & <%= chr2InsTotals['0'] %> & <%= chr2InsTotals['1'] %> & <%= NA18507InsTotals['0'] %> & <%= NA18507InsTotals['1'] %> \\ 
+\cline{2-6}
+&  Cloudbreak  & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Cloudbreak', '0') %> & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Cloudbreak', '1') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Cloudbreak', '0') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Cloudbreak', '1') %> \\ 
+&  Cloudbreak-GEM  & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Cloudbreak-GEM', '0') %> & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Cloudbreak-GEM', '1') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Cloudbreak-GEM', '0') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Cloudbreak-GEM', '1') %> \\ 
+&  Breakdancer & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Breakdancer', '0') %> & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Breakdancer', '1') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Breakdancer', '0') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Breakdancer', '1') %> \\
+&  Pindel      & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Pindel', '0') %> & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'Pindel', '1') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Pindel', '0') %> & <%= printPredTableCell(NA18507InsPreds, NA18507ExInsPreds, 'Pindel', '1') %> \\ 
+&  MoDIL      & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'MoDIL', '0') %> & <%= printPredTableCell(chr2InsPreds, chr2ExInsPreds, 'MoDIL', '1') %> & NA & NA \\ 
+\hline
+\end{tabular}
+\end{center}
+\caption{Detected deletions and insertions on the simulated and NA18507 data sets identified by each tool, broken down by whether the deletion overlaps with a RepeatMasker-annotated element. For all calls the maximum sensitivity cutoff was used.}
+\label{predsByRepmask}
+\end{table}
