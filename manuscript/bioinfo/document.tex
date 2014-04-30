@@ -127,7 +127,7 @@ Finally, and quite importantly from a practical point of view, our implementatio
 
 \begin{figure}
 \centering
-\includegraphics[width=.5\textwidth]{workflow_with_whirr.png}
+\includegraphics[width=.5\textwidth]{workflow_with_whirr.eps}
 \caption{An overview of the Cloudbreak workflow. Reads are first uploaded to a Hadoop cluster from local storage. Cloudbreak then executes three MapReduce jobs to process the data: 1) Mapping with sensitive settings. 2) Computation of features across the genome. 3) Calling structural variations based on the features computed in the previous step. Finally, SV predictions can be downloaded from the Hadoop cluster and examined. Cloudbreak can also use the Apache Whirr library to automatically provision Hadoop clusters on and deploy data to cloud providers such as Amazon Elastic Compute Cloud.}
 \label{cloudbreak_workflow}
 \end{figure}
@@ -252,7 +252,7 @@ There is no available test set of real Illumina sequencing data from a sample th
 
 \begin{figure*}[!tpb]
 \centering
-\includegraphics[width=1\textwidth]{chr2_rocs_runtimes_journal.pdf}
+\includegraphics[width=1\textwidth]{chr2_rocs_runtimes_journal.eps}
 \caption{Accuracy and runtime performance on a simulated data set. (a) Receiver Operating Characteristic (ROC) curves showing the specificity and sensitivity of each tool to deletions larger than 40bp on a simulated set of reads giving diploid coverage of 30X on human chromosome 2. Deletions from the Venter genome were randomly added to one or both haplotypes. Each point on a curve represents a different threshold on the confidence of predictions made by that tool. Thresholds vary by: Cloudbreak - likelihood ratio; BreakDancer, DELLY, GASVPro - number of supporting read pairs; Pindel - simple score. (b) ROC curves for insertion predictions. (c) Runtimes for each tool, not including alignment time, parallelized when possible (see Supplementary Material).}
 \label{chr2CombinedRoc}
 \end{figure*}
@@ -302,7 +302,7 @@ We downloaded a set of reads from Yoruban individual NA18507, experiment ERX0096
 
 \begin{figure*}
 \centering
-\includegraphics[width=1\textwidth]{NA18507_rocs_runtimes_journal.pdf}
+\includegraphics[width=1\textwidth]{NA18507_rocs_runtimes_journal.eps}
 \caption{Accuracy and performance on the 37X NA18507 sample. (a) ROC curve for deletion prediction performance, tested against the combined gold standard sets of deletions taken from~\cite{Kidd:2008p926},~\cite{Mills:2011fi}, and~\cite{GenomesProjectConsortium:2012co}. (b) ROC curve for insertion prediction performance. (c) Runtimes for each tool, not including alignment time, parallelized when possible (see Supplementary Material). }
 \label{NA18507CombinedRoc}
 \end{figure*}

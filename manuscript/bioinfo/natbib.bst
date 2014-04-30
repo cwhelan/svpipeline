@@ -240,6 +240,14 @@ FUNCTION {format.names}
       "{vv~}{ll}{, jj}{, f.}" format.name$ 't :=
       nameptr #1 >
         {
+	  nameptr #1
+          #1 + =
+          numnames #2
+          > and
+            { "others" 't :=
+              #1 'namesleft := }
+            'skip$
+          if$
           namesleft #1 >
             { ", " * t * }
             {
