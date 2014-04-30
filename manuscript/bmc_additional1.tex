@@ -61,7 +61,7 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{{\em Cloudbreak}: Accurate and Scalable Genomic Structural Variation Detection in the Cloud with MapReduce}
+\title{{\em Cloudbreak}: Accurate and Scalable Genomic Structural Variation Detection in the Cloud with MapReduce \\ (Appendix)}
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
@@ -106,7 +106,15 @@
 
 \maketitle
 
-\begin{figure}
+\tableofcontents
+
+\newpage
+
+\section{Additional Figures}
+
+\bigskip
+
+\begin{figure}[h]
 \centering
 \includegraphics[width=1\textwidth]{../figures/insert_size_mixtures.pdf}
 \caption{Illustration of insert size mixtures at individual genomic locations. A) There is no variant present at the location indicated by the vertical line (left), so the mix of insert sizes (right) follows the expected distribution of the library centered at 200bp, with a small amount of noise coming from low-quality mappings. B) A homozygous deletion of 50bp at the location has shifted the distribution of observed insert sizes. C) A heterozygous deletion at the location causes a mixture of normal and long insert sizes to be detected. D) A heterozygous small insertion shifts a portion of the mixture to have lower insert sizes.}
@@ -141,6 +149,8 @@
 \end{figure}
 
 \clearpage
+
+\section{Additional Tables}
 
 \begin{table}[h]
 \begin{center}
@@ -223,7 +233,7 @@
 \cline{2-6}
 \end{tabular}
 \end{center}
-\caption{Table A4. Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
+\caption{Confusion matrices for the predicted genotype of deletions found by Cloudbreak on both the simulated and NA18507 data sets.}
 \label{deletionGenotypeaccuracy}
 \end{table}
 
