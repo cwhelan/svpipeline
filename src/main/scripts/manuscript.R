@@ -6,6 +6,10 @@ library(VariantAnnotation)
 library(brew)
 library(ggplot2)
 
+fMeasure <- function(p, r) {
+  (2 * p * r) / (p + r) 
+}
+
 drawPerfLine <- function(perf, col, lineType, maxFP) {
   calls <- c(perf$Calls, min(perf$Calls) - min(perf$TP), 0)
   tp <- c(perf$TP, 0, 0)
@@ -69,7 +73,8 @@ sizeclasses <- function(sizelens) {
   sc[sizelens > 250 & sizelens <= 500] <- "251-500bp"
   sc[sizelens > 500 & sizelens <= 1000] <- "501-1000bp"
   sc[sizelens > 1000] <- "> 1000bp"  
-  factor(sc, levels=c("< 40bp", "40-100bp","101-250bp","251-500bp","501-1000bp","> 1000bp"),ordered=TRUE)
+  #factor(sc, levels=c("< 40bp", "40-100bp","101-250bp","251-500bp","501-1000bp","> 1000bp"),ordered=TRUE)
+  factor(sc, levels=c("< 40bp", "40-100bp","101-250bp","251-500bp","501-1000bp","> 1000bp"))
 }
 
 processDeletionPredictions <- function(name, predfile, trueDels) {
@@ -229,12 +234,12 @@ modilChr2InsertionHitsFileMaxSensitivity <- '~/Documents/gene_rearrange/svpipeli
 # # JCVI SIM WGS
 # 
 # # deletions
-# cloudbreakBWAWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/_allindels_100bp_dip/bwa_del.perf.txt'
-# breakdancerWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_35_2_3_del.perf.txt'
-# gasvProWGSDeletionPerfFile <-  '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/gasvpro_gte40.perf.txt'
-# dellyWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_gte40.perf.txt'
-# dellyBRWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort.delly_q0_c5_br.perf.txt'
-# pindelWGSDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/human_b36_male_WGS_venterindels_c15_i100_s30_rl100_sort_pindel_D_gte40.perf.txt'
+ cloudbreakBWAWholeGenomeDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_wholegenome_100bp_dip/bwa_gmm_dels.perf.txt'
+ breakdancerWholeGenomeDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_wholegenome_100bp_dip/human_b36_male_wholegenome_venterindels_c15_i100_s30_rl100_sort_35_2_3.bd_out.perf.txt'
+ # gasvProWGSDeletionPerfFile <-  '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/gasvpro_gte40.perf.txt'
+ dellyWholeGenomeDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_wholegenome_100bp_dip/bwa_delly_del.perf.txt'
+ dellyBRWholeGenomeDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_wholegenome_100bp_dip/bwa_delly_br.perf.txt'
+ pindelWholeGenomeDeletionPerfFile <- '~/Documents/gene_rearrange/svpipeline/venter_wholegenome_100bp_dip/bwa_pindel_dels.perf.txt'
 # 
 # cloudbreakBWAWGSDeletionPredictionsFileFDR10 <- '~/Documents/gene_rearrange/svpipeline/venter_WGS_allindels_100bp_dip/bwa_del_1p98.bed'
 # 
@@ -488,8 +493,12 @@ gasvFDR10 <- processDeletionPredictions('GASVPro', gasvProChr2DeletionHitsFileFD
 dellyFDR10 <- processDeletionPredictions('DELLY-RP', dellyChr2DeletionHitsFileFDR10, trueDels)
 dellyBRFDR10 <- processDeletionPredictions('DELLY-SR', dellyBRChr2DeletionHitsFileFDR10, trueDels)
 pindelFDR10 <- processDeletionPredictions('Pindel', pindelChr2DeletionHitsFileFDR10, trueDels)
-allpredsFDR10 <- rbind(as.data.frame(cbFDR10),as.data.frame(cbGEMFDR10),as.data.frame(bdFDR10),as.data.frame(gasvFDR10),as.data.frame(dellyFDR10),as.data.frame(dellyBRFDR10),as.data.frame(pindelFDR10))
+
+allpredsFDR10 <- rbind(as.data.frame(cbFDR10),as.data.frame(bdFDR10),as.data.frame(gasvFDR10),as.data.frame(dellyFDR10),as.data.frame(dellyBRFDR10),as.data.frame(pindelFDR10))
 allpredsFDR10 <- ddply(allpredsFDR10, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
+allpredsWithGemFDR10 <- rbind(as.data.frame(cbFDR10),as.data.frame(cbGEMFDR10),as.data.frame(bdFDR10),as.data.frame(gasvFDR10),as.data.frame(dellyFDR10),as.data.frame(dellyBRFDR10),as.data.frame(pindelFDR10))
+allpredsWithGemFDR10 <- ddply(allpredsWithGemFDR10, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
 
 #res preds
 cbRes1 <- processDeletionPredictions("1", "~/Documents/gene_rearrange/svpipeline/venter_chr2_allindels_100bp_dip/res_test_1_dels_gt198.hits.txt", trueDels)
@@ -504,6 +513,9 @@ resPreds <- ddply(resPreds, .(tok), function(x) { cbind(x, list(discoveries=rep(
 # tabulate against true deletion data
 predsBySizeFDR10 <- table(allpredsFDR10[,c('name','sizeclasses')])
 exBySizeFDR10 <- table(allpredsFDR10[which(allpredsFDR10$discoveries == 1),c('name','sizeclasses')])
+
+predsByRepMaskWithGemFDR10 <- table(allpredsWithGemFDR10[,c('name','repMask')])
+exPredsByRepMaskWithGemFDR10 <- table(allpredsWithGemFDR10[which(allpredsFDR10$discoveries == 1),c('name','repMask')])
 
 predsByRepMaskFDR10 <- table(allpredsFDR10[,c('name','repMask')])
 exPredsByRepMaskFDR10 <- table(allpredsFDR10[which(allpredsFDR10$discoveries == 1),c('name','repMask')])
@@ -525,18 +537,24 @@ chr2HapCMFDR10 <- table(cbpredsWithExtraDataFDR10$haps, cbpredsWithExtraDataFDR1
 
 # load true positive predictions
 cbMaxSensitivity <- processDeletionPredictions("Cloudbreak", cloudbreakBWAChr2DeletionHitsFileMaxSensitivity, trueDels)
+cbGEMMaxSensitivity <- processDeletionPredictions("Cloudbreak-GEM", cloudbreakGEMChr2DeletionHitsFileMaxSensitivity, trueDels)
 bdMaxSensitivity <- processDeletionPredictions('Breakdancer', breakdancerChr2DeletionHitsFileMaxSensitivity, trueDels)
 gasvMaxSensitivity <- processDeletionPredictions('GASVPro', gasvProChr2DeletionHitsFileMaxSensitivity, trueDels)
 dellyMaxSensitivity <- processDeletionPredictions('DELLY-RP', dellyChr2DeletionHitsFileMaxSensitivity, trueDels)
 dellyBRMaxSensitivity <- processDeletionPredictions('DELLY-SR', dellyBRChr2DeletionHitsFileMaxSensitivity, trueDels)
 pindelMaxSensitivity <- processDeletionPredictions('Pindel', pindelChr2DeletionHitsFileMaxSensitivity, trueDels)
 modilMaxSensitivity <- processDeletionPredictions('MoDIL', modilChr2DeletionHitsFileMaxSensitivity, trueDels)
+
 allpredsMaxSensitivity <- rbind(as.data.frame(cbMaxSensitivity),as.data.frame(bdMaxSensitivity),as.data.frame(gasvMaxSensitivity),as.data.frame(dellyMaxSensitivity),as.data.frame(dellyBRMaxSensitivity),as.data.frame(pindelMaxSensitivity),as.data.frame(modilMaxSensitivity))
 allpredsMaxSensitivity <- ddply(allpredsMaxSensitivity, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
+allpredsWithGEMMaxSensitivity <- rbind(as.data.frame(cbMaxSensitivity),as.data.frame(cbGEMMaxSensitivity),as.data.frame(bdMaxSensitivity),as.data.frame(gasvMaxSensitivity),as.data.frame(dellyMaxSensitivity),as.data.frame(dellyBRMaxSensitivity),as.data.frame(pindelMaxSensitivity),as.data.frame(modilMaxSensitivity))
+allpredsWithGEMMaxSensitivity <- ddply(allpredsWithGEMMaxSensitivity, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
 
 modilChr2DeletionPredictionsMaxSensitivity <- read.table(modilChr2DeletionPredictionsFileMaxSensitivity)
 
 totalCloudbreakChr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(cloudbreakBWAChr2DeletionPerf, chr2MaxSensitivityDelCutoffs['cloudbreakBWA'])
+totalCloudbreakGEMChr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(cloudbreakGEMChr2DeletionPerf, chr2MaxSensitivityDelCutoffs['cloudbreakGEM'])
 totalBreakdancerchr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(breakdancerChr2DeletionPerf, chr2MaxSensitivityDelCutoffs['breakdancer'])
 totalGASVProchr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(gasvChr2DeletionPerf, chr2MaxSensitivityDelCutoffs['GASVPro'])
 totalDELLYchr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(dellyChr2DeletionPerf, chr2MaxSensitivityDelCutoffs['DELLY'])
@@ -544,7 +562,7 @@ totalDELLYBRchr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(dellyBRChr
 totalPindelchr2MaxSensitivityDelPredictions <- numPredictionsAtLevel(pindelChr2DeletionPerf, chr2MaxSensitivityDelCutoffs['Pindel'])
 totalMoDILchr2MaxSensitivityDelPredictions <- dim(modilChr2DeletionPredictionsMaxSensitivity)[1]
 
-totalchr2MaxSensitivityDelPredictions <- list(Cloudbreak=totalCloudbreakChr2MaxSensitivityDelPredictions, 
+totalchr2MaxSensitivityDelPredictions <- list(Cloudbreak=totalCloudbreakChr2MaxSensitivityDelPredictions,
                                               Breakdancer=totalBreakdancerchr2MaxSensitivityDelPredictions, 
                                               GASVPro=totalGASVProchr2MaxSensitivityDelPredictions, 
                                               DELLY=totalDELLYchr2MaxSensitivityDelPredictions, 
@@ -553,8 +571,22 @@ totalchr2MaxSensitivityDelPredictions <- list(Cloudbreak=totalCloudbreakChr2MaxS
                                               MoDIL=totalMoDILchr2MaxSensitivityDelPredictions)
 totalchr2MaxSensitivityDelHits <- list(Cloudbreak=dim(cbMaxSensitivity)[1], Breakdancer=dim(bdMaxSensitivity)[1], GASVPro=dim(gasvMaxSensitivity)[1], DELLY=dim(dellyMaxSensitivity)[1], DELLYSR=dim(dellyBRMaxSensitivity)[1], Pindel=dim(pindelMaxSensitivity)[1], MoDIL=dim(modilMaxSensitivity)[1])
 
+totalchr2MaxSensitivityDelPredictionsWithGEM <- list(Cloudbreak=totalCloudbreakChr2MaxSensitivityDelPredictions,
+                                              CloudbreakGEM=totalCloudbreakGEMChr2MaxSensitivityDelPredictions,
+                                              Breakdancer=totalBreakdancerchr2MaxSensitivityDelPredictions, 
+                                              GASVPro=totalGASVProchr2MaxSensitivityDelPredictions, 
+                                              DELLY=totalDELLYchr2MaxSensitivityDelPredictions, 
+                                              DELLYSR=totalDELLYBRchr2MaxSensitivityDelPredictions, 
+                                              Pindel=totalPindelchr2MaxSensitivityDelPredictions, 
+                                              MoDIL=totalMoDILchr2MaxSensitivityDelPredictions)
+totalchr2MaxSensitivityDelHitsWithGEM <- list(Cloudbreak=dim(cbMaxSensitivity)[1], CloudbreakGEM=dim(cbGEMMaxSensitivity)[1], Breakdancer=dim(bdMaxSensitivity)[1], GASVPro=dim(gasvMaxSensitivity)[1], DELLY=dim(dellyMaxSensitivity)[1], DELLYSR=dim(dellyBRMaxSensitivity)[1], Pindel=dim(pindelMaxSensitivity)[1], MoDIL=dim(modilMaxSensitivity)[1])
+
+
 chr2MaxSensitivityDelPrecision <- unlist(totalchr2MaxSensitivityDelHits) / unlist(totalchr2MaxSensitivityDelPredictions)
 chr2MaxSensitivityDelRecall <- unlist(totalchr2MaxSensitivityDelHits) / length(trueDelsGte40)
+
+chr2MaxSensitivityDelPrecisionWithGEM <- unlist(totalchr2MaxSensitivityDelHitsWithGEM) / unlist(totalchr2MaxSensitivityDelPredictionsWithGEM)
+chr2MaxSensitivityDelRecallWithGEM <- unlist(totalchr2MaxSensitivityDelHitsWithGEM) / length(trueDelsGte40)
 
 # tabulate against true deletion data
 predsBySizeMaxSensitivity <- table(allpredsMaxSensitivity[,c('name','sizeclasses')])
@@ -563,11 +595,17 @@ exBySizeMaxSensitivity <- table(allpredsMaxSensitivity[which(allpredsMaxSensitiv
 predsByRepMaskMaxSensitivity <- table(allpredsMaxSensitivity[,c('name','repMask')])
 exPredsByRepMaskMaxSensitivity <- table(allpredsMaxSensitivity[which(allpredsMaxSensitivity$discoveries == 1),c('name','repMask')])
 
+predsByRepMaskMaxSensitivityWithGEM <- table(allpredsWithGEMMaxSensitivity[,c('name','repMask')])
+exPredsByRepMaskMaxSensitivityWithGEM <- table(allpredsWithGEMMaxSensitivity[which(allpredsWithGEMMaxSensitivity$discoveries == 1),c('name','repMask')])
+
 predsByHapMaxSensitivity <- table(allpredsMaxSensitivity[,c('name','haps')])
 exPredsByHapMaxSensitivity <- table(allpredsMaxSensitivity[which(allpredsMaxSensitivity$discoveries == 1),c('name','haps')])
 
 predsBySegDupMaxSensitivity <- table(allpredsMaxSensitivity[,c('name','segdup')])
 exPredsBySegDupMaxSensitivity <- table(allpredsMaxSensitivity[which(allpredsMaxSensitivity$discoveries == 1),c('name','segdup')])
+
+predsBySegDupMaxSensitivityWithGEM <- table(allpredsWithGEMMaxSensitivity[,c('name','segdup')])
+exPredsBySegDupMaxSensitivityWithGEM <- table(allpredsWithGEMMaxSensitivity[which(allpredsWithGEMMaxSensitivity$discoveries == 1),c('name','segdup')])
 
 # genotyping with extra data
 extraDataMaxSensitivity <- read.table(cloudbreakBWAChr2DeletionPredictionsFileMaxSensitivity, skip=1)
@@ -669,18 +707,18 @@ perfNames <- c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DEL
 legend(xy.coords(170,120), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3)
 dev.off()
 
-pdf(chr2ROCsMultipleMappingsFile, width=20)
-par(xpd=T, mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,6))
+pdf(chr2ROCsMultipleMappingsFile, width=18)
+par(mfrow=(c(1,2)), oma=par()$oma+c(0,0,0,3.5), cex=1.8)
 plotROC(perfsListDelsMultimapChr2, 
         c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", 
           "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
         totalDelsChr2, "Deletions",legendLoc=NULL, maxTP=350, colLtyMapping=myColLtyMapping)
-par(mar=par()$mar+c(0,0,0,12))
+par(mar=par()$mar+c(0,0,0,9))
 plotROC(perfsListInsertionsMultimapChr2, 
         c("Cloudbreak", "Breakdancer","Pindel", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM"), 
         totalInsertionsChr2, "Insertions",legendLoc=NA,  maxTP=totalInsertionsChr2, colLtyMapping=myColLtyMapping)
 perfNames <- c("Cloudbreak", "Breakdancer","Pindel", "GASVPro", "DELLY-RP", "DELLY-SR", "Cloudbreak-BWA-PE-MM", "Cloudbreak-GEM-SE-MM")
-legend(xy.coords(totalInsertionsChr2 * 1.1,100), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.9)
+legend(xy.coords(totalInsertionsChr2 * 1.2,120), legend=perfNames, col=getCols(perfNames, myColLtyMapping), lty=getLtys(perfNames, myColLtyMapping), lwd=3, cex=.7, xpd=T)
 dev.off()
 
 
@@ -715,15 +753,21 @@ trueInsertionsRepmask <- table(trueInsertionsGte40$repMask)
 
 # load true positive predictions
 cbInsertionsMaxSensitivity <- processInsertionPredictions("Cloudbreak", cloudbreakBWAChr2InsertionHitsFileMaxSensitivity, trueInsertions)
+cbGEMInsertionsMaxSensitivity <- processInsertionPredictions("Cloudbreak-GEM", cloudbreakGEMChr2InsertionHitsFileMaxSensitivity, trueInsertions)
 bdInsertionsMaxSensitivity <- processInsertionPredictions('Breakdancer', breakdancerChr2InsertionHitsFileMaxSensitivity, trueInsertions)
 pindelInsertionsMaxSensitivity <- processInsertionPredictions('Pindel', pindelChr2InsertionHitsFileMaxSensitivity, trueInsertions)
 modilInsertionsMaxSensitivity <- processInsertionPredictions('MoDIL', modilChr2InsertionHitsFileMaxSensitivity, trueInsertions)
+
 allpredsInsertionsMaxSensitivity <- rbind(as.data.frame(cbInsertionsMaxSensitivity),as.data.frame(bdInsertionsMaxSensitivity),as.data.frame(pindelInsertionsMaxSensitivity),as.data.frame(modilInsertionsMaxSensitivity))
 allpredsInsertionsMaxSensitivity <- ddply(allpredsInsertionsMaxSensitivity, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
+allpredsWithGEMInsertionsMaxSensitivity <- rbind(as.data.frame(cbInsertionsMaxSensitivity),as.data.frame(cbGEMInsertionsMaxSensitivity),as.data.frame(bdInsertionsMaxSensitivity),as.data.frame(pindelInsertionsMaxSensitivity),as.data.frame(modilInsertionsMaxSensitivity))
+allpredsWithGEMInsertionsMaxSensitivity <- ddply(allpredsWithGEMInsertionsMaxSensitivity, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
 
 modilChr2InsertionPredictionsMaxSensitivity <- read.table(modilChr2InsertionPredictionsFileMaxSensitivity)
 
 totalCloudbreakChr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(cloudbreakBWAChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['cloudbreakBWA'])
+totalCloudbreakGEMChr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(cloudbreakGEMChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['cloudbreakGEM'])
 totalBreakdancerchr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(breakdancerChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['breakdancer'])
 totalPindelchr2MaxSensitivityInsPredictions <- numPredictionsAtLevel(pindelChr2InsertionPerf, chr2MaxSensitivityInsCutoffs['Pindel'])
 totalMoDILchr2MaxSensitivityInsPredictions <- dim(modilChr2InsertionPredictionsMaxSensitivity)[1]
@@ -731,8 +775,14 @@ totalMoDILchr2MaxSensitivityInsPredictions <- dim(modilChr2InsertionPredictionsM
 totalchr2MaxSensitivityInsPredictions <- list(Cloudbreak=totalCloudbreakChr2MaxSensitivityInsPredictions, Breakdancer=totalBreakdancerchr2MaxSensitivityInsPredictions, Pindel=totalPindelchr2MaxSensitivityInsPredictions, MoDIL=totalMoDILchr2MaxSensitivityInsPredictions)
 totalchr2MaxSensitivityInsHits <- list(Cloudbreak=dim(cbInsertionsMaxSensitivity)[1], Breakdancer=dim(bdInsertionsMaxSensitivity)[1], Pindel=dim(pindelInsertionsMaxSensitivity)[1], MoDIL=dim(modilInsertionsMaxSensitivity)[1])
 
+totalchr2MaxSensitivityInsPredictionsWithGEM <- list(Cloudbreak=totalCloudbreakChr2MaxSensitivityInsPredictions, CloudbreakGEM=totalCloudbreakGEMChr2MaxSensitivityInsPredictions, Breakdancer=totalBreakdancerchr2MaxSensitivityInsPredictions, Pindel=totalPindelchr2MaxSensitivityInsPredictions, MoDIL=totalMoDILchr2MaxSensitivityInsPredictions)
+totalchr2MaxSensitivityInsHitsWithGEM <- list(Cloudbreak=dim(cbInsertionsMaxSensitivity)[1], CloudbreakGEM=dim(cbGEMInsertionsMaxSensitivity)[1], Breakdancer=dim(bdInsertionsMaxSensitivity)[1], Pindel=dim(pindelInsertionsMaxSensitivity)[1], MoDIL=dim(modilInsertionsMaxSensitivity)[1])
+
 chr2MaxSensitivityInsPrecision <- unlist(totalchr2MaxSensitivityInsHits) / unlist(totalchr2MaxSensitivityInsPredictions)
 chr2MaxSensitivityInsRecall <- unlist(totalchr2MaxSensitivityInsHits) / length(trueInsertionsGte40)
+
+chr2MaxSensitivityInsPrecisionWithGEM <- unlist(totalchr2MaxSensitivityInsHitsWithGEM) / unlist(totalchr2MaxSensitivityInsPredictionsWithGEM)
+chr2MaxSensitivityInsRecallWithGEM <- unlist(totalchr2MaxSensitivityInsHitsWithGEM) / length(trueInsertionsGte40)
 
 # tabulate against true insertion data
 insertionPredsBySizeMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[,c('name','sizeclasses')])
@@ -741,11 +791,17 @@ insertionExBySizeMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[which(
 insertionPredsByRepMaskMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[,c('name','repMask')])
 insertionExPredsByRepMaskMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[which(allpredsInsertionsMaxSensitivity$discoveries == 1),c('name','repMask')])
 
+insertionPredsByRepMaskMaxSensitivityWithGEM <- table(allpredsWithGEMInsertionsMaxSensitivity[,c('name','repMask')])
+insertionExPredsByRepMaskMaxSensitivityWithGEM <- table(allpredsWithGEMInsertionsMaxSensitivity[which(allpredsWithGEMInsertionsMaxSensitivity$discoveries == 1),c('name','repMask')])
+
 insertionPredsByHapMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[,c('name','haps')])
 insertionExPredsByHapMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[which(allpredsInsertionsMaxSensitivity$discoveries == 1),c('name','haps')])
 
 insertionPredsBySegDupMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[,c('name','segdup')])
 insertionExPredsBySegDupMaxSensitivity <- table(allpredsInsertionsMaxSensitivity[which(allpredsInsertionsMaxSensitivity$discoveries == 1),c('name','segdup')])
+
+insertionPredsBySegDupMaxSensitivityWithGEM <- table(allpredsWithGEMInsertionsMaxSensitivity[,c('name','segdup')])
+insertionExPredsBySegDupMaxSensitivityWithGEM <- table(allpredsWithGEMInsertionsMaxSensitivity[which(allpredsWithGEMInsertionsMaxSensitivity$discoveries == 1),c('name','segdup')])
 
 # genotyping insertions
 extraInsertionDataMaxSensitivity <- read.table(cloudbreakBWAChr2InsertionPredictionsFileMaxSensitivity, skip=1)
@@ -783,7 +839,7 @@ trueDelRepmaskNA18507 <- table(trueDelsNA18507Gte40$repMask)
 # 
 # na185071KGDels <- na185071KGDels[width(na185071KGDels) >= 40]
 
-mcols(trueDelsNA18507)$hap <- NA
+mcols(trueDelsNA18507)$hap <- -1
 
 newNA185071KGData <- read.table('/Users/cwhelan/Documents/gene_rearrange/svpipeline/NA18507/ALL.integrated_phase1_v3.20101123.snps_indels_svs.genotypes.NA18507.indels_and_svs.txt.gz',
                                     col.names=c('chrom', 'pos', 'ref', 'alt', 'gtr', 'gt', 'type', 'svtype', 'imprecise', 'end', 'cipos', 'ciend'))
@@ -840,7 +896,14 @@ totalDELLYNA18507DelPredictions <- numPredictionsAtLevel(NA18507dellyDelsPerf, N
 totalDELLYBRNA18507DelPredictions <- numPredictionsAtLevel(NA18507dellyBRDelsPerf, NA18507delCutoffs['DELLYSR'])
 totalPindelNA18507DelPredictions <- numPredictionsAtLevel(NA18507pindelDelsPerf, NA18507delCutoffs['Pindel'])
 
-totalNA18507DelPredictions <- list(Cloudbreak=totalCloudbreakNA18507DelPredictions,
+totalNA18507DelPredictions <- list(Cloudbreak=totalCloudbreakNA18507DelPredictions, #                                  CloudbreakGEM=totalCloudbreakGEMNA18507DelPredictions,
+                                   Breakdancer=totalBreakdancerNA18507DelPredictions, 
+                                   GASVPro=totalGASVProNA18507DelPredictions, 
+                                   DELLY=totalDELLYNA18507DelPredictions, 
+                                   DELLYBR=totalDELLYBRNA18507DelPredictions, 
+                                   Pindel=totalPindelNA18507DelPredictions)
+
+totalNA18507DelPredictionsWithGEM <- list(Cloudbreak=totalCloudbreakNA18507DelPredictions, 
                                    CloudbreakGEM=totalCloudbreakGEMNA18507DelPredictions,
                                    Breakdancer=totalBreakdancerNA18507DelPredictions, 
                                    GASVPro=totalGASVProNA18507DelPredictions, 
@@ -858,7 +921,14 @@ dellyHitsNA18507 <- processDeletionPredictions('DELLY-RP', dellyNA18507DeletionH
 dellyBRHitsNA18507 <- processDeletionPredictions('DELLY-SR', dellyBRNA18507DeletionHitsFile, trueDelsNA18507)
 pindelHitsNA18507 <- processDeletionPredictions('Pindel', pindelNA18507DeletionHitsFile, trueDelsNA18507)
 
-totalNumNA18507DeletionHits <- list(list(Cloudbreak=dim(cbHitsNA18507)[1],
+totalNumNA18507DeletionHits <- list(list(Cloudbreak=dim(cbHitsNA18507)[1], 
+                                         Breakdancer=dim(bdHitsNA18507)[1], 
+                                         GASVPro=dim(gasvHitsNA18507)[1], 
+                                         DELLY=dim(dellyHitsNA18507)[1], 
+                                         DELLYSR=dim(dellyBRHitsNA18507)[1], 
+                                         Pindel=dim(pindelHitsNA18507)[1]))
+
+totalNumNA18507DeletionHitsWithGEM <- list(list(Cloudbreak=dim(cbHitsNA18507)[1], 
                                          CloudbreakGEM=dim(cbGEMHitsNA18507)[1], 
                                          Breakdancer=dim(bdHitsNA18507)[1], 
                                          GASVPro=dim(gasvHitsNA18507)[1], 
@@ -869,8 +939,10 @@ totalNumNA18507DeletionHits <- list(list(Cloudbreak=dim(cbHitsNA18507)[1],
 NA18507DelPrecision <- unlist(totalNumNA18507DeletionHits) / unlist(totalNA18507DelPredictions)
 NA18507DelRecall <- unlist(totalNumNA18507DeletionHits) / length(trueDelsNA18507Gte40)
 
-allpredsNA18507 <- rbind(as.data.frame(cbHitsNA18507),
-                         as.data.frame(cbGEMHitsNA18507),
+NA18507DelPrecisionWithGEM <- unlist(totalNumNA18507DeletionHitsWithGEM) / unlist(totalNA18507DelPredictionsWithGEM)
+NA18507DelRecallWithGEM <- unlist(totalNumNA18507DeletionHitsWithGEM) / length(trueDelsNA18507Gte40)
+
+allpredsNA18507 <- rbind(as.data.frame(cbHitsNA18507), # as.data.frame(cbGEMHitsNA18507),
                          as.data.frame(bdHitsNA18507),
                          as.data.frame(gasvHitsNA18507),
                          as.data.frame(dellyHitsNA18507),
@@ -878,11 +950,23 @@ allpredsNA18507 <- rbind(as.data.frame(cbHitsNA18507),
                          as.data.frame(pindelHitsNA18507))
 allpredsNA18507 <- ddply(allpredsNA18507, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
 
+allpredsNA18507WithGEM <- rbind(as.data.frame(cbHitsNA18507), 
+                                as.data.frame(cbGEMHitsNA18507),
+                         as.data.frame(bdHitsNA18507),
+                         as.data.frame(gasvHitsNA18507),
+                         as.data.frame(dellyHitsNA18507),
+                         as.data.frame(dellyBRHitsNA18507),
+                         as.data.frame(pindelHitsNA18507))
+allpredsNA18507WithGEM <- ddply(allpredsNA18507WithGEM, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
 predsBySizeNA18507 <- table(allpredsNA18507[,c('name','sizeclasses')])
 exBySizeNA18507 <- table(allpredsNA18507[which(allpredsNA18507$discoveries == 1),c('name','sizeclasses')])
 
 predsByRepMaskNA18507 <- table(allpredsNA18507[,c('name','repMask')])
 exByRepMaskNA18507 <- table(allpredsNA18507[which(allpredsNA18507$discoveries == 1),c('name','repMask')])
+
+predsByRepMaskNA18507WithGEM <- table(allpredsNA18507WithGEM[,c('name','repMask')])
+exByRepMaskNA18507WithGEM <- table(allpredsNA18507WithGEM[which(allpredsNA18507WithGEM$discoveries == 1),c('name','repMask')])
 
 predsByHapNA18507 <- table(allpredsNA18507[,c('name','hap')])
 exByHapNA18507 <- table(allpredsNA18507[which(allpredsNA18507$discoveries == 1),c('name','hap')])
@@ -1023,19 +1107,27 @@ genotypedMillsInsertions <- merge(millsInsertionsWithIds, millsGenotypes, by="pr
  genotypedMillsInsertions$shorttok <- paste(genotypedMillsInsertions$chrom, ':', genotypedMillsInsertions$start)
 
 totalCloudbreakNA18507InsertionPredictions <- numPredictionsAtLevel(cloudbreakBWATweakNA18507InsertionsPerf, NA18507insertionCutoffs['cloudbreakBWATweak']) 
+totalCloudbreakGEMNA18507InsertionPredictions <- numPredictionsAtLevel(cloudbreakGEMNA18507InsertionsPerf, NA18507insertionCutoffs['cloudbreakGEM']) 
 totalBreakdancerNA18507InsertionPredictions <- numPredictionsAtLevel(breakdancerNA18507InsertionsPerf, NA18507insertionCutoffs['breakdancer']) 
 totalPindelNA18507InsertionPredictions <- numPredictionsAtLevel(pindelNA18507InsertionsPerf, NA18507insertionCutoffs['Pindel']) 
 
 # load true positive predictions
 cbInsertionsNA18507 <- processInsertionPredictions("Cloudbreak", cloudbreakBWATweakNA18507InsertionHitsFile, trueInsertionsNA18507)
+cbGEMInsertionsNA18507 <- processInsertionPredictions("Cloudbreak-GEM", cloudbreakGEMNA18507InsertionHitsFile, trueInsertionsNA18507)
 bdInsertionsNA18507 <- processInsertionPredictions('Breakdancer', breakdancerNA18507InsertionHitsFile, trueInsertionsNA18507)
 pindelInsertionsNA18507 <- processInsertionPredictions('Pindel', pindelNA18507InsertionHitsFile, trueInsertionsNA18507)
 
 allpredsInsertionsNA18507 <- rbind(as.data.frame(cbInsertionsNA18507),as.data.frame(bdInsertionsNA18507),as.data.frame(pindelInsertionsNA18507))
 allpredsInsertionsNA18507 <- ddply(allpredsInsertionsNA18507, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
 
+allpredsInsertionsNA18507WithGEM <- rbind(as.data.frame(cbInsertionsNA18507),as.data.frame(cbGEMInsertionsNA18507),as.data.frame(bdInsertionsNA18507),as.data.frame(pindelInsertionsNA18507))
+allpredsInsertionsNA18507WithGEM <- ddply(allpredsInsertionsNA18507WithGEM, .(tok), function(x) { cbind(x, list(discoveries=rep(dim(x)[1],dim(x)[1]))) })
+
 totalNA18507InsertionPredictions <- list(Cloudbreak=totalCloudbreakNA18507InsertionPredictions, Breakdancer=totalBreakdancerNA18507InsertionPredictions, Pindel=totalPindelNA18507InsertionPredictions)
 totalNumNA18507InsertionHits <- list(list(Cloudbreak=dim(cbInsertionsNA18507)[1], Breakdancer=dim(bdInsertionsNA18507)[1], Pindel=dim(pindelInsertionsNA18507)[1]))
+
+totalNA18507InsertionPredictionsWithGEM <- list(Cloudbreak=totalCloudbreakNA18507InsertionPredictions, CloudbreakGEM=totalCloudbreakGEMNA18507InsertionPredictions, Breakdancer=totalBreakdancerNA18507InsertionPredictions, Pindel=totalPindelNA18507InsertionPredictions)
+totalNumNA18507InsertionHitsWithGEM <- list(list(Cloudbreak=dim(cbInsertionsNA18507)[1], CloudbreakGEM=dim(cbGEMInsertionsNA18507)[1], Breakdancer=dim(bdInsertionsNA18507)[1], Pindel=dim(pindelInsertionsNA18507)[1]))
 
 # tabulate against true insertion data
 trueInsertionsNA18507Gte40 <- trueInsertionsNA18507[mcols(trueInsertionsNA18507)$length >= 40]
@@ -1051,6 +1143,9 @@ NA18507insertionExPredsBySize <- table(allpredsInsertionsNA18507[which(allpredsI
 
 NA18507insertionPredsByRepMask <- table(allpredsInsertionsNA18507[,c('name','repMask')])
 NA18507insertionExPredsByRepMask <- table(allpredsInsertionsNA18507[which(allpredsInsertionsNA18507$discoveries == 1),c('name','repMask')])
+
+NA18507insertionPredsByRepMaskWithGEM <- table(allpredsInsertionsNA18507WithGEM[,c('name','repMask')])
+NA18507insertionExPredsByRepMaskWithGEM <- table(allpredsInsertionsNA18507WithGEM[which(allpredsInsertionsNA18507$discoveries == 1),c('name','repMask')])
 
 NA18507insertionPredsByHap <- table(allpredsInsertionsNA18507[,c('name','hap')])
 NA18507insertionExPredsByHap <- table(allpredsInsertionsNA18507[which(allpredsInsertionsNA18507$discoveries == 1),c('name','hap')])
@@ -1166,6 +1261,23 @@ assign("NA18507Preds", NA18507insertionPredsByRepMask, envir=tableEnv)
 assign("NA18507ExPreds", NA18507insertionExPredsByRepMask, envir=tableEnv)
 brew('~/Documents/svpipeline/manuscript/insertionRepmask.table.brew.tex', env=tableEnv)
 
+# deletions and insertions in repetitive regions
+tableEnv = new.env()
+assign("chr2DelTotals", trueDelRepmask, envir=tableEnv)
+assign("chr2DelPreds", predsByRepMaskMaxSensitivityWithGEM, envir=tableEnv)
+assign("chr2ExDelPreds", exPredsByRepMaskMaxSensitivityWithGEM, envir=tableEnv)
+assign("NA18507DelTotals", trueDelRepmaskNA18507, envir=tableEnv)
+assign("NA18507DelPreds", predsByRepMaskNA18507WithGEM, envir=tableEnv)
+assign("NA18507ExDelPreds", exByRepMaskNA18507WithGEM, envir=tableEnv)
+assign("chr2InsTotals", trueInsertionsRepmask, envir=tableEnv)
+assign("chr2InsPreds", insertionPredsByRepMaskMaxSensitivityWithGEM, envir=tableEnv)
+assign("chr2ExInsPreds", insertionExPredsByRepMaskMaxSensitivityWithGEM, envir=tableEnv)
+assign("NA18507InsTotals", trueInsertionsNA18507Repmask, envir=tableEnv)
+assign("NA18507InsPreds", NA18507insertionPredsByRepMaskWithGEM, envir=tableEnv)
+assign("NA18507ExInsPreds", NA18507insertionExPredsByRepMaskWithGEM, envir=tableEnv)
+brew('~/Documents/svpipeline/manuscript/combinedRepmaskMultipleMappings.table.brew.tex', env=tableEnv)
+
+
 # genotyping
 tableEnv = new.env()
 assign("chr2HapCM", chr2HapCMFDR10, envir=tableEnv)
@@ -1178,10 +1290,6 @@ allpredsFDR10$lendiff <- with(allpredsFDR10, abs((predend - predstart) - (trueen
 ggplot(aes(y=lendiff,x=name),data=allpredsFDR10) + geom_boxplot() + xlab("") + ylab("Difference in length")
 dev.off()
 
-fMeasure <- function(p, r) {
-  (2 * p * r) / (p + r) 
-}
-  
 resolutionResults <- data.frame(rbind(c(1, 4760.3, 274, 228),
                            c(5, 974.4, 268, 228),
                            c(10, 519.4, 258, 223),
@@ -1250,8 +1358,9 @@ dev.off()
 #   theme(panel.border=element_rect(colour="black"))
 # dev.off()
 
-cairo_pdf('~/Documents/svpipeline/figures/chr2BestRuntimes_horizontal.pdf', height=3, width=8)
+cairo_pdf('~/Documents/svpipeline/figures/chr2BestRuntimes_horizontal.pdf', height=4.5, width=10)
 ggplot(bestChr2Runtimes, aes(y=reorder(name,runtimes), x=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  geom_text(aes(label=runtimes),hjust=0.5, vjust=-1) +
   scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + 
   ylab("") + 
   xlab("Runtime (s)") + theme_bw(base_family= 'Helvetica')  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
@@ -1271,8 +1380,9 @@ ggplot(bestNA18507Runtimes, aes(x=reorder(name,runtimes), y=runtimes)) + geom_po
   theme(panel.border=element_rect(colour="black"))
 dev.off()
 
-cairo_pdf('~/Documents/svpipeline/figures/NA18507BestRuntimes_horizontal.pdf', height=3, width=8)
+cairo_pdf('~/Documents/svpipeline/figures/NA18507BestRuntimes_horizontal.pdf', height=4.5, width=10)
 ggplot(bestNA18507Runtimes, aes(y=reorder(name,runtimes), x=runtimes)) + geom_point(aes(colour=reorder(name,runtimes)), size=5) +
+  geom_text(aes(label=runtimes),hjust=0.5, vjust=-1) +
   scale_colour_manual(values=colorsByRuntime(bestChr2Runtimes, myColLtyMapping, nameMap=list(DELLY="DELLY-RP"))) + ylab("") + 
   xlab("Runtime (s)") + theme_bw()  + theme(axis.text.x=element_text(angle=-90)) + theme(text=element_text(size=18)) +
   theme(panel.grid.major.y=element_line(linetype = c("28"), color="black")) + theme(legend.position="none") +
@@ -1333,4 +1443,31 @@ pdf("~/Documents/svpipeline/figures/breakpointResolutionNA18507_withCRF.pdf", wi
 ggplot(aes(y=lendiff,x=name),data=allpredsNA18507) + geom_boxplot() + xlab("") + 
   ylab("Difference in length between prediction and gold standard") + ggtitle("NA18507 Deletion Breakpoint Resolution")
 dev.off()
+
+# Whole genome simulation
+totalDelsWholeGenome <- 5754
+cloudbreakBWAWholeGenomeDeletionPerf <- read.table(cloudbreakBWAWholeGenomeDeletionPerfFile, header=TRUE, sep="\t")
+breakdancerWholeGenomeDeletionPerf <- read.table(breakdancerWholeGenomeDeletionPerfFile, header=TRUE)
+dellyWholeGenomeDeletionPerf <- read.table(dellyWholeGenomeDeletionPerfFile, header=TRUE)
+dellyBRWholeGenomeDeletionPerf <- read.table(dellyBRWholeGenomeDeletionPerfFile, header=TRUE)
+pindelWholeGenomeDeletionPerf <- read.table(pindelWholeGenomeDeletionPerfFile, header=TRUE)
+
+perfsListDelsWholeGenome <- list(cloudbreak=cloudbreakBWAWholeGenomeDeletionPerf, breakdancer=breakdancerWholeGenomeDeletionPerf, pindel=pindelWholeGenomeDeletionPerf, delly=dellyWholeGenomeDeletionPerf, dellyBR=dellyBRWholeGenomeDeletionPerf)
+
+pdf("~/Documents/svpipeline/figures/wholeGenomeSimulationDeletionsROC.pdf", width=10)
+par(xpd=T, mar=par()$mar+c(0,0,0,7))
+plotROC(perfsListDelsWholeGenome, 
+        c("Cloudbreak", "Breakdancer","Pindel", "DELLY-RP", "DELLY-SR"), 
+        totalDelsWholeGenome, "Deletions in Venter Diploid Whole Genome simulation",legendLoc=xy.coords(6200,2000), maxTP=4000, 
+        colLtyMapping=myColLtyMapping)
+dev.off()
+
+# crf label tests
+crfLabelRes <- data.frame(tp=c(1137,1221,1120,1042), calls=c(9268,12328,13025,12875))
+crfLabelRes$fp <- crfLabelRes$calls - crfLabelRes$tp
+crfLabelRes$prec <- crfLabelRes$tp / crfLabelRes$calls
+crfLabelRes$rec <- crfLabelRes$tp / 9271
+crfLabelRes$f1 <- fMeasure(crfLabelRes$prec, crfLabelRes$rec)
+
+
 
